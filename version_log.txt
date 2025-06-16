@@ -1,0 +1,27 @@
+--------------------------------[Version log]--------------------------------
+
+Version: v.0.1.0 Alpha
+- Start version with endless mode for one grid
+
+Version: v.0.2.0 Alpha
+- Implemented levels menu where there are different unlockable levels
+
+Version: v.0.3.0 Alpha
+- Added new gamemode: endless
+- Game contains two modes: classic mode and endless mode
+- Added menu option: version log to check for version log
+- Polished the game by removing excessive text output
+- Smoother input for menu navigation and gameplay (no need to press enter after each key press except for when changing size in options)
+
+Version: v.0.4.0 Alpha 
+- Optimized game
+- Optimized locked message for locked levels
+- Added 5 new levels
+
+Version: v.0.5.0 Alpha (Current Version)
+- Added 5 new levels
+- Added new snack types. More yum!
+- Added traps to the game, something to watch out for!
+- Added a powerup. I wonder what it does.
+- Added save file mechanic. I can finally save my progress!
+- Save file management is in options. Finally some use for options!

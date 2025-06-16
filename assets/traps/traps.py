@@ -1,0 +1,21 @@
+# Trap class for the game
+from typing import List
+import random
+
+class Trap:
+    def spawn_trap(self, board: List[List[str]], occupied_positions: List[List[int]]) -> None:
+        '''
+            Spawns a trap on the board at a random available position.
+            Args:
+                board: The board where the trap will be spawned.
+        '''
+        self._position = [random.randint(0, len(board)-1), random.randint(0, len(board)-1)]
+
+        while self._position in occupied_positions or board[self._position[0]][self._position[1]] != ' ':
+            self._position = [random.randint(0, len(board)-1), random.randint(0, len(board)-1)]    
+    
+    def reveal_trap(self, board: List[List[str]]) -> None:
+        board[self._position[0]][self._position[1]] = self._trap_entity
+    
+    def hide(self, board: List[List[str]]) -> None:
+        board[self._position[0]][self._position[1]] = ' '
