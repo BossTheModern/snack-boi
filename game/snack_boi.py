@@ -1,4 +1,9 @@
-# Game module for handling essential game mode mechanics
+'''
+    snack_boi.py
+    
+    Game module for where the main game logic lies for both classic and 
+    endless gamemode
+'''
 import sys
 import os
 import keyboard
@@ -25,7 +30,7 @@ sys.path.insert(0, traps_path)
 sys.path.insert(0, snacks_path)
 sys.path.insert(0, levels_path)
 
-from board_creator import draw_grid, obstacle_char
+from board_creator import draw_grid, OBSTACLE_CHAR
 from levels import Levels
 from snack import Snack
 from snack_types import SuperSnack, FakeSnack, NormalSnack
@@ -42,7 +47,6 @@ from text_collection import TextCollection
 
 # Game class where the game logic is implemented
 class Game:
-    # Version variable
     _version: str = "0.5.0 alpha"
     
     # Validation properties 
@@ -91,7 +95,10 @@ class Game:
         self.menu: Menu = Menu(self.game_loop)
     
     def eat_snack(self, current_lvl_index: int) -> None:
-        # handle extra snack logic for levels starting from set level
+        '''
+            Handles eating snack based on whether the player have reached
+            a minimum level for newer snacks or not
+        '''
         if current_lvl_index >= self._lvl_cond-1:
             match self._current_snack._type:
                 case 'normal':
@@ -120,7 +127,9 @@ class Game:
         self._recon_snack._counter = 0
 
     def game_spawn_snack(self, grid: List[List[str]], occupied_positions: List[List[int]], snack_num: int) -> None:
-        # Spawn snack based on the number generated
+        '''
+            Spawns snack based on the snack number generated on the board
+        '''
         match snack_num:
             case 1:
                 self._normal_snack.spawn_snack(grid, occupied_positions)
@@ -141,6 +150,10 @@ class Game:
 
     # object tracker for debugging purposes
     def print_obj_tracker(self, occupied_positions: List[List[int]]) -> None:
+        '''
+            Tracks all objects existing in the board by providing positional
+            data for each of them. Used for debugging purposes
+        '''
         print(f"Current snack position: {self._current_snack._position}")
         print(f"Number of traps: {len(self._traps)}")
         
@@ -205,8 +218,10 @@ class Game:
             draw_grid(grid)
             print("Snack count:", self._snack._count)
         
-        # Handler for classic game win
         def classic_game_win(current_lvl_index: int) -> None:
+            '''
+                Handles winning logic for classic game mode
+            '''
             next_level_index: int
             print("You win! You have eaten enough snacks!")
 
@@ -222,7 +237,7 @@ class Game:
                 self._classic_levels[current_lvl_index]._cleared = True
         
         # Game setup
-        self._player.spawn_player(board, obstacle_char)
+        self._player.spawn_player(board, OBSTACLE_CHAR)
 
         # Add new snack logic available starting from certain levels
         if current_level_index >= self._lvl_cond-1:
@@ -236,33 +251,31 @@ class Game:
             occupied_positions.append(self._current_snack._position)
 
         
-        # Enable traps starting from a set level
-        if current_level_index >= self._trap_start_lvl-1:
-            # setup hunger traps
+        # Enable traps and spawn them starting from a set level
+        # Enable recon snack starting from the same level
+        if current_level_index >= self._trap_start_lvl-1:            
             for _ in range(self._hunger_traps_limit):
                 self._hunger_traps.append(HungerTrap(self._snack))
             
-            # setup parallel dimension traps
             for _ in range(self._parallel_traps_limit):
                 self._parallel_dimension_traps.append(ParallelDimensionTrap(self._player))
 
-            # Merge traps together and spawn them            
+                        
             self._traps = self._hunger_traps + self._parallel_dimension_traps
 
             for trap in self._traps:
                 trap.spawn_trap(board, occupied_positions)
                 occupied_positions.append(trap._position)
             
-            # Enable recon snack
             recon_start_reached = True
         
-        # Intro flag toggle conditions
+        
         levels_unlocked = len([lvl for lvl in self._classic_levels if lvl._unlocked == True])
 
         # Game loop handling both modes
         while True:
+            # Intro text before game display
             if intro_show_state:
-                # Intro text before game display
                 match levels_unlocked:
                     case 1: self._fancy_print.print_text_line(self._text_collection._start_intro)
                     case self._lvl_cond: self._fancy_print.print_text_line(self._text_collection._extra_snack_intro)
@@ -276,7 +289,7 @@ class Game:
                 if self._snack._count >= self._classic_levels[current_level_index]._win_cap:
                     classic_game_win(current_level_index)
                     break
-
+            
             if show_state:
                 match game_mode:
                     case 'classic':
@@ -290,6 +303,7 @@ class Game:
                 print("Super snack spawned! Eat it for extra points!") if self._current_snack._type == 'super' else None
                 print(f"Recon duration: {recon_duration} moves") if self._recon_snack._active else None
                 
+                # Supplementary toggle text
                 if self._recon_snack._spawned:
                     print("Oh, I see a powerup over there. Let's get it!") 
                     self._recon_snack._spawned = False
@@ -329,7 +343,7 @@ class Game:
             
             # Handle player movement
             if key_event.event_type == keyboard.KEY_DOWN and key_event.name in self._valid_move_keys:
-                self._player.move_player(key_event, board, obstacle_char, self._player._position)
+                self._player.move_player(key_event, board, OBSTACLE_CHAR, self._player._position)
 
                 if self._recon_snack._active:
                     recon_duration -= 1
@@ -401,6 +415,9 @@ class Game:
         print("Quitting game, back to main menu")
 
     def game_menu(self) -> None:
+        '''
+            Game's main menu with saving prompt upon closing the game
+        '''
         key_event: KeyboardEvent
         show_menu: bool = True
 
