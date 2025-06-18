@@ -23,7 +23,7 @@ sys.path.insert(0, printer_dir)
 sys.path.insert(0, snacks_dir)
 
 from grid_collection import empty_grid
-from board_creator import draw_grid, obstacle_char
+from board_creator import draw_grid, OBSTACLE_CHAR
 from fancy_printer import FancyPrinter
 from snack import Snack
 
@@ -112,7 +112,7 @@ class ParallelDimensionTrap(Trap):
 
             # Handle player movement in parallel dimension
             if key_event.event_type == keyboard.KEY_DOWN and key_event.name in self._valid_move_keys:
-                self._player.move_player(key_event, self._parallel_board, obstacle_char, self._player._parallel_position)
+                self._player.move_player(key_event, self._parallel_board, OBSTACLE_CHAR, self._player._parallel_position)
                 show_board = True
 
             # Handle player finding hidden trigger
