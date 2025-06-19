@@ -14,6 +14,7 @@ rectangular_grid_void_2: List[List[str]] = [[' ' for _ in range(3)] for _ in ran
 def border_line(length: int) -> None:
     '''
         Draws a border line with specified pattern with specified length:
+        Example of border line with length = 5
         |---|---|---|---|---|
     '''
     print("|", end="")
@@ -46,7 +47,7 @@ def is_within_bounds(grid: List[List[str]], row: int, col: int) -> bool:
 def add_obstacles_vertically(grid: List[List[str]], row: int, col: int, length: int, char: str) -> None:
     '''
         adds obstacles vertically starting from a set point on the board
-        with a set length
+        to a set length
     '''
     if not is_within_bounds(grid, row-1, col-1):
         return
@@ -59,7 +60,7 @@ def add_obstacles_vertically(grid: List[List[str]], row: int, col: int, length: 
 def add_obstacles_horizontally(grid: List[List[str]], row: int, col: int, length: int, char: str) -> None:
     '''
         adds obstacles horizontally starting from a set point on the board
-        with a set length
+        to a set length
     '''
     if not is_within_bounds(grid, row-1, col-1):
         return 
@@ -71,7 +72,7 @@ def add_obstacles_horizontally(grid: List[List[str]], row: int, col: int, length
 
 def add_obstacle(grid: List[List[str]], row: int, col: int, char: str) -> None:
     '''
-        Adds the obstacle to the specified position on the board
+        Adds an obstacle to the specified position on the board
     '''
     if not is_within_bounds(grid, row-1, col-1):
         return

@@ -1,4 +1,9 @@
-# Class for the different trap types in the game
+'''
+    trap_types.py
+
+    Handles logic for different types of traps. All of them are children of
+    Trap class
+'''
 from traps import Trap
 from typing import List
 from player import Player
@@ -28,6 +33,9 @@ from fancy_printer import FancyPrinter
 from snack import Snack
 
 class HungerTrap(Trap):
+    '''
+        Hunger trap that reduces snack count upon stepping on it
+    '''
     def __init__(self, snack: Snack) -> None:
         self._trap_entity: str = 'H'
         self._type: str = 'hunger'
@@ -55,6 +63,10 @@ class HungerTrap(Trap):
 
 
 class ParallelDimensionTrap(Trap):
+    '''
+        Parallel dimension trap that sends players to an empty parallel
+        dimension upon triggering it
+    '''
     def __init__(self, player: Player) -> None:
         self._player: Player = player
         self._trap_entity: str = 'Ø'
@@ -73,9 +85,10 @@ class ParallelDimensionTrap(Trap):
     
     def teleport_player(self, game_mode: str) -> None:
         '''
-            Teleports the player to a parallel dimension (empty 10 x 10 grid)
+            Teleports the player to a parallel dimension
             Once the player is teleported, they have to find a hidden trigger.
-            When the hidden trigger is found, it will activate the exit
+            When the hidden trigger is found, it will activate the exit 
+            allowing the player to escape
         '''
         key_event: KeyboardEvent
         show_board: bool = True

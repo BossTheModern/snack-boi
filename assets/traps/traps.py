@@ -1,11 +1,16 @@
-# Trap class for the game
+'''
+    traps.py
+
+    Parent class containing methods that is shared across all traps
+'''
 from typing import List
 import random
 
 class Trap:
     def spawn_trap(self, board: List[List[str]], occupied_positions: List[List[int]]) -> None:
         '''
-            Spawns a trap on the board at a random available position.
+            Spawns a trap on the board at a random available position. The
+            traps are hidden by default
             Args:
                 board: The board where the trap will be spawned.
         '''

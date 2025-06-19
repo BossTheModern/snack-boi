@@ -1,4 +1,8 @@
-# Levels module to serve as a database of levels from Level class
+'''
+    levels.py
+
+    A colection of all levels in the game
+'''
 import os
 import sys
 from typing import List

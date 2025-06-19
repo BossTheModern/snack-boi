@@ -1,4 +1,8 @@
-# Recon snack powerup that spawns and reveals trap location
+'''
+    recon_snack.py
+
+    Handles logic for powerup recon snack
+'''
 from typing import List
 import random
 import os

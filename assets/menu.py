@@ -1,8 +1,8 @@
-# Menu module consiting of menu display and menu logic functions
+'''
+    menu.py
 
-# TODO:
-# Consider adding type hint for file reading
-
+    Module that handles menu navigation and action logic
+'''
 import sys, os, copy, keyboard
 from typing import List, Callable
 from save_file import SaveFile
@@ -38,12 +38,18 @@ class Menu:
         self.game_loop = game_loop
     
     def print_welcome_screen(self) -> None:
+        '''
+            prints the welcome screen that runs upon booting the game
+        '''
         text: str = "Welcome to snack boi!\n" \
                     "Press any button to continue"
 
         self._fancy_print.print_text(text)
 
     def print_game_menu(self, version: str, menu_options: List[str]) -> None:
+        '''
+            Prints the main menu of the game
+        '''
         print("-----[Snack boi]-----")
         print(f"[{menu_options[0]}] Start Game")
         print(f"[{menu_options[1]}] Options")
@@ -53,6 +59,9 @@ class Menu:
         print("---------------------")   
     
     def print_version_log(self) -> None:
+        '''
+            Prints the contents of version log file
+        '''
         file_content: str
         file_path: str
         try:
@@ -66,6 +75,10 @@ class Menu:
             print("Error: Could not read file")
     
     def version_log(self) -> None:
+        '''
+            Prints the contents of the version log file and prompts the user
+            to return to menu
+        '''
         display_text: bool = True
         key_event: KeyboardEvent
         
@@ -83,6 +96,9 @@ class Menu:
         print("Returning to menu")
 
     def print_endless_mode_levels_menu(self, levels: List[Level]) -> None:
+        '''
+            Prints menu for levels on endless mode
+        '''
         counter: int = 0
 
         print("-----[ENDLESS MODE LEVELS]-----\n")
@@ -104,6 +120,9 @@ class Menu:
         print("-------------------------------")
     
     def print_level_menu(self, levels: List[Level]) -> None:
+        '''
+            Prints menu for levels on classic mode
+        '''
         counter: int = 0
 
         print("-----[CLASSIC MODE LEVELS]-----\n")
@@ -134,6 +153,9 @@ class Menu:
     
 
     def mode_selection_menu(self, levels: List[Level]) -> None:
+        '''
+            Logic for handling mode selection and displaying its menu
+        '''
         show_menu: bool = True
 
         def print_mode_selection_menu() -> None:
@@ -164,6 +186,9 @@ class Menu:
                 break 
     
     def fetch_progress(self, save_file: SaveFile) -> None:
+        '''
+            Fetches progress and displays it on the menu
+        '''
         key_event: KeyboardEvent
         show_text: bool = True
 
@@ -207,6 +232,9 @@ class Menu:
         
 
     def game_options(self, board: List[Level], save_file: SaveFile) -> None:
+        '''
+            Logic for handling options and displaying its menu
+        '''
         show_menu: bool = True
         show_save_menu: bool = True
         key_event: KeyboardEvent
@@ -284,6 +312,9 @@ class Menu:
         print("Returning to main menu")
     
     def navigate_selection(self, input: KeyboardEvent, levels: List[Level]) -> None:
+        '''
+            Logic for naviagting selection of levels from existing gamemodes
+        '''
         # Find index of currently selected level
         current_lvl_index: int = 0
 
@@ -307,6 +338,9 @@ class Menu:
             levels[current_lvl_index]._selected = False
     
     def level_menu(self, levels: List[Level]) -> None:
+        '''
+            Logic for handling classic level naviagtion and selection
+        '''
         selected_level: Level
         original_grid: List[List[str]]
         show_menu: bool = True
@@ -338,6 +372,9 @@ class Menu:
                 show_menu = True
     
     def endless_mode_levels_menu(self, levels: List[Level]) -> None:
+        '''
+            Logic for handling endless levels navigation and selection
+        '''
         selected_level: Level
         original_grid: List[List[str]]
         show_menu: bool = True
@@ -367,5 +404,6 @@ class Menu:
                 self.navigate_selection(key_event, levels)
                 show_menu = True
     
+    # UNDER DEVELOPMENT: Merging menu displays for existing gamemodes
     def merged_levels_menu(self, levels: List[Level], mode: str) -> None:
         pass
