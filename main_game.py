@@ -1,4 +1,8 @@
-# Starting point of the game
+'''
+    main_game.py
+
+    the starting point of the game
+'''
 import os
 import sys
 

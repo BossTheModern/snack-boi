@@ -1,4 +1,9 @@
-# Text collection to store text for fancy printing
+'''
+    text_collection.py    
+
+    Module working as a collection of text in a format compatible for
+    printing usign FancyPrint module
+'''
 
 class TextCollection: 
     def __init__(self) -> None:

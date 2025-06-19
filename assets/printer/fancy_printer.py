@@ -1,4 +1,16 @@
-# Fancy printer to print text strings in a writing motion
+'''
+    fancy_printer.py
+
+    Handles printing a text line by line with a given format in a writing 
+    motion
+
+    Format:
+    Some text line \n
+    Some text line some text line \n
+
+    \n is the default pause marker for each line where any logic can follow
+    after it is read
+'''
 import keyboard
 import time
 from keyboard import KeyboardEvent

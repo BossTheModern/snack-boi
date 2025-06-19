@@ -1,4 +1,9 @@
-# Snack module with related data and handling spawn logic
+'''
+    snack.py
+
+    Parent class containing fields and methods that is shared across all types
+    of snacks
+'''
 from typing import List
 import random
 

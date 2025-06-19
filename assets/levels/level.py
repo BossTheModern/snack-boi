@@ -1,4 +1,8 @@
-# Level module as a template for game levels
+'''
+    level.py
+
+    Blueprint of individual levels
+'''
 from typing import List
 
 class Level:

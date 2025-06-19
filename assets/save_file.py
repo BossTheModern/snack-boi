@@ -1,3 +1,13 @@
+'''
+    save_file.py
+
+    Handles save file logic (load, save, delete) for files sent from
+    save_files directory as argument upon initialization
+
+    Target file format:
+    highest_unlcoked_level: (int number)
+    highest_cleared_level: (int number)
+'''
 from typing import Dict, List
 import os
 import sys 
@@ -16,6 +26,10 @@ class SaveFile:
         self._already_saved: bool = False
 
     def load(self, levels: List[Level]) -> None:
+        '''
+            Loads specified file and its data to class, then unlocks and clears 
+            levels accordingly
+        '''
         try:            
             with open(self._file_path) as file:
                 highest_unlocked_lvl = file.readline().strip().split(':')[1]
@@ -49,6 +63,10 @@ class SaveFile:
             print(f"Error while loading save file: {e}")
     
     def save(self, levels: List[Level]) -> None:
+        '''
+            Saves game level progression to class and writes the new 
+            progression to target file
+        '''
         # Find the highest unlocked and cleared levels
         highest_unlocked_level: int = 0
         highest_cleared_level: int = 0
