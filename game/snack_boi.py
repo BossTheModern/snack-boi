@@ -32,6 +32,7 @@ sys.path.insert(0, levels_path)
 
 from utils import consts
 from utils import debug
+from utils import keyboard_utils
 from board_creator import draw_grid, OBSTACLE_CHAR
 from levels import Levels
 from snack import Snack
@@ -99,9 +100,6 @@ class Game:
         else:
             print("Snack eaten!")
             self._snack._count += 1
-
-    def check_key_event(self, key_event: KeyboardEvent, target_key: str):
-        return key_event.event_type == keyboard.KEY_DOWN and key_event.name == target_key
     
     def clear_game_data(self) -> None:
         self._player._position.clear()
@@ -301,7 +299,7 @@ class Game:
 
             key_event = keyboard.read_event(suppress=True)
 
-            if self.check_key_event(key_event, 'q'):
+            if keyboard_utils.check_key_event(key_event, 'q'):
                 break
             
             # Handle player movement
@@ -408,16 +406,16 @@ class Game:
 
             key_event = keyboard.read_event(suppress=True)
 
-            if self.check_key_event(key_event, self._main_menu_options[0]):
+            if keyboard_utils.check_key_event(key_event, self._main_menu_options[0]):
                 self.menu.mode_selection_menu(self._classic_levels)
                 show_menu = True
-            elif self.check_key_event(key_event, self._main_menu_options[1]):
+            elif keyboard_utils.check_key_event(key_event, self._main_menu_options[1]):
                 self.menu.game_options(self._classic_levels, self._save_file)
                 show_menu = True
-            elif self.check_key_event(key_event, self._main_menu_options[2]):
+            elif keyboard_utils.check_key_event(key_event, self._main_menu_options[2]):
                 self.menu.version_log()
                 show_menu = True
-            elif self.check_key_event(key_event, self._main_menu_options[3]):
+            elif keyboard_utils.check_key_event(key_event, self._main_menu_options[3]):
                 break
         
         save_prompt() if not self._save_file._already_saved else None
