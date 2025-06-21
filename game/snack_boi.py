@@ -61,7 +61,6 @@ class Game:
     _super_snack: SuperSnack = SuperSnack()
     _fake_snack: FakeSnack = FakeSnack()
     _current_snack: Snack
-    _previous_snack: Snack
 
     # Trap related properties
     _hunger_traps: List[Trap] = []
@@ -208,7 +207,6 @@ class Game:
         else:
             self._normal_snack.spawn_snack(board, occupied_positions)
             self._current_snack = self._normal_snack
-            self._previous_snack = self._current_snack
             occupied_positions.append(self._current_snack._position)
 
         
