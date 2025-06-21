@@ -30,6 +30,8 @@ sys.path.insert(0, traps_path)
 sys.path.insert(0, snacks_path)
 sys.path.insert(0, levels_path)
 
+from utils import consts
+from utils import debug
 from board_creator import draw_grid, OBSTACLE_CHAR
 from levels import Levels
 from snack import Snack
@@ -46,9 +48,7 @@ from text_collection import TextCollection
 
 
 # Game class where the game logic is implemented
-class Game:
-    _version: str = "0.5.0 alpha"
-    
+class Game:    
     # Validation properties 
     _valid_move_keys: List[str] = ['w', 'a', 's', 'd']
     _main_menu_options: List[str] = ['1', '2', '3', '4']
@@ -63,28 +63,17 @@ class Game:
     _previous_snack: Snack
 
     # Trap related properties
-    _hunger_traps_limit: int = 7
     _hunger_traps: List[Trap] = []
     _parallel_dimension_traps: List[Trap] = []
-    _parallel_traps_limit: int = 4
     _traps: List[Trap] = []
 
     # Powerup related properties
     _recon_snack: ReconSnack = ReconSnack()
     _recon_duration: int = 3
-    _recon_requirement: int = 3
     
     # Levels related properties
     _new_levels: Levels = Levels()
-    # Requirement lvl is by index
-    _trap_start_lvl: int = 8
-    _lvl_cond: int = 5
     _classic_levels: List[Level] = _new_levels._classic_levels_set_1
-
-    # "Introduced to feature" flags
-    _first_play_ever: bool = False
-    _new_snacks_introduced: bool = False
-    _traps_introduced: bool = False
 
     # Other properties
     _save_file: SaveFile = SaveFile(os.path.join(save_files_path, 'save_file.txt'))
@@ -99,7 +88,7 @@ class Game:
             Handles eating snack based on whether the player have reached
             a minimum level for newer snacks or not
         '''
-        if current_lvl_index >= self._lvl_cond-1:
+        if current_lvl_index >= consts.NEW_SNACKS_START_LVL-1:
             match self._current_snack._type:
                 case 'normal':
                     self._snack._count += 1
@@ -147,32 +136,6 @@ class Game:
     def actiavte_parallel_trap(self, parallel_trap: ParallelDimensionTrap, game_mode: str) -> None:
             parallel_trap.teleport_player(game_mode)
             self._traps.remove(parallel_trap)
-
-    # object tracker for debugging purposes
-    def print_obj_tracker(self, occupied_positions: List[List[int]]) -> None:
-        '''
-            Tracks all objects existing in the board by providing positional
-            data for each of them. Used for debugging purposes
-        '''
-        print(f"Current snack position: {self._current_snack._position}")
-        print(f"Number of traps: {len(self._traps)}")
-        
-        print(f"Trap positions: {[x._position for x in self._traps]}")
-        print(f"Hunger traps: {len([x for x in self._traps if x._type == 'hunger'])}")
-        print(f"Hunger traps positions: {[x._position for x in self._traps if x._type == 'hunger']}")
-        print(f"Parallel traps: {len([x for x in self._traps if x._type == 'parallel dimension'])}")
-        print(f"Parallel traps positions: {[x._position for x in self._traps if x._type == 'parallel dimension']}")
-        print(f"Recon snack position: {self._recon_snack._position}")
-        print(f"Overall occupied positions: {occupied_positions}")
-
-        if self._current_snack._position in [trap._position for trap in self._traps]:
-            print("Snack in same position as trap")
-        
-        if self._current_snack._position == self._recon_snack._position:
-            print("Snack in same position as recon snack")
-
-        if self._recon_snack._position in [trap._position for trap in self._traps]:
-            print("Recon snack in same position as trap")
         
     
     def game_loop(self, board: List[List[str]], game_mode: str) -> None:
@@ -240,7 +203,7 @@ class Game:
         self._player.spawn_player(board, OBSTACLE_CHAR)
 
         # Add new snack logic available starting from certain levels
-        if current_level_index >= self._lvl_cond-1:
+        if current_level_index >= consts.NEW_SNACKS_START_LVL-1:
             random_snack_num = random.randint(1, 3)
             self.game_spawn_snack(board, occupied_positions, random_snack_num)
             occupied_positions.append(self._current_snack._position)
@@ -253,11 +216,11 @@ class Game:
         
         # Enable traps and spawn them starting from a set level
         # Enable recon snack starting from the same level
-        if current_level_index >= self._trap_start_lvl-1:            
-            for _ in range(self._hunger_traps_limit):
+        if current_level_index >= consts.TRAP_START_LVL-1:            
+            for _ in range(consts.HUNGER_TRAPS_LIMIT):
                 self._hunger_traps.append(HungerTrap(self._snack))
             
-            for _ in range(self._parallel_traps_limit):
+            for _ in range(consts.PARALLEL_TRAPS_LIMIT):
                 self._parallel_dimension_traps.append(ParallelDimensionTrap(self._player))
 
                         
@@ -278,8 +241,8 @@ class Game:
             if intro_show_state:
                 match levels_unlocked:
                     case 1: self._fancy_print.print_text_line(self._text_collection._start_intro)
-                    case self._lvl_cond: self._fancy_print.print_text_line(self._text_collection._extra_snack_intro)
-                    case self._trap_start_lvl: self._fancy_print.print_text_line(self._text_collection._traps_intro)
+                    case consts.NEW_SNACKS_START_LVL: self._fancy_print.print_text_line(self._text_collection._extra_snack_intro)
+                    case consts.TRAP_START_LVL: self._fancy_print.print_text_line(self._text_collection._traps_intro)
                     case _: print("Nothing to show")
 
                 intro_show_state = False
@@ -333,7 +296,7 @@ class Game:
                     super_snack_eaten = False
                 
                 # Object tracker for debugging purposes
-                # self.print_obj_tracker(occupied_positions)
+                # debug.print_obj_tracker(occupied_positions, self._current_snack, self._traps, self._recon_snack)
                 show_state = False            
 
             key_event = keyboard.read_event(suppress=True)
@@ -371,7 +334,7 @@ class Game:
                     case 'fake': fake_snack_eaten = True
 
                 # Spawn new snack and handle new snacks starting from a set level
-                if current_level_index >= self._lvl_cond-1:
+                if current_level_index >= consts.NEW_SNACKS_START_LVL-1:
                     random_snack_num = random.randint(1, 3)
                     self.game_spawn_snack(board, occupied_positions, random_snack_num)
                     occupied_positions.append(self._current_snack._position)
@@ -440,7 +403,7 @@ class Game:
         # Main menu loop
         while True:
             if show_menu:
-                self.menu.print_game_menu(self._version, self._main_menu_options)
+                self.menu.print_game_menu(consts.VERSION, self._main_menu_options)
                 show_menu = False
 
             key_event = keyboard.read_event(suppress=True)
