@@ -33,6 +33,7 @@ sys.path.insert(0, levels_path)
 from utils import consts
 from utils import debug
 from utils import keyboard_utils
+from utils import game_utils
 from board_creator import draw_grid, OBSTACLE_CHAR
 from levels import Levels
 from snack import Snack
@@ -60,6 +61,7 @@ class Game:
     _normal_snack: NormalSnack = NormalSnack()
     _super_snack: SuperSnack = SuperSnack()
     _fake_snack: FakeSnack = FakeSnack()
+    _game_utils: game_utils.GameUtils = game_utils.GameUtils(_snack)
     _current_snack: Snack
 
     # Trap related properties
@@ -165,37 +167,6 @@ class Game:
                 break
             current_level_index += 1
         
-        # Game loop specific functions
-        def classic_display_current_state(grid: List[List[str]], 
-                                      current_lvl_index: int) -> None:
-            print(f"--------[CLASSIC MODE - {self._classic_levels[current_lvl_index]._level_name}]--------")
-            draw_grid(grid)
-            print(f"{self._snack._count}/{self._classic_levels[current_lvl_index]._win_cap} snacks eaten")
-        
-        def endless_display_current_state(grid: List[List[str]], 
-                                      current_lvl_index: int) -> None:
-            print(f"--------[ENDLESS MODE - {self._classic_levels[current_lvl_index]._level_name}]--------")
-            draw_grid(grid)
-            print("Snack count:", self._snack._count)
-        
-        def classic_game_win(current_lvl_index: int) -> None:
-            '''
-                Handles winning logic for classic game mode
-            '''
-            next_level_index: int
-            print("You win! You have eaten enough snacks!")
-
-            if current_lvl_index + 1 <= len(self._classic_levels)-1:
-                next_level_index = current_lvl_index + 1
-
-                if not self._classic_levels[next_level_index]._unlocked:
-                    self._classic_levels[next_level_index]._unlocked = True
-                    print("Next level unlocked")
-
-            if not self._classic_levels[current_lvl_index]._cleared:
-                print(f"Endless mode for {self._classic_levels[current_lvl_index]._level_name} unlocked!")
-                self._classic_levels[current_lvl_index]._cleared = True
-        
         # Game setup
         self._player.spawn_player(board, OBSTACLE_CHAR)
 
@@ -246,15 +217,15 @@ class Game:
             # Handle win condition
             if game_mode == 'classic':
                 if self._snack._count >= self._classic_levels[current_level_index]._win_cap:
-                    classic_game_win(current_level_index)
+                    self._game_utils.classic_game_win(current_level_index, self._classic_levels)
                     break
             
             if show_state:
                 match game_mode:
                     case 'classic':
-                        classic_display_current_state(board, current_level_index)
+                        self._game_utils.classic_display_current_state(board, current_level_index, self._classic_levels)
                     case 'endless':
-                        endless_display_current_state(board, current_level_index)
+                        self._game_utils.endless_display_current_state(board, current_level_index, self._classic_levels)
                     case _:
                         print("Nothing to display")
 
