@@ -6,7 +6,7 @@
 import os
 import sys
 from typing import List
-from level import Level
+from assets.levels.level import Level
 
 current_dir: str = os.path.dirname(os.path.abspath(__file__))
 parent_dir: str = os.path.dirname(current_dir)
@@ -14,14 +14,14 @@ boards_dir: str = os.path.join(parent_dir, 'boards')
 
 sys.path.insert(0, boards_dir)
 
-from grid_collection import square_obstacle_grid, square_obstacle_grid_2
-from grid_collection import square_obstacle_grid_3, square_obstacle_grid_4
-from grid_collection import square_obstacle_grid_5, square_obstacle_grid_6
-from grid_collection import square_obstacle_grid_7, square_obstacle_grid_8
-from grid_collection import square_obstacle_grid_9, square_obstacle_grid_10
-from grid_collection import square_obstacle_grid_11, square_obstacle_grid_12
-from grid_collection import square_obstacle_grid_13, square_obstacle_grid_14
-from grid_collection import square_obstacle_grid_15
+from boards.grid_collection import square_obstacle_grid, square_obstacle_grid_2
+from boards.grid_collection import square_obstacle_grid_3, square_obstacle_grid_4
+from boards.grid_collection import square_obstacle_grid_5, square_obstacle_grid_6
+from boards.grid_collection import square_obstacle_grid_7, square_obstacle_grid_8
+from boards.grid_collection import square_obstacle_grid_9, square_obstacle_grid_10
+from boards.grid_collection import square_obstacle_grid_11, square_obstacle_grid_12
+from boards.grid_collection import square_obstacle_grid_13, square_obstacle_grid_14
+from boards.grid_collection import square_obstacle_grid_15
 
 
 class Levels:

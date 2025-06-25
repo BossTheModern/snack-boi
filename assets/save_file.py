@@ -8,16 +8,9 @@
     highest_unlcoked_level: (int number)
     highest_cleared_level: (int number)
 '''
-from typing import Dict, List
 import os
-import sys 
-
-current_dir: str = os.path.dirname(os.path.abspath(__file__))
-levels_dir: str = os.path.join(current_dir, 'levels')
-
-sys.path.insert(0, levels_dir)
-
-from level import Level
+from typing import Dict, List
+from assets.levels.level import Level
 
 class SaveFile:
     def __init__(self, file_path: str) -> None:
