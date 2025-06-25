@@ -9,8 +9,8 @@ Additionally, some can include obstacles, which are represented by a specific ch
 It includes methods to load grid files, save grid files, and display the contents of a grid file.
 '''
 
-from board_creator import add_obstacles_horizontally, add_obstacles_vertically
-from board_creator import add_obstacle, OBSTACLE_CHAR, preview_grid
+from boards.board_creator import add_obstacles_horizontally, add_obstacles_vertically
+from boards.board_creator import add_obstacle, OBSTACLE_CHAR, preview_grid
 from typing import List
 
 

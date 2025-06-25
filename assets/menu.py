@@ -3,23 +3,12 @@
 
     Module that handles menu navigation and action logic
 '''
-import sys, os, copy, keyboard
+import os, copy, keyboard
 from typing import List, Callable
-from save_file import SaveFile
+from assets.save_file import SaveFile
 from keyboard import KeyboardEvent
-
-current_dir: str = os.path.dirname(os.path.abspath(__file__))
-parent_dir: str = os.path.dirname(current_dir)
-boards_dir: str = os.path.join(parent_dir, 'boards')
-print_dir: str = os.path.join(current_dir, 'printer')
-levels_dir: str = os.path.join(current_dir, 'levels')
-
-sys.path.insert(0, boards_dir)
-sys.path.insert(0, print_dir)
-sys.path.insert(0, levels_dir)
-
-from fancy_printer import FancyPrinter
-from level import Level
+from assets.printer.fancy_printer import FancyPrinter
+from assets.levels.level import Level
 
 class Menu:
     _valid_min_max_size: List[int] = [5, 30]
@@ -65,7 +54,7 @@ class Menu:
         file_content: str
         file_path: str
         try:
-            file_path = os.path.join(parent_dir, 'version_log.txt')
+            file_path = 'assets/version_log.txt'
             
             with open(file_path) as file:
                 file_content = file.read()

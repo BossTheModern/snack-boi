@@ -10,43 +10,23 @@ import keyboard
 import random
 from typing import List
 from keyboard import KeyboardEvent
-
-current_dir: str = os.path.dirname(os.path.abspath(__file__))
-parent_dir: str = os.path.dirname(current_dir)
-boards_path: str = os.path.join(parent_dir, 'boards')
-assets_path: str = os.path.join(parent_dir, 'assets')
-save_files_path: str = os.path.join(assets_path, 'save_files')
-powerups_path: str = os.path.join(assets_path, 'powerups')
-printer_path: str = os.path.join(assets_path, 'printer')
-traps_path: str = os.path.join(assets_path, 'traps')
-levels_path: str = os.path.join(assets_path, 'levels')
-snacks_path: str = os.path.join(assets_path, 'snacks')
-
-sys.path.insert(0, boards_path)
-sys.path.insert(0, assets_path)
-sys.path.insert(0, powerups_path)
-sys.path.insert(0, printer_path)
-sys.path.insert(0, traps_path)
-sys.path.insert(0, snacks_path)
-sys.path.insert(0, levels_path)
-
 from utils import consts
 from utils import debug
 from utils import keyboard_utils
 from utils import game_utils
-from board_creator import draw_grid, OBSTACLE_CHAR
-from levels import Levels
-from snack import Snack
-from snack_types import SuperSnack, FakeSnack, NormalSnack
-from save_file import SaveFile
-from level import Level
-from menu import Menu
-from player import Player
-from traps import Trap
-from trap_types import HungerTrap, ParallelDimensionTrap
-from recon_snack import ReconSnack
-from fancy_printer import FancyPrinter
-from text_collection import TextCollection
+from boards.board_creator import draw_grid, OBSTACLE_CHAR
+from assets.levels.levels import Levels
+from assets.snacks.snack import Snack
+from assets.snacks.snack_types import SuperSnack, FakeSnack, NormalSnack
+from assets.save_file import SaveFile
+from assets.levels.level import Level
+from assets.menu import Menu
+from assets.player import Player
+from assets.traps.traps import Trap
+from assets.traps.trap_types import HungerTrap, ParallelDimensionTrap
+from assets.powerups.recon_snack import ReconSnack
+from assets.printer.fancy_printer import FancyPrinter
+from assets.text_collection import TextCollection
 
 
 # Game class where the game logic is implemented
@@ -61,7 +41,7 @@ class Game:
     _normal_snack: NormalSnack = NormalSnack()
     _super_snack: SuperSnack = SuperSnack()
     _fake_snack: FakeSnack = FakeSnack()
-    _game_utils: game_utils.GameUtils = game_utils.GameUtils(_snack)
+    
     _current_snack: Snack
 
     # Trap related properties
@@ -78,12 +58,13 @@ class Game:
     _classic_levels: List[Level] = _new_levels._classic_levels_set_1
 
     # Other properties
-    _save_file: SaveFile = SaveFile(os.path.join(save_files_path, 'save_file.txt'))
+    _save_file: SaveFile = SaveFile('assets/save_files/save_file.txt')
     _fancy_print: FancyPrinter = FancyPrinter()
     _text_collection: TextCollection = TextCollection()
 
     def __init__(self) -> None:
         self.menu: Menu = Menu(self.game_loop)
+        self._game_utils: game_utils.GameUtils = game_utils.GameUtils(self._snack, self._player)
     
     def eat_snack(self, current_lvl_index: int) -> None:
         '''

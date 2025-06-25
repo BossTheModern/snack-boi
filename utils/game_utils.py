@@ -5,28 +5,15 @@
 '''
 
 from typing import List
-import os
-import sys
-
-current_dir: str = os.path.dirname(os.path.abspath(__file__))
-parent_dir: str = os.path.dirname(current_dir)
-assets_dir: str = os.path.join(parent_dir, 'assets')
-levels_dir: str = os.path.join(assets_dir, 'levels')
-snacks_dir: str = os.path.join(assets_dir, 'snacks')
-boards_dir: str = os.path.join(parent_dir, 'boards')
-
-sys.path.insert(0, levels_dir)
-sys.path.insert(0, snacks_dir)
-sys.path.insert(0, boards_dir)
-
-
-from level import Level
-from snack import Snack
-from board_creator import draw_grid
+from assets.levels.level import Level
+from assets.snacks.snack import Snack
+from assets.player import Player
+from boards.board_creator import draw_grid
 
 class GameUtils:
-    def __init__(self, snack: Snack) -> None:
+    def __init__(self, snack: Snack, player: Player) -> None:
           self._snack: Snack = snack
+          self._player: Player = player
 
     def classic_display_current_state(self, board: List[List[str]], current_lvl_index: int, levels: List[Level]) -> None:
         print(f"--------[CLASSIC MODE - {levels[current_lvl_index]._level_name}]--------")
@@ -55,3 +42,9 @@ class GameUtils:
         if not levels[current_lvl_index]._cleared:
             print(f"Endless mode for {levels[current_lvl_index]._level_name} unlocked!")
             levels[current_lvl_index]._cleared = True
+    
+    def setup_game(self) -> None:
+        '''
+            Sets up the game by spawning players, snacks, and other entities
+            on the board
+        '''

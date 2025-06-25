@@ -4,33 +4,19 @@
     Handles logic for different types of traps. All of them are children of
     Trap class
 '''
-from traps import Trap
+from assets.traps.traps import Trap
 from typing import List
-from player import Player
+from assets.player import Player
 from keyboard import KeyboardEvent
-from hidden_trigger import HiddenTrigger
-from dimension_exit import DimensionExit
+from assets.traps.hidden_trigger import HiddenTrigger
+from assets.traps.dimension_exit import DimensionExit
 import keyboard
-import os
-import sys
 import random
 import copy
-
-current_dir: str = os.path.dirname(os.path.abspath(__file__))
-parent_dir: str = os.path.dirname(current_dir)
-parent_parent_dir: str = os.path.dirname(parent_dir)
-boards_dir: str = os.path.join(parent_parent_dir, 'boards')
-printer_dir: str = os.path.join(parent_dir, 'printer')
-snacks_dir: str = os.path.join(parent_dir, 'snacks')
-
-sys.path.insert(0, boards_dir)
-sys.path.insert(0, printer_dir)
-sys.path.insert(0, snacks_dir)
-
-from grid_collection import empty_grid
-from board_creator import draw_grid, OBSTACLE_CHAR
-from fancy_printer import FancyPrinter
-from snack import Snack
+from boards.grid_collection import empty_grid
+from boards.board_creator import draw_grid, OBSTACLE_CHAR
+from assets.printer.fancy_printer import FancyPrinter
+from assets.snacks.snack import Snack
 
 class HungerTrap(Trap):
     '''
