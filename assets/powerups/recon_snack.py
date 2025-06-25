@@ -3,17 +3,9 @@
 
     Handles logic for powerup recon snack
 '''
-from typing import List
 import random
-import os
-import sys
-
-current_dir: str = os.path.dirname(os.path.abspath(__file__))
-parent_dir: str = os.path.join(current_dir)
-
-sys.path.insert(0, parent_dir)
-
-from traps import Trap
+from typing import List
+from assets.traps.traps import Trap
 
 class ReconSnack:
     def __init__(self) -> None:
