@@ -27,6 +27,8 @@ class ReconSnack:
             self._position = [random.randint(0, len(board)-1), random.randint(0, len(board)-1)]
         
         board[self._position[0]][self._position[1]] = self._entity_char
+        self._counter += 1
+        self._spawned = True
     
     def reveal_position(self, board: List[List[str]], traps: List[Trap]) -> None:
         '''
@@ -40,7 +42,15 @@ class ReconSnack:
         # Implement position reveal logic
         for trap in traps:
             trap.reveal_trap(board)
+        
+        self._position.clear()
+        self._traps_revealed = True
+        self._active = True
     
     def undo_effect(self, board: List[List[str]], traps: List[Trap]) -> None:
         for trap in traps:
             trap.hide(board)
+        
+        self._eaten_counter = 0
+        self._counter -= 1
+        self._active = False

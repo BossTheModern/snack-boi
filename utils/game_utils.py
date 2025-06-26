@@ -4,16 +4,18 @@
     contains utility functions for game loop
 '''
 
+
 from typing import List
 from assets.levels.level import Level
 from assets.snacks.snack import Snack
+from assets.snacks.snack_types import NormalSnack, FakeSnack, SuperSnack
+from boards.board_creator import OBSTACLE_CHAR
 from assets.player import Player
 from boards.board_creator import draw_grid
 
 class GameUtils:
-    def __init__(self, snack: Snack, player: Player) -> None:
+    def __init__(self, snack: Snack) -> None:
           self._snack: Snack = snack
-          self._player: Player = player
 
     def classic_display_current_state(self, board: List[List[str]], current_lvl_index: int, levels: List[Level]) -> None:
         print(f"--------[CLASSIC MODE - {levels[current_lvl_index]._level_name}]--------")
@@ -42,9 +44,3 @@ class GameUtils:
         if not levels[current_lvl_index]._cleared:
             print(f"Endless mode for {levels[current_lvl_index]._level_name} unlocked!")
             levels[current_lvl_index]._cleared = True
-    
-    def setup_game(self) -> None:
-        '''
-            Sets up the game by spawning players, snacks, and other entities
-            on the board
-        '''

@@ -10,6 +10,7 @@ import random
 class Snack:
     _position: List[int] = [0, 0]
     _count: int = 0
+    _type: str = ''
     
     def spawn_snack(self, board: List[List[str]], occupied_positions: List[List[int]]) -> None:
         '''

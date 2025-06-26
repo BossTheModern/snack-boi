@@ -4,8 +4,10 @@
     Game module for where the main game logic lies for both classic and 
     endless gamemode
 '''
-import sys
-import os
+
+# TODO: 
+# - Find a way to fix display bug when eating hunger trap (player disappears upon eating revealed hunger trap)
+
 import keyboard
 import random
 from typing import List
@@ -14,7 +16,7 @@ from utils import consts
 from utils import debug
 from utils import keyboard_utils
 from utils import game_utils
-from boards.board_creator import draw_grid, OBSTACLE_CHAR
+from boards.board_creator import OBSTACLE_CHAR
 from assets.levels.levels import Levels
 from assets.snacks.snack import Snack
 from assets.snacks.snack_types import SuperSnack, FakeSnack, NormalSnack
@@ -42,7 +44,7 @@ class Game:
     _super_snack: SuperSnack = SuperSnack()
     _fake_snack: FakeSnack = FakeSnack()
     
-    _current_snack: Snack
+    _current_snack: Snack = Snack()
 
     # Trap related properties
     _hunger_traps: List[Trap] = []
@@ -64,7 +66,7 @@ class Game:
 
     def __init__(self) -> None:
         self.menu: Menu = Menu(self.game_loop)
-        self._game_utils: game_utils.GameUtils = game_utils.GameUtils(self._snack, self._player)
+        self._game_utils: game_utils.GameUtils = game_utils.GameUtils(self._snack)
     
     def eat_snack(self, current_lvl_index: int) -> None:
         '''
@@ -130,7 +132,7 @@ class Game:
         key_event: KeyboardEvent
         show_state: bool = True
         intro_show_state: bool = True
-        recon_duration: int = self._recon_duration
+        recon_duration: int = self._recon_snack._duration
         trap: Trap
         occupied_positions: List[List[int]] = []
         levels_unlocked: int = 0
@@ -186,14 +188,14 @@ class Game:
         # Game loop handling both modes
         while True:
             # Intro text before game display
-            if intro_show_state:
-                match levels_unlocked:
-                    case 1: self._fancy_print.print_text_line(self._text_collection._start_intro)
-                    case consts.NEW_SNACKS_START_LVL: self._fancy_print.print_text_line(self._text_collection._extra_snack_intro)
-                    case consts.TRAP_START_LVL: self._fancy_print.print_text_line(self._text_collection._traps_intro)
-                    case _: print("Nothing to show")
+            # if intro_show_state:
+            #     match levels_unlocked:
+            #         case 1: self._fancy_print.print_text_line(self._text_collection._start_intro)
+            #         case consts.NEW_SNACKS_START_LVL: self._fancy_print.print_text_line(self._text_collection._extra_snack_intro)
+            #         case consts.TRAP_START_LVL: self._fancy_print.print_text_line(self._text_collection._traps_intro)
+            #         case _: print("Nothing to show")
 
-                intro_show_state = False
+            #     intro_show_state = False
             
             # Handle win condition
             if game_mode == 'classic':
@@ -244,7 +246,7 @@ class Game:
                     super_snack_eaten = False
                 
                 # Object tracker for debugging purposes
-                # debug.print_obj_tracker(occupied_positions, self._current_snack, self._traps, self._recon_snack)
+                debug.print_obj_tracker(occupied_positions, self._current_snack, self._traps, self._recon_snack)
                 show_state = False            
 
             key_event = keyboard.read_event(suppress=True)
@@ -264,9 +266,6 @@ class Game:
                 if recon_duration <= 0:
                     self._recon_snack.undo_effect(board, self._traps)
                     recon_duration = self._recon_snack._duration
-                    self._recon_snack._eaten_counter = 0
-                    self._recon_snack._counter -= 1
-                    self._recon_snack._active = False
 
             # Handle eating snack
             if self._player._position == self._current_snack._position:
@@ -294,16 +293,11 @@ class Game:
             # Recon snack count requirement for spawning recon snack
             if self._recon_snack._eaten_counter >= self._recon_snack._required_eaten_snacks and self._recon_snack._counter < self._recon_snack._max_number:
                 self._recon_snack.spawn(board, occupied_positions)
-                self._recon_snack._counter += 1
-                self._recon_snack._spawned = True
                 occupied_positions.append(self._recon_snack._position)
             
             # Handle eating recon snack
             if self._player._position == self._recon_snack._position:
                 self._recon_snack.reveal_position(board, self._traps)
-                self._recon_snack._position.clear()
-                self._recon_snack._traps_revealed = True
-                self._recon_snack._active = True
                 occupied_positions.remove(self._recon_snack._position)
             
             # Handle player eating any trap
