@@ -326,20 +326,7 @@ class Game:
         key_event: KeyboardEvent
         show_menu: bool = True
 
-        def save_prompt() -> None:
-            print("Do you want to save your progress? (y/n)")
-            while True:
-                key_event = keyboard.read_event(suppress=True)
-                if key_event.event_type == keyboard.KEY_DOWN and key_event.name in ['y', 'n']:
-                    break
-            if key_event.name == 'y':
-                print("Saving progress...")
-                self._save_file.save(self._classic_levels)
-            elif key_event.name == 'n':
-                print("Progress kept as it is")
-
         self.menu.print_welcome_screen()
-
         self._save_file.load(self._classic_levels)
 
         # Main menu loop
@@ -362,4 +349,4 @@ class Game:
             elif keyboard_utils.check_key_event(key_event, self._main_menu_options[3]):
                 break
         
-        save_prompt() if not self._save_file._already_saved else None
+        self._save_file.save_prompt(key_event, self._classic_levels) if not self._save_file._already_saved else None

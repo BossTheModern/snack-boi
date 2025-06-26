@@ -11,6 +11,8 @@
 import os
 from typing import Dict, List
 from assets.levels.level import Level
+import keyboard
+from keyboard import KeyboardEvent
 
 class SaveFile:
     def __init__(self, file_path: str) -> None:
@@ -102,3 +104,15 @@ class SaveFile:
             print("File not found. Nothing to delete.")
         except Exception as e:
             print(f"Error while deleting file: {e}")
+    
+    def save_prompt(self, key_event: KeyboardEvent, levels: List[Level]) -> None:
+            print("Do you want to save your progress? (y/n)")
+            while True:
+                key_event = keyboard.read_event(suppress=True)
+                if key_event.event_type == keyboard.KEY_DOWN and key_event.name in ['y', 'n']:
+                    break
+            if key_event.name == 'y':
+                print("Saving progress...")
+                self.save(levels)
+            elif key_event.name == 'n':
+                print("Progress kept as it is")
