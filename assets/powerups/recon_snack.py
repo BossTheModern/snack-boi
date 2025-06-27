@@ -17,8 +17,6 @@ class ReconSnack:
         self._eaten_counter: int = 0
         self._duration: int = 4 # Visible for n-1 moves (this case it's 3 moves)
         self._active: bool = False
-        self._traps_revealed: bool = False
-        self._spawned: bool = False
 
     def spawn(self, board: List[List[str]], occupied_positions: List[List[int]]) -> None:
         self._position = [random.randint(0, len(board)-1), random.randint(0, len(board)-1)]
@@ -28,7 +26,6 @@ class ReconSnack:
         
         board[self._position[0]][self._position[1]] = self._entity_char
         self._counter += 1
-        self._spawned = True
     
     def reveal_position(self, board: List[List[str]], traps: List[Trap]) -> None:
         '''
@@ -44,7 +41,6 @@ class ReconSnack:
             trap.reveal_trap(board)
         
         self._position.clear()
-        self._traps_revealed = True
         self._active = True
     
     def undo_effect(self, board: List[List[str]], traps: List[Trap]) -> None:

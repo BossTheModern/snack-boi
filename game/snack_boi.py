@@ -7,6 +7,7 @@
 
 # TODO: 
 # - Find a way to fix display bug when eating hunger trap (player disappears upon eating revealed hunger trap)
+# - Refactor toggle text display (mvoe to a separate module)
 
 import keyboard
 import random
@@ -96,6 +97,7 @@ class Game:
         self._recon_snack._position.clear()
         self._recon_snack._eaten_counter = 0
         self._recon_snack._counter = 0
+        self._game_utils.clear_toggle_text()
 
     def game_spawn_snack(self, grid: List[List[str]], occupied_positions: List[List[int]], snack_num: int) -> None:
         '''
@@ -138,11 +140,6 @@ class Game:
         levels_unlocked: int = 0
         
         # Eating flags for one time display
-        parallel_trap_eaten: bool = False
-        hunger_trap_eaten: bool = False
-        snack_eaten: bool = False
-        super_snack_eaten: bool = False
-        fake_snack_eaten: bool = False
         recon_start_reached: bool = False
 
         for level in self._classic_levels:
@@ -172,7 +169,6 @@ class Game:
             
             for _ in range(consts.PARALLEL_TRAPS_LIMIT):
                 self._parallel_dimension_traps.append(ParallelDimensionTrap(self._player))
-
                         
             self._traps = self._hunger_traps + self._parallel_dimension_traps
 
@@ -181,7 +177,6 @@ class Game:
                 occupied_positions.append(trap._position)
             
             recon_start_reached = True
-        
         
         levels_unlocked = len([lvl for lvl in self._classic_levels if lvl._unlocked == True])
 
@@ -217,36 +212,10 @@ class Game:
                 print(f"Recon duration: {recon_duration} moves") if self._recon_snack._active else None
                 
                 # Supplementary toggle text
-                if self._recon_snack._spawned:
-                    print("Oh, I see a powerup over there. Let's get it!") 
-                    self._recon_snack._spawned = False
-
-                if self._recon_snack._traps_revealed:
-                    print("I can see the traps plain as day!")
-                    self._recon_snack._traps_revealed = False
-                
-                if hunger_trap_eaten:
-                    print("Oh no! I feel so hungry...")
-                    hunger_trap_eaten = False
-                
-                if parallel_trap_eaten:
-                    print("Getting out of here, see ya later!")
-                    parallel_trap_eaten = False
-                
-                if snack_eaten:
-                    print("Nom nom")
-                    snack_eaten = False
-                
-                if fake_snack_eaten:
-                    print("What!? That snack was fake!")
-                    fake_snack_eaten = False
-                
-                if super_snack_eaten:
-                    print("Yum! That one was delicious!")
-                    super_snack_eaten = False
+                self._game_utils.toggleText()
                 
                 # Object tracker for debugging purposes
-                debug.print_obj_tracker(occupied_positions, self._current_snack, self._traps, self._recon_snack)
+                # debug.print_obj_tracker(occupied_positions, self._current_snack, self._traps, self._recon_snack)
                 show_state = False            
 
             key_event = keyboard.read_event(suppress=True)
@@ -276,9 +245,9 @@ class Game:
                 occupied_positions.remove(self._current_snack._position)
 
                 match self._current_snack._type:
-                    case 'normal': snack_eaten = True
-                    case 'super': super_snack_eaten = True
-                    case 'fake': fake_snack_eaten = True
+                    case 'normal': self._game_utils._snack_eaten = True
+                    case 'super': self._game_utils._super_snack_eaten = True
+                    case 'fake': self._game_utils._fake_snack_eaten = True
 
                 # Spawn new snack and handle new snacks starting from a set level
                 if current_level_index >= consts.NEW_SNACKS_START_LVL-1:
@@ -293,11 +262,13 @@ class Game:
             # Recon snack count requirement for spawning recon snack
             if self._recon_snack._eaten_counter >= self._recon_snack._required_eaten_snacks and self._recon_snack._counter < self._recon_snack._max_number:
                 self._recon_snack.spawn(board, occupied_positions)
+                self._game_utils._recon_spawned = True
                 occupied_positions.append(self._recon_snack._position)
             
             # Handle eating recon snack
             if self._player._position == self._recon_snack._position:
                 self._recon_snack.reveal_position(board, self._traps)
+                self._game_utils._traps_revealed = True
                 occupied_positions.remove(self._recon_snack._position)
             
             # Handle player eating any trap
@@ -309,11 +280,11 @@ class Game:
                         occupied_positions.remove(trap._position)
                         self.activate_hunger_trap(trap, board, occupied_positions)
                         occupied_positions.append(trap._position)
-                        hunger_trap_eaten = True
+                        self._game_utils._hunger_trap_eaten = True
                     case 'parallel dimension': 
                         self.actiavte_parallel_trap(trap, game_mode)
                         occupied_positions.remove(trap._position)
-                        parallel_trap_eaten = True
+                        self._game_utils._parallel_trap_eaten = True
                     case _: print("No type found")                
         
         self.clear_game_data()

@@ -1,2 +1,0 @@
-highest_unlocked_level: 2
-highest_cleared_level: 1
