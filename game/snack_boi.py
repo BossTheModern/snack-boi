@@ -61,7 +61,7 @@ class Game:
     _classic_levels: List[Level] = _new_levels._classic_levels_set_1
 
     # Other properties
-    _save_file: SaveFile = SaveFile('assets/save_files/save_file.txt')
+    _save_file: SaveFile = SaveFile(consts.SAVE_FILE_PATH)
     _fancy_print: FancyPrinter = FancyPrinter()
     _text_collection: TextCollection = TextCollection()
 

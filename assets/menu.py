@@ -4,6 +4,7 @@
     Module that handles menu navigation and action logic
 '''
 import os, copy, keyboard
+from utils import consts
 from typing import List, Callable
 from assets.save_file import SaveFile
 from keyboard import KeyboardEvent
@@ -52,11 +53,8 @@ class Menu:
             Prints the contents of version log file
         '''
         file_content: str
-        file_path: str
         try:
-            file_path = 'assets/version_log.txt'
-            
-            with open(file_path) as file:
+            with open(consts.VERSION_LOG_FILE_PATH) as file:
                 file_content = file.read()
 
             print(file_content)
