@@ -25,14 +25,22 @@ class SaveFile:
             Loads specified file and its data to class, then unlocks and clears 
             levels accordingly
         '''
+        highest_unlocked_lvl: int = 0
+        highest_cleared_lvl: int = 0
+        lvl_format_error: bool = False
+
         try:            
             with open(self._file_path) as file:
-                highest_unlocked_lvl = file.readline().strip().split(':')[1]
-                highest_cleared_lvl = file.readline().strip().split(':')[1]
+                highest_unlocked_lvl = int(file.readline().strip().split(':')[1])
+                highest_cleared_lvl = int(file.readline().strip().split(':')[1])
+
+                if highest_unlocked_lvl - highest_cleared_lvl != 1:
+                    lvl_format_error = True
+                    raise ValueError()
 
                 self._data = {
-                    'highest_unlocked_lvl': int(highest_unlocked_lvl),
-                    'highest_cleared_lvl': int(highest_cleared_lvl)
+                    'highest_unlocked_lvl': highest_unlocked_lvl,
+                    'highest_cleared_lvl': highest_cleared_lvl
                 }
 
                 print("Save file loaded successfully")
@@ -53,7 +61,10 @@ class SaveFile:
         except FileNotFoundError:
             print("File not found. Game will load without saved data")
         except ValueError:
-            print("Error parsing data in file. Please check the file format.")
+            if lvl_format_error:
+                print("Error, invalid data format: highest_unlocked_lvl must be one higher than highest_cleared_lvl") 
+            else: 
+                print("Error parsing data in file. Please check the file format.")
         except Exception as e:
             print(f"Error while loading save file: {e}")
     
