@@ -5,6 +5,7 @@
 '''
 import os, copy, keyboard
 from utils import consts
+from utils import keyboard_utils
 from typing import List, Callable
 from assets.save_file import SaveFile
 from keyboard import KeyboardEvent
@@ -77,7 +78,7 @@ class Menu:
             
             key_event = keyboard.read_event(suppress=True)
             
-            if self.check_key_event(key_event, 'q'):
+            if keyboard_utils.check_key_event(key_event, 'q'):
                 break
         
         print("Returning to menu")
@@ -129,15 +130,11 @@ class Menu:
         print("\n[A] Move left [D] Move right [S] Select")
         print("[Q] Back to main menu")
         print("---------------------")
-    
-    def check_key_event(self, key_event: KeyboardEvent, target_key: str):
-        return key_event.event_type == keyboard.KEY_DOWN and key_event.name == target_key
 
     def selected_level(self, levels: List[Level]) -> Level:
         for level in levels:
             if level._selected:
                 return level
-    
 
     def mode_selection_menu(self, levels: List[Level]) -> None:
         '''
@@ -159,15 +156,15 @@ class Menu:
                 
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
-            if self.check_key_event(key_event, '1'):
+            if keyboard_utils.check_key_event(key_event, '1'):
                 self.level_menu(levels)
                 show_menu = True
                 break
-            elif self.check_key_event(key_event, '2'):
+            elif keyboard_utils.check_key_event(key_event, '2'):
                 self.endless_mode_levels_menu(levels)
                 show_menu = True
                 break
-            elif self.check_key_event(key_event, '3'):
+            elif keyboard_utils.check_key_event(key_event, '3'):
                 print("Returning to main menu")
                 show_menu = True
                 break 
@@ -253,7 +250,7 @@ class Menu:
                 if key_event.event_type == keyboard.KEY_DOWN and key_event.name in ['y', 'n']:
                     break
 
-            save_file.delete() if self.check_key_event(key_event, 'y') else print("Save file not deleted")
+            save_file.delete() if keyboard_utils.check_key_event(key_event, 'y') else print("Save file not deleted")
 
         # Game options menu loop
         while True:
@@ -263,11 +260,11 @@ class Menu:
 
             key_event = keyboard.read_event(suppress=True)
 
-            if self.check_key_event(key_event, '2'):
+            if keyboard_utils.check_key_event(key_event, '2'):
                 break
             
             # Manage save file options
-            if self.check_key_event(key_event, '1'): 
+            if keyboard_utils.check_key_event(key_event, '1'): 
                 show_menu = True
                 
                 while True:
@@ -277,21 +274,21 @@ class Menu:
                     
                     key_event = keyboard.read_event(suppress=True)
                     
-                    if self.check_key_event(key_event, '1'):
+                    if keyboard_utils.check_key_event(key_event, '1'):
                         print("Loading current progress...")
                         self.fetch_progress(save_file)
                         show_save_menu = True
                     
-                    if self.check_key_event(key_event, '2'):
+                    if keyboard_utils.check_key_event(key_event, '2'):
                         print("Saving current progress...")
                         save_file.save(board)
                         show_save_menu = True
                     
-                    if self.check_key_event(key_event, '3'):
+                    if keyboard_utils.check_key_event(key_event, '3'):
                         delete_file()
                         show_save_menu = True
                     
-                    if self.check_key_event(key_event, '4'):
+                    if keyboard_utils.check_key_event(key_event, '4'):
                         print("Returning to options menu")
                         show_save_menu = True
                         break
@@ -311,13 +308,13 @@ class Menu:
             current_lvl_index += 1
         
         # Handle keyboard input
-        if self.check_key_event(input, 'a'):
+        if keyboard_utils.check_key_event(input, 'a'):
             if current_lvl_index - 1 < 0:
                 return
             
             levels[current_lvl_index-1]._selected = True
             levels[current_lvl_index]._selected = False
-        elif self.check_key_event(input, 'd'):
+        elif keyboard_utils.check_key_event(input, 'd'):
             if current_lvl_index + 1 > len(levels)-1:
                 return
             
@@ -339,12 +336,12 @@ class Menu:
 
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
-            if self.check_key_event(key_event, 'q'):
+            if keyboard_utils.check_key_event(key_event, 'q'):
                 print("Going back to main menu")
                 break
 
 
-            if self.check_key_event(key_event, 's'):
+            if keyboard_utils.check_key_event(key_event, 's'):
                 selected_level = self.selected_level(levels)
                 if selected_level._unlocked:
                     print(f"Running {selected_level._level_name}")
@@ -354,7 +351,7 @@ class Menu:
                 else: 
                     print("Level is locked, clear the previous level first")
             
-            if self.check_key_event(key_event, 'a') or self.check_key_event(key_event, 'd'):
+            if keyboard_utils.check_key_event(key_event, 'a') or keyboard_utils.check_key_event(key_event, 'd'):
                 self.navigate_selection(key_event, levels)
                 show_menu = True
     
@@ -373,11 +370,11 @@ class Menu:
 
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
-            if self.check_key_event(key_event, 'q'):
+            if keyboard_utils.check_key_event(key_event, 'q'):
                 print("Going back to main menu")
                 break
 
-            if self.check_key_event(key_event, 's'):
+            if keyboard_utils.check_key_event(key_event, 's'):
                 selected_level = self.selected_level(levels)
                 if selected_level._cleared:
                     print(f"Running {selected_level._level_name}")
@@ -387,7 +384,7 @@ class Menu:
                 else: 
                     print("Level is locked, clear the corresponding level in classic mode first")
                 
-            if self.check_key_event(key_event, 'a') or self.check_key_event(key_event, 'd'):
+            if keyboard_utils.check_key_event(key_event, 'a') or keyboard_utils.check_key_event(key_event, 'd'):
                 self.navigate_selection(key_event, levels)
                 show_menu = True
     

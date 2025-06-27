@@ -54,7 +54,6 @@ class Game:
 
     # Powerup related properties
     _recon_snack: ReconSnack = ReconSnack()
-    _recon_duration: int = 3
     
     # Levels related properties
     _new_levels: Levels = Levels()
@@ -117,7 +116,7 @@ class Game:
     def activate_hunger_trap(self, hunger_trap: HungerTrap, board: List[List[str]], occupied_positions: List[List[int]]) -> None:
             hunger_trap.reduce_snack_count(board, occupied_positions)
 
-    def actiavte_parallel_trap(self, parallel_trap: ParallelDimensionTrap, game_mode: str) -> None:
+    def activate_parallel_trap(self, parallel_trap: ParallelDimensionTrap, game_mode: str) -> None:
             parallel_trap.teleport_player(game_mode)
             self._traps.remove(parallel_trap)
         
@@ -282,7 +281,7 @@ class Game:
                         occupied_positions.append(trap._position)
                         self._game_utils._hunger_trap_eaten = True
                     case 'parallel dimension': 
-                        self.actiavte_parallel_trap(trap, game_mode)
+                        self.activate_parallel_trap(trap, game_mode)
                         occupied_positions.remove(trap._position)
                         self._game_utils._parallel_trap_eaten = True
                     case _: print("No type found")                

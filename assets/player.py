@@ -4,6 +4,7 @@
     Player module handling player logic (spawn, movement)
 '''
 from typing import List
+from utils import keyboard_utils
 import random
 import keyboard
 from keyboard import KeyboardEvent
@@ -13,9 +14,6 @@ class Player:
     _position: List[int] = [0, 0]
     _parallel_position: List[int] = [0, 0]
 
-    def check_key_event(self, key_event: KeyboardEvent, target_key: str):
-        return key_event.event_type == keyboard.KEY_DOWN and key_event.name == target_key
-    
     def spawn_player(self, grid: List[List[str]], obstacle_char: str) -> None:
         '''
             Spawns player on the grid ensuring there are no obstacles on
@@ -45,7 +43,7 @@ class Player:
             Handles player movement on the board ensuring the player does not
             go outside the board nor stepping on top of obstacles
         '''
-        if self.check_key_event(move_input, 'w'):
+        if keyboard_utils.check_key_event(move_input, 'w'):
             if (player_pos[0] - 1 < 0):
                 print("Out of bounds, try again")
                 move_input = keyboard.read_event(suppress=True)
@@ -56,7 +54,7 @@ class Player:
                 grid[player_pos[0]][player_pos[1]] = ' '
                 player_pos[0] -= 1
                 grid[player_pos[0]][player_pos[1]] = self._entity
-        elif self.check_key_event(move_input, 'a'):
+        elif keyboard_utils.check_key_event(move_input, 'a'):
             if (player_pos[1] - 1 < 0):
                 print("Out of bounds, try again")
                 move_input = keyboard.read_event(suppress=True)
@@ -67,7 +65,7 @@ class Player:
                 grid[player_pos[0]][player_pos[1]] = ' '
                 player_pos[1] -= 1
                 grid[player_pos[0]][player_pos[1]] = self._entity
-        elif self.check_key_event(move_input, 's'):
+        elif keyboard_utils.check_key_event(move_input, 's'):
             if (player_pos[0] + 1 > len(grid)-1):
                 print("Out of bounds, try again")
                 move_input = keyboard.read_event(suppress=True)
@@ -78,7 +76,7 @@ class Player:
                 grid[player_pos[0]][player_pos[1]] = ' '
                 player_pos[0] += 1
                 grid[player_pos[0]][player_pos[1]] = self._entity
-        elif self.check_key_event(move_input, 'd'):
+        elif keyboard_utils.check_key_event(move_input, 'd'):
             if (player_pos[1] + 1 > len(grid)-1):
                 print("Out of bounds, try again")
                 move_input = keyboard.read_event(suppress=True)
