@@ -5,10 +5,6 @@
     endless gamemode
 '''
 
-# TODO: 
-# - Find a way to fix display bug when eating hunger trap (player disappears upon eating revealed hunger trap)
-# - Refactor toggle text display (mvoe to a separate module)
-
 import keyboard
 import random
 from typing import List
@@ -182,14 +178,9 @@ class Game:
         # Game loop handling both modes
         while True:
             # Intro text before game display
-            # if intro_show_state:
-            #     match levels_unlocked:
-            #         case 1: self._fancy_print.print_text_line(self._text_collection._start_intro)
-            #         case consts.NEW_SNACKS_START_LVL: self._fancy_print.print_text_line(self._text_collection._extra_snack_intro)
-            #         case consts.TRAP_START_LVL: self._fancy_print.print_text_line(self._text_collection._traps_intro)
-            #         case _: print("Nothing to show")
-
-            #     intro_show_state = False
+            if intro_show_state:
+                self._game_utils.intro_text_display(levels_unlocked)
+                intro_show_state = False
             
             # Handle win condition
             if game_mode == 'classic':

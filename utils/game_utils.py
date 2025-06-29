@@ -6,6 +6,9 @@
 
 
 from typing import List
+from utils import consts
+from assets.printer.fancy_printer import FancyPrinter
+from assets.text_collection import TextCollection
 from assets.levels.level import Level
 from assets.snacks.snack import Snack
 from boards.board_creator import draw_grid
@@ -22,6 +25,8 @@ class GameUtils:
           self._snack_eaten: bool = False
           self._fake_snack_eaten: bool = False
           self._super_snack_eaten: bool = False
+          self._fancy_print: FancyPrinter = FancyPrinter()
+          self._text_collection: TextCollection = TextCollection()
 
     def classic_display_current_state(self, board: List[List[str]], current_lvl_index: int, levels: List[Level]) -> None:
         print(f"--------[CLASSIC MODE - {levels[current_lvl_index]._level_name}]--------")
@@ -95,3 +100,10 @@ class GameUtils:
         self._snack_eaten = False
         self._fake_snack_eaten = False
         self._super_snack_eaten = False
+    
+    def intro_text_display(self, levels_unlocked: int) -> None:
+        match levels_unlocked:
+            case 1: self._fancy_print.print_text_line(self._text_collection._start_intro)
+            case consts.NEW_SNACKS_START_LVL: self._fancy_print.print_text_line(self._text_collection._extra_snack_intro)
+            case consts.TRAP_START_LVL: self._fancy_print.print_text_line(self._text_collection._traps_intro)
+            case _: print("Nothing to show")
