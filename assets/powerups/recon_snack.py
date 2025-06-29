@@ -50,3 +50,11 @@ class ReconSnack:
         self._eaten_counter = 0
         self._counter -= 1
         self._active = False
+    
+    def clear_data(self) -> None:
+        '''
+            Clears powerup data
+        '''
+        self._position.clear()
+        self._eaten_counter = 0
+        self._counter = 0

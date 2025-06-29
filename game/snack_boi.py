@@ -42,12 +42,6 @@ class Game:
     _fake_snack: FakeSnack = FakeSnack()
     
     _current_snack: Snack = Snack()
-
-    # Trap related properties
-    _hunger_traps: List[Trap] = []
-    _parallel_dimension_traps: List[Trap] = []
-    _traps: List[Trap] = []
-
     # Powerup related properties
     _recon_snack: ReconSnack = ReconSnack()
     
@@ -82,16 +76,9 @@ class Game:
             self._snack._count += 1
     
     def clear_game_data(self) -> None:
-        self._player._position.clear()
-        self._player._parallel_position.clear()
-        self._snack._position.clear()
-        self._snack._count = 0
-        self._hunger_traps.clear()
-        self._parallel_dimension_traps.clear()
-        self._traps.clear()
-        self._recon_snack._position.clear()
-        self._recon_snack._eaten_counter = 0
-        self._recon_snack._counter = 0
+        self._player.clear_data()
+        self._snack.clear_data()
+        self._recon_snack.clear_data()
         self._game_utils.clear_toggle_text()
 
     def game_spawn_snack(self, grid: List[List[str]], occupied_positions: List[List[int]], snack_num: int) -> None:
@@ -114,7 +101,6 @@ class Game:
 
     def activate_parallel_trap(self, parallel_trap: ParallelDimensionTrap, game_mode: str) -> None:
             parallel_trap.teleport_player(game_mode)
-            self._traps.remove(parallel_trap)
         
     
     def game_loop(self, board: List[List[str]], game_mode: str) -> None:
@@ -133,6 +119,9 @@ class Game:
         trap: Trap
         occupied_positions: List[List[int]] = []
         levels_unlocked: int = 0
+        hunger_traps: List[Trap] = []
+        parallel_dimension_traps: List[Trap] = []
+        traps: List[Trap] = []
         
         # Eating flags for one time display
         recon_start_reached: bool = False
@@ -160,14 +149,14 @@ class Game:
         # Enable recon snack starting from the same level
         if current_level_index >= consts.TRAP_START_LVL-1:            
             for _ in range(consts.HUNGER_TRAPS_LIMIT):
-                self._hunger_traps.append(HungerTrap(self._snack))
+                hunger_traps.append(HungerTrap(self._snack))
             
             for _ in range(consts.PARALLEL_TRAPS_LIMIT):
-                self._parallel_dimension_traps.append(ParallelDimensionTrap(self._player))
+                parallel_dimension_traps.append(ParallelDimensionTrap(self._player))
                         
-            self._traps = self._hunger_traps + self._parallel_dimension_traps
+            traps = hunger_traps + parallel_dimension_traps
 
-            for trap in self._traps:
+            for trap in traps:
                 trap.spawn_trap(board, occupied_positions)
                 occupied_positions.append(trap._position)
             
@@ -205,7 +194,7 @@ class Game:
                 self._game_utils.toggleText()
                 
                 # Object tracker for debugging purposes
-                # debug.print_obj_tracker(occupied_positions, self._current_snack, self._traps, self._recon_snack)
+                debug.print_obj_tracker(occupied_positions, self._current_snack, traps, self._recon_snack)
                 show_state = False            
 
             key_event = keyboard.read_event(suppress=True)
@@ -223,7 +212,7 @@ class Game:
                 
                 # handle recon snack duration
                 if recon_duration <= 0:
-                    self._recon_snack.undo_effect(board, self._traps)
+                    self._recon_snack.undo_effect(board, traps)
                     recon_duration = self._recon_snack._duration
 
             # Handle eating snack
@@ -257,12 +246,12 @@ class Game:
             
             # Handle eating recon snack
             if self._player._position == self._recon_snack._position:
-                self._recon_snack.reveal_position(board, self._traps)
+                self._recon_snack.reveal_position(board, traps)
                 self._game_utils._traps_revealed = True
                 occupied_positions.remove(self._recon_snack._position)
             
             # Handle player eating any trap
-            trap = next((t for t in self._traps if t._position == self._player._position), None)
+            trap = next((t for t in traps if t._position == self._player._position), None)
             if trap:
                 # Check type and activate accordingly
                 match trap._type:
@@ -273,6 +262,7 @@ class Game:
                         self._game_utils._hunger_trap_eaten = True
                     case 'parallel dimension': 
                         self.activate_parallel_trap(trap, game_mode)
+                        traps.remove(trap)
                         occupied_positions.remove(trap._position)
                         self._game_utils._parallel_trap_eaten = True
                     case _: print("No type found")                

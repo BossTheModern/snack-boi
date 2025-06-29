@@ -102,6 +102,11 @@ class GameUtils:
         self._super_snack_eaten = False
     
     def intro_text_display(self, levels_unlocked: int) -> None:
+        '''
+            Displays intro text based on the current level unlocked
+            TODO: Change the logic so it doesn't play on other levels
+            than the intended level
+        '''
         match levels_unlocked:
             case 1: self._fancy_print.print_text_line(self._text_collection._start_intro)
             case consts.NEW_SNACKS_START_LVL: self._fancy_print.print_text_line(self._text_collection._extra_snack_intro)

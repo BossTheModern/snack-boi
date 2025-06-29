@@ -24,3 +24,10 @@ class Snack:
         while self._position in occupied_positions or board[self._position[0]][self._position[1]] != ' ':
             self._position = [random.randint(0, len(board)-1), random.randint(0, len(board)-1)]
         board[self._position[0]][self._position[1]] = self._entity
+    
+    def clear_data(self) -> None:
+        '''
+            Clears snack data
+        '''
+        self._position.clear()
+        self._count = 0
