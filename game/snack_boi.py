@@ -167,7 +167,7 @@ class Game:
         # Game loop handling both modes
         while True:
             # Intro text before game display
-            if intro_show_state:
+            if intro_show_state and game_mode == 'classic':
                 self._game_utils.intro_text_display(levels_unlocked)
                 intro_show_state = False
             
@@ -178,23 +178,13 @@ class Game:
                     break
             
             if show_state:
-                match game_mode:
-                    case 'classic':
-                        self._game_utils.classic_display_current_state(board, current_level_index, self._classic_levels)
-                    case 'endless':
-                        self._game_utils.endless_display_current_state(board, current_level_index, self._classic_levels)
-                    case _:
-                        print("Nothing to display")
-
-                print("Move by pressing (w/a/s/d) or press q to quit")
-                print("Super snack spawned! Eat it for extra points!") if self._current_snack._type == 'super' else None
-                print(f"Recon duration: {recon_duration} moves") if self._recon_snack._active else None
-                
-                # Supplementary toggle text
-                self._game_utils.toggleText()
+                self._game_utils.display_current_state(board, current_level_index, 
+                                                       self._classic_levels, 
+                                                       game_mode, self._current_snack._type, 
+                                                       recon_duration, self._recon_snack._active)
                 
                 # Object tracker for debugging purposes
-                debug.print_obj_tracker(occupied_positions, self._current_snack, traps, self._recon_snack)
+                # debug.print_obj_tracker(occupied_positions, self._current_snack, traps, self._recon_snack)
                 show_state = False            
 
             key_event = keyboard.read_event(suppress=True)

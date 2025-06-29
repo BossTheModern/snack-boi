@@ -112,3 +112,24 @@ class GameUtils:
             case consts.NEW_SNACKS_START_LVL: self._fancy_print.print_text_line(self._text_collection._extra_snack_intro)
             case consts.TRAP_START_LVL: self._fancy_print.print_text_line(self._text_collection._traps_intro)
             case _: print("Nothing to show")
+    
+    def display_current_state(self, board: List[List[str]], current_lvl_index: int, 
+                              levels: List[Level], game_mode: str, 
+                              current_snack_type: str, recon_duration: int, recon_active: bool) -> None:
+        '''
+            Displays the current state of the game basd on game mode
+        '''
+        match game_mode:
+            case 'classic':
+                self.classic_display_current_state(board, current_lvl_index, levels)
+            case 'endless':
+                self.endless_display_current_state(board, current_lvl_index, levels)
+            case _:
+                print("Nothing to display")
+
+        print("Move by pressing (w/a/s/d) or press q to quit")
+        print("Super snack spawned! Eat it for extra points!") if current_snack_type == 'super' else None
+        print(f"Recon duration: {recon_duration} moves") if recon_active else None
+            
+        # Supplementary toggle text
+        self.toggleText()
