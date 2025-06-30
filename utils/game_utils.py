@@ -100,17 +100,18 @@ class GameUtils:
         self._fake_snack_eaten = False
         self._super_snack_eaten = False
     
-    def intro_text_display(self, levels_unlocked: int) -> None:
+    def intro_text_display(self, levels_unlocked: int, current_lvl_index: int) -> None:
         '''
             Displays intro text based on the current level unlocked
             TODO: Change the logic so it doesn't play on other levels
             than the intended level
         '''
-        match levels_unlocked:
-            case 1: self._fancy_print.print_text_line(self._text_collection._start_intro)
-            case consts.NEW_SNACKS_START_LVL: self._fancy_print.print_text_line(self._text_collection._extra_snack_intro)
-            case consts.TRAP_START_LVL: self._fancy_print.print_text_line(self._text_collection._traps_intro)
-            case _: print("Nothing to show")
+        if levels_unlocked == 1 and current_lvl_index == 0:
+            self._fancy_print.print_text_line(self._text_collection._start_intro)
+        elif levels_unlocked == consts.NEW_SNACKS_START_LVL and current_lvl_index == consts.NEW_SNACKS_START_LVL - 1:
+            self._fancy_print.print_text_line(self._text_collection._extra_snack_intro)
+        elif levels_unlocked == consts.TRAP_START_LVL and current_lvl_index == consts.TRAP_START_LVL - 1:
+            self._fancy_print.print_text_line(self._text_collection._traps_intro)
     
     def display_current_state(self, board: List[List[str]], current_lvl_index: int, 
                               levels: List[Level], game_mode: str, 

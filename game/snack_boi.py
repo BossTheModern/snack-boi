@@ -163,7 +163,7 @@ class Game:
         while True:
             # Intro text before game display
             if intro_show_state and game_mode == 'classic':
-                self._game_utils.intro_text_display(levels_unlocked)
+                self._game_utils.intro_text_display(levels_unlocked, current_level_index)
                 intro_show_state = False
             
             # Handle win condition
