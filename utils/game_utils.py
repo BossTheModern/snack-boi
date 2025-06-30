@@ -4,7 +4,6 @@
     contains utility functions for game loop
 '''
 
-
 from typing import List
 from utils import consts
 from assets.printer.fancy_printer import FancyPrinter
@@ -133,3 +132,12 @@ class GameUtils:
             
         # Supplementary toggle text
         self.toggleText()
+    
+    def set_snack_eaten(self, current_snack_type: str) -> None:
+        '''
+            Sets appropriate toggle text variables based on snack eaten
+        '''
+        match current_snack_type:
+            case 'normal': self._snack_eaten = True
+            case 'super': self._super_snack_eaten = True
+            case 'fake': self._fake_snack_eaten = True

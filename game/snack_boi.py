@@ -51,8 +51,6 @@ class Game:
 
     # Other properties
     _save_file: SaveFile = SaveFile(consts.SAVE_FILE_PATH)
-    _fancy_print: FancyPrinter = FancyPrinter()
-    _text_collection: TextCollection = TextCollection()
 
     def __init__(self) -> None:
         self.menu: Menu = Menu(self.game_loop)
@@ -172,10 +170,9 @@ class Game:
                 intro_show_state = False
             
             # Handle win condition
-            if game_mode == 'classic':
-                if self._snack._count >= self._classic_levels[current_level_index]._win_cap:
-                    self._game_utils.classic_game_win(current_level_index, self._classic_levels)
-                    break
+            if game_mode == 'classic' and self._snack._count >= self._classic_levels[current_level_index]._win_cap:
+                self._game_utils.classic_game_win(current_level_index, self._classic_levels)
+                break
             
             if show_state:
                 self._game_utils.display_current_state(board, current_level_index, 
@@ -212,11 +209,7 @@ class Game:
                 
                 self.eat_snack(current_level_index)
                 occupied_positions.remove(self._current_snack._position)
-
-                match self._current_snack._type:
-                    case 'normal': self._game_utils._snack_eaten = True
-                    case 'super': self._game_utils._super_snack_eaten = True
-                    case 'fake': self._game_utils._fake_snack_eaten = True
+                self._game_utils.set_snack_eaten(self._current_snack._type)
 
                 # Spawn new snack and handle new snacks starting from a set level
                 if current_level_index >= consts.NEW_SNACKS_START_LVL-1:
