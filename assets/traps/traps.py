@@ -30,3 +30,4 @@ class Trap:
     
     def hide(self, board: List[List[str]]) -> None:
         board[self._position[0]][self._position[1]] = ' '
+        self.revealed = False

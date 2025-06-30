@@ -93,9 +93,6 @@ class Game:
             case 3:
                 self._super_snack.spawn_snack(grid, occupied_positions)
                 self._current_snack = self._super_snack
-    
-    def activate_hunger_trap(self, hunger_trap: HungerTrap, board: List[List[str]], occupied_positions: List[List[int]]) -> None:
-            hunger_trap.reduce_snack_count(board, occupied_positions)
 
     def activate_parallel_trap(self, parallel_trap: ParallelDimensionTrap, game_mode: str) -> None:
             parallel_trap.teleport_player(game_mode)
@@ -240,7 +237,7 @@ class Game:
                 match trap._type:
                     case 'hunger': 
                         occupied_positions.remove(trap._position)
-                        self.activate_hunger_trap(trap, board, occupied_positions)
+                        trap.reduce_snack_count(board, occupied_positions)
                         occupied_positions.append(trap._position)
                         self._game_utils._hunger_trap_eaten = True
                     case 'parallel dimension': 
