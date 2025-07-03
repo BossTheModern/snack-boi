@@ -26,6 +26,7 @@ from assets.traps.trap_types import HungerTrap, ParallelDimensionTrap
 from assets.powerups.recon_snack import ReconSnack
 from assets.printer.fancy_printer import FancyPrinter
 from assets.text_collection import TextCollection
+from assets.menu_front import MenuFront
 
 
 # Game class where the game logic is implemented
@@ -51,6 +52,7 @@ class Game:
 
     # Other properties
     _save_file: SaveFile = SaveFile(consts.SAVE_FILE_PATH)
+    _menu_front: MenuFront = MenuFront()
 
     def __init__(self) -> None:
         self.menu: Menu = Menu(self.game_loop)
@@ -263,7 +265,7 @@ class Game:
         # Main menu loop
         while True:
             if show_menu:
-                self.menu.print_game_menu(consts.VERSION, self._main_menu_options)
+                self._menu_front.print_game_menu(consts.VERSION, self._main_menu_options)
                 show_menu = False
 
             key_event = keyboard.read_event(suppress=True)
