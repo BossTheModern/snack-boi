@@ -10,7 +10,7 @@ from assets.traps.traps import Trap
 class ReconSnack:
     def __init__(self) -> None:
         self._position: List[int] = []
-        self._entity_char: str = 'R'
+        self._entity_char: str = 'Q'
         self._counter: int = 0
         self._max_number: int = 1
         self._required_eaten_snacks: int = 5
