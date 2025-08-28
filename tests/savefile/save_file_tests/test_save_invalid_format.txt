@@ -1,0 +1,2 @@
+highest_unlocked_level: 5
+highest_cleared_level: 3
