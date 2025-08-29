@@ -22,7 +22,8 @@ from typing import List
 from io import StringIO
 
 class TestSaveFile(unittest.TestCase):
-    def test_load_save_file(self) -> None:
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_load_save_file(self, mock_stdout) -> None:
         '''
             Testing if loading a normal save file works as intended
         '''
@@ -30,9 +31,11 @@ class TestSaveFile(unittest.TestCase):
         save_file: SaveFile = SaveFile("save_file_tests/test_save_normal.txt")
         levels: List[Level] = copy.deepcopy(Levels._classic_levels_set_1)
         save_file.load(levels)
+        output: StringIO = mock_stdout.getvalue()
 
         self.assertTrue(levels[4]._unlocked)
-        self.assertTrue(levels[3]._cleared)      
+        self.assertTrue(levels[3]._cleared)
+        self.assertIn("Save file loaded successfully", output)      
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_load_save_file_invalid_format(self, mock_stdout) -> None:
@@ -65,7 +68,8 @@ class TestSaveFile(unittest.TestCase):
         self.assertFalse(levels[2]._cleared)
         self.assertIn("File not found. Game will load without saved data", output)
 
-    def test_save_file(self) -> None:
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_save_file(self, mock_stdout) -> None:
         '''
             Tests if save file saves correctly
         '''
@@ -81,24 +85,29 @@ class TestSaveFile(unittest.TestCase):
             levels[i]._cleared = True
         
         save_file.save(levels)
+        output: StringIO = mock_stdout.getvalue()
 
         self.assertEqual(expected_highest_unlocked, save_file._data['highest_unlocked_lvl'])
         self.assertEqual(expected_highest_cleared, save_file._data['highest_cleared_lvl'])
         self.assertEqual(save_file._data['highest_unlocked_lvl'] - save_file._data['highest_cleared_lvl'], 1)
+        self.assertIn("Save file saved successfully", output)
 
-
-    def test_delete_file(self) -> None:
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_delete_file(self, mock_stdout) -> None:
         '''
             Tests if save file deletes correctly
         '''
 
         save_file: SaveFile = SaveFile("save_file_tests/test_deleted_save.txt")
         levels: List[Level] = copy.deepcopy(Levels._classic_levels_set_1)
+        output: StringIO
 
         save_file.save(levels)
         save_file.delete()
+        output = mock_stdout.getvalue()
 
         self.assertFalse(os.path.exists(save_file._file_path))
+        self.assertIn("Save file deleted successfully", output)
     
     @patch('sys.stdout', new_callable=StringIO)
     def test_delete_nonexistent_file(self, mock_stdout) -> None:
