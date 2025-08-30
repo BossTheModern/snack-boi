@@ -4,7 +4,7 @@
     Contains different types of snacks with different entity symbols and
     types. They are all children of Snack class
 '''
-from snack import Snack
+from assets.snacks.snack import Snack
 
 # Super snack giving more points for eating it
 class SuperSnack(Snack):
