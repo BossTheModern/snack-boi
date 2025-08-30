@@ -55,7 +55,6 @@ class TestTraps(unittest.TestCase):
             occupied_positions.append(trap._position)
             trap.reveal_trap(board)
 
-
         preview_grid(board, 'board with traps spawned')
 
         self.assertEqual(len(occupied_positions), HUNGER_TRAPS_LIMIT + PARALLEL_TRAPS_LIMIT)
