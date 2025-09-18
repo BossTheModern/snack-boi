@@ -33,11 +33,18 @@ class Account:
         print("[Q] back to main menu")
     
     def show_owned_powerups(self) -> None:
-        print("Owned powerups:")
+        nothing_shown: bool = True
+
+        print("Owned powerups: ", end='')
         
         for item in self._owned_shop_items:
             if item._stock > 0:
                 print(f"{item._name}: {item._stock:<10}", end='')
+                nothing_shown = False
+    
+        if nothing_shown:
+            print("None")
+        
     
     def account_display(self) -> None:
         '''
