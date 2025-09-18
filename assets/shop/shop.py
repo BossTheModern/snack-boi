@@ -21,6 +21,12 @@ class Shop:
         for index, item in enumerate(self._shop_items):
             print(f"[{index + 1}] {item._name:<15}", end='')
         
+        print()
+        
+        for item in self._shop_items:
+            print(f"Stock: {item._stock}/{item._limit:<10}", end='')
+
+        
         print(f"\n\n{'':-<50}")
         print("Select item number to view details")
         print("[Q] Back to main menu")

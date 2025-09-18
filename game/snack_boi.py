@@ -27,13 +27,14 @@ from assets.powerups.recon_snack import ReconSnack
 from assets.printer.fancy_printer import FancyPrinter
 from assets.text_collection import TextCollection
 from assets.menu_front import MenuFront
+from account.account import Account
 
 
 # Game class where the game logic is implemented
 class Game:    
     # Validation properties 
     _valid_move_keys: List[str] = ['w', 'a', 's', 'd']
-    _main_menu_options: List[str] = ['1', '2', '3', '4', '5']
+    _main_menu_options: List[str] = ['1', '2', '3', '4', '5', '6']
 
     # Player and snack related properties
     _player: Player = Player()
@@ -53,6 +54,7 @@ class Game:
     # Other properties
     _save_file: SaveFile = SaveFile(consts.SAVE_FILE_PATH)
     _menu_front: MenuFront = MenuFront()
+    _account: Account = Account()
 
     def __init__(self) -> None:
         self.menu: Menu = Menu(self.game_loop)
@@ -277,12 +279,16 @@ class Game:
                 self.menu.shop_menu()
                 show_menu = True
             elif keyboard_utils.check_key_event(key_event, self._main_menu_options[2]):
-                self.menu.game_options(self._classic_levels, self._save_file)
+                print("entering account")
+                self._account.account_display()
                 show_menu = True
             elif keyboard_utils.check_key_event(key_event, self._main_menu_options[3]):
-                self.menu.version_log()
+                self.menu.game_options(self._classic_levels, self._save_file)
                 show_menu = True
             elif keyboard_utils.check_key_event(key_event, self._main_menu_options[4]):
+                self.menu.version_log()
+                show_menu = True
+            elif keyboard_utils.check_key_event(key_event, self._main_menu_options[5]):
                 break
         
         self._save_file.save_prompt(key_event, self._classic_levels) if not self._save_file._already_saved else None

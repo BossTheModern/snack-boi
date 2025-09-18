@@ -20,3 +20,9 @@ class Doubler(ShopItem):
             for a cerayin duration of snacks eaten
         '''
         self._active = True
+    
+    def deactivate(self) -> None:
+        '''
+            Deactivates doubler effect
+        '''
+        self._active = False
