@@ -12,6 +12,7 @@ from keyboard import KeyboardEvent
 from assets.printer.fancy_printer import FancyPrinter
 from assets.levels.level import Level
 from assets.menu_front import MenuFront
+from assets.shop.shop import Shop
 
 class Menu:
     _valid_options_inputs: List[str] = ['1', '2']
@@ -19,6 +20,7 @@ class Menu:
     _game_modes: List[str] = ['classic', 'endless']
     game_loop: Callable[[List[List[str]]], None]
     _menu_front: MenuFront = MenuFront()
+    _shop: Shop = Shop()
     
     _fancy_print: FancyPrinter = FancyPrinter()
 
@@ -254,3 +256,48 @@ class Menu:
             if keyboard_utils.check_key_event(key_event, 'a') or keyboard_utils.check_key_event(key_event, 'd'):
                 self.navigate_selection(key_event, levels)
                 show_menu = True
+
+    def shop_menu(self) -> None:
+        '''
+            Logic for handling shop menu display and navigation
+        '''
+        show_menu: bool = True
+
+        while True:
+            if show_menu:
+                self._shop.print_shop_menu()
+                show_menu = False
+            
+            key_event: KeyboardEvent = keyboard.read_event(suppress=True)
+            if keyboard_utils.check_key_event(key_event, 'q'):
+                print("Returning to main menu")
+                break
+
+            if key_event.event_type == keyboard.KEY_DOWN and key_event.name in [str(x+1) for x in range(len(self._shop._shop_items))]:
+                self.shop_item_details_menu(int(key_event.name))
+                show_menu = True
+            
+
+
+    def shop_item_details_menu(self, item_num: int) -> None:
+        '''
+            Logic for handling shop item detals menu display and navigation
+        '''
+        show_menu: bool = True
+
+        while True:
+            if show_menu:
+                self._shop.show_shop_item_details(item_num)
+                show_menu = False
+            
+            key_event: KeyboardEvent = keyboard.read_event(suppress=True)
+
+            if keyboard_utils.check_key_event(key_event, 'q'):
+                print("Returning to shop menu\n\n")
+                break
+
+            if keyboard_utils.check_key_event(key_event, 'b'):
+                # TODO: Create logic for buying item
+                print("Buying item...\n\n")
+                break
+            

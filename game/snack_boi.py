@@ -33,7 +33,7 @@ from assets.menu_front import MenuFront
 class Game:    
     # Validation properties 
     _valid_move_keys: List[str] = ['w', 'a', 's', 'd']
-    _main_menu_options: List[str] = ['1', '2', '3', '4']
+    _main_menu_options: List[str] = ['1', '2', '3', '4', '5']
 
     # Player and snack related properties
     _player: Player = Player()
@@ -274,12 +274,15 @@ class Game:
                 self.menu.mode_selection_menu(self._classic_levels)
                 show_menu = True
             elif keyboard_utils.check_key_event(key_event, self._main_menu_options[1]):
-                self.menu.game_options(self._classic_levels, self._save_file)
+                self.menu.shop_menu()
                 show_menu = True
             elif keyboard_utils.check_key_event(key_event, self._main_menu_options[2]):
-                self.menu.version_log()
+                self.menu.game_options(self._classic_levels, self._save_file)
                 show_menu = True
             elif keyboard_utils.check_key_event(key_event, self._main_menu_options[3]):
+                self.menu.version_log()
+                show_menu = True
+            elif keyboard_utils.check_key_event(key_event, self._main_menu_options[4]):
                 break
         
         self._save_file.save_prompt(key_event, self._classic_levels) if not self._save_file._already_saved else None

@@ -20,9 +20,10 @@ class MenuFront:
         '''
         print("-----[Snack boi]-----")
         print(f"[{menu_options[0]}] Start Game")
-        print(f"[{menu_options[1]}] Options")
-        print(f"[{menu_options[2]}] Version log")
-        print(f"[{menu_options[3]}] Quit")
+        print(f"[{menu_options[1]}] Shop")
+        print(f"[{menu_options[2]}] Options")
+        print(f"[{menu_options[3]}] Version log")
+        print(f"[{menu_options[4]}] Quit")
         print("version:", version)
         print("---------------------")
     
