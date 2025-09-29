@@ -15,6 +15,8 @@ from assets.menu_front import MenuFront
 from assets.shop.shop import Shop
 from account.account import Account
 from assets.shop.shop_item import ShopItem
+from utils.consts import NAME_MIN_LENGTH
+from utils.consts import NAME_MAX_LENGTH
 
 class Menu:
     _valid_options_inputs: List[str] = ['1', '2']
@@ -348,3 +350,18 @@ class Menu:
             if keyboard_utils.check_key_event(key_event, 'n'):
                 print("Canceled purchase\n\n")
                 break
+
+    def prompt_name(self) -> None:
+        '''
+            Prompts the user to enter their name upon first boot
+            of the game
+        '''
+        new_name: str = input("Enter your name: ")
+
+        # input sanitization
+        while len(new_name) < NAME_MIN_LENGTH or len(new_name) > NAME_MAX_LENGTH:
+            print("Name must be between 1 and 20 characters, try again")
+            new_name = input("Enter your name: ")
+
+        self._account._name = new_name
+        print(f"Welcome to the game, {self._account._name}!")

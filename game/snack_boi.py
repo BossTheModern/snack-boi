@@ -245,6 +245,10 @@ class Game:
         show_menu: bool = True
 
         self.menu.print_welcome_screen()
+        
+        if self._account._name == "":
+            self.menu.prompt_name()
+            
         self._save_file.load(self._classic_levels)
 
         # Main menu loop

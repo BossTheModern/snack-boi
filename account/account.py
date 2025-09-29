@@ -10,10 +10,12 @@ from utils import keyboard_utils
 from typing import List
 from assets.shop.shop_items import ShopItems
 from assets.shop.shop_item import ShopItem
+from utils.consts import NAME_MIN_LENGTH
+from utils.consts import NAME_MAX_LENGTH
 
 
 class Account:
-    _name: str = "BossTheModern"
+    _name: str = ""
     _points_balance: int = 100
     _owned_shop_items: List[ShopItem] = []
 
@@ -70,6 +72,10 @@ class Account:
         '''
         new_name: str = input("Enter new name: ")
         show_menu: bool = True
+
+        while len(new_name) < NAME_MIN_LENGTH or len(new_name) > NAME_MAX_LENGTH:
+            print("Name must be between 1 and 20 characters, try again")
+            new_name = input("Enter new name: ")
 
         while True:
             if show_menu:
