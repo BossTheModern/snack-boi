@@ -57,25 +57,8 @@ class Game:
     _account: Account = Account()
 
     def __init__(self) -> None:
-        self.menu: Menu = Menu(self.game_loop)
+        self.menu: Menu = Menu(self.game_loop, self._account)
         self._game_utils: game_utils.GameUtils = game_utils.GameUtils(self._snack)
-    
-    def eat_snack(self, current_lvl_index: int) -> None:
-        '''
-            Handles eating snack based on whether the player have reached
-            a minimum level for newer snacks or not
-        '''
-        if current_lvl_index >= consts.NEW_SNACKS_START_LVL-1:
-            match self._current_snack._type:
-                case 'normal':
-                    self._snack._count += 1
-                case 'super':
-                    self._snack._count += 2
-            self._snack._position.clear()            
-        
-        else:
-            print("Snack eaten!")
-            self._snack._count += 1
     
     def clear_game_data(self) -> None:
         self._player.clear_data()
@@ -208,7 +191,7 @@ class Game:
                 if recon_start_reached:
                     self._recon_snack._eaten_counter += 1
                 
-                self.eat_snack(current_level_index)
+                self._snack.eat_snack(current_level_index, self._current_snack)
                 occupied_positions.remove(self._current_snack._position)
                 self._game_utils.set_snack_eaten(self._current_snack._type)
 

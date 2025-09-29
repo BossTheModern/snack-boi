@@ -6,6 +6,10 @@
 '''
 from typing import List
 import random
+import snack
+from utils.consts import NORMAL_SNACK_POINTS
+from utils.consts import SUPER_SNACK_POINTS
+from utils.consts import NEW_SNACKS_START_LVL
 
 class Snack:
     _position: List[int] = [0, 0]
@@ -31,3 +35,18 @@ class Snack:
         '''
         self._position.clear()
         self._count = 0
+
+    def eat_snack(self, current_lvl_index: int, target_snack: snack) -> None:
+        '''
+            Handles eating snack based on whether the player have reached
+            a minimum level for newer snacks or not
+        '''
+        print("Eating snack...")
+        if current_lvl_index >= NEW_SNACKS_START_LVL-1:
+            match target_snack._type:
+                case 'normal': self._count += NORMAL_SNACK_POINTS
+                case 'super': self._count += SUPER_SNACK_POINTS
+            self._position.clear()
+        else:
+            print("Sanck eaten!")
+            self._count += NORMAL_SNACK_POINTS

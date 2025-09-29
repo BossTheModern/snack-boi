@@ -13,6 +13,8 @@ from assets.printer.fancy_printer import FancyPrinter
 from assets.levels.level import Level
 from assets.menu_front import MenuFront
 from assets.shop.shop import Shop
+from account.account import Account
+from assets.shop.shop_item import ShopItem
 
 class Menu:
     _valid_options_inputs: List[str] = ['1', '2']
@@ -21,11 +23,13 @@ class Menu:
     game_loop: Callable[[List[List[str]]], None]
     _menu_front: MenuFront = MenuFront()
     _shop: Shop = Shop()
+    _account: Account
     
     _fancy_print: FancyPrinter = FancyPrinter()
 
-    def __init__(self, game_loop: Callable[[List[List[str]]], None]) -> None:
+    def __init__(self, game_loop: Callable[[List[List[str]]], None], account: Account) -> None:
         self.game_loop = game_loop
+        self._account = account
     
     def print_welcome_screen(self) -> None:
         '''
@@ -265,7 +269,7 @@ class Menu:
 
         while True:
             if show_menu:
-                self._shop.print_shop_menu()
+                self._shop.print_shop_menu(self._account)
                 show_menu = False
             
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
@@ -298,6 +302,49 @@ class Menu:
 
             if keyboard_utils.check_key_event(key_event, 'b'):
                 # TODO: Create logic for buying item
-                print("Buying item...\n\n")
+                self.shop_item_purchase(item_num)
+                break
+    
+    def shop_item_purchase(self, item_num: int) -> None:
+        '''
+            Handles the logic of purchasing the shop item,
+            such as linking button presses to corresponding actions
+            such as purchasing or cancelling
+        '''
+        show_menu: bool = True
+        item_num -= 1
+        current_balance: int = self._account._points_balance
+        price: int = self._shop._shop_items[item_num]._price
+        shop_item: ShopItem = self._shop._shop_items[item_num]
+        shop_item_limit: int = shop_item._limit
+        acc_shop_items: List[ShopItem] = self._account._owned_shop_items
+        shop_item_stock: int = acc_shop_items[item_num]._stock if len(acc_shop_items) > 0 else 0
+
+        # Reject preemptively if the user has insufficient funds
+        # or if item stock has reached limit
+        if current_balance < price:
+            print("Insufficient funds, try again later\n\n")
+            return
+        
+        if shop_item_stock == shop_item_limit:
+            print("Stock limit reached, try again later\n\n")
+            return
+
+        
+        while True:
+            if show_menu:
+                self._shop.purchase_item_menu(item_num+1)
+                show_menu = False
+            
+            key_event: KeyboardEvent = keyboard.read_event(suppress=True)
+
+            if keyboard_utils.check_key_event(key_event, 'y'):
+                self._account._owned_shop_items.append(shop_item)
+                shop_item._stock += 1
+                self._account._points_balance -= price
+                print("Purchase successful\n\n")
                 break
             
+            if keyboard_utils.check_key_event(key_event, 'n'):
+                print("Canceled purchase\n\n")
+                break

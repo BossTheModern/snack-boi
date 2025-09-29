@@ -14,8 +14,8 @@ from assets.shop.shop_item import ShopItem
 
 class Account:
     _name: str = "BossTheModern"
-    _points_balance: int = 0
-    _owned_shop_items: List[ShopItem] = ShopItems._shop_items
+    _points_balance: int = 100
+    _owned_shop_items: List[ShopItem] = []
 
     def show_account(self) -> None:
         '''
@@ -33,17 +33,14 @@ class Account:
         print("[Q] back to main menu")
     
     def show_owned_powerups(self) -> None:
-        nothing_shown: bool = True
-
         print("Owned powerups: ", end='')
         
-        for item in self._owned_shop_items:
-            if item._stock > 0:
-                print(f"{item._name}: {item._stock:<10}", end='')
-                nothing_shown = False
-    
-        if nothing_shown:
+        if len(self._owned_shop_items) == 0:
             print("None")
+        else: 
+            for item in self._owned_shop_items:
+                if item._stock > 0:
+                    print(f"{item._name}: {item._stock:<10}")
         
     
     def account_display(self) -> None:
