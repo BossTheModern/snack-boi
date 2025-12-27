@@ -13,12 +13,15 @@ from typing import Dict, List
 from assets.levels.level import Level
 import keyboard
 from keyboard import KeyboardEvent
+from account.account import Account
+from utils.consts import START_POINTS
 
 class SaveFile:
-    def __init__(self, file_path: str) -> None:
+    def __init__(self, file_path: str, account: Account) -> None:
         self._file_path: str = file_path
         self._data: Dict[str, int] = {}
         self._already_saved: bool = False
+        self._account = account
 
     def load(self, levels: List[Level]) -> None:
         '''
@@ -27,21 +30,33 @@ class SaveFile:
         '''
         highest_unlocked_lvl: int = 0
         highest_cleared_lvl: int = 0
+        name: str = ""
+        balance: int = 0
         lvl_format_error: bool = False
 
         try:            
             with open(self._file_path) as file:
+                # Read data from file
                 highest_unlocked_lvl = int(file.readline().strip().split(':')[1])
                 highest_cleared_lvl = int(file.readline().strip().split(':')[1])
+                name = file.readline().strip().split(':')[1]
+                balance = file.readline().strip().split(':')[1]
 
+                # Validate data                
                 if highest_unlocked_lvl - highest_cleared_lvl != 1:
                     lvl_format_error = True
                     raise ValueError()
 
+                # Store data in class
                 self._data = {
                     'highest_unlocked_lvl': highest_unlocked_lvl,
                     'highest_cleared_lvl': highest_cleared_lvl
                 }
+
+                # Store account data
+                print(f"loaded name: {name}")
+                Account._name = name
+                Account._points_balance = int(balance) if balance else START_POINTS
 
                 print("Save file loaded successfully")
 
@@ -92,11 +107,15 @@ class SaveFile:
         self._data['highest_unlocked_lvl'] = highest_unlocked_level
         self._data['highest_cleared_lvl'] = highest_cleared_level
 
+        print(f"Current name: {self._account._name}")
+
         try:
             with open(self._file_path, 'w') as file:
                 print("Saving data...")
                 file.write(f"highest_unlocked_level: {self._data['highest_unlocked_lvl']}")
                 file.write(f"\nhighest_cleared_level: {self._data['highest_cleared_lvl']}")
+                file.write(f"\nname: {self._account._name}")
+                file.write(f"\nbalance: {self._account._points_balance}")
                 
                 print("Save file saved successfully")
                 self._already_saved = True

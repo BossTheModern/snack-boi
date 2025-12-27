@@ -35,7 +35,7 @@ class Account:
         print("[Q] back to main menu")
     
     def show_owned_powerups(self) -> None:
-        print("Owned powerups: ", end='')
+        print("Owned powerups: ")
         
         if len(self._owned_shop_items) == 0:
             print("None")

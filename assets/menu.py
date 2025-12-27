@@ -341,7 +341,9 @@ class Menu:
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
             if keyboard_utils.check_key_event(key_event, 'y'):
-                self._account._owned_shop_items.append(shop_item)
+                if not self.shop_item_exists(shop_item):                    
+                    self._account._owned_shop_items.append(shop_item)
+
                 shop_item._stock += 1
                 self._account._points_balance -= price
                 print("Purchase successful\n\n")
@@ -350,7 +352,19 @@ class Menu:
             if keyboard_utils.check_key_event(key_event, 'n'):
                 print("Canceled purchase\n\n")
                 break
+    
+    def shop_item_exists(self, shop_item: ShopItem) -> bool:
+        owned_shop_items: List[ShopItem] = self._account._owned_shop_items
 
+        if len(owned_shop_items) == 0:
+            return False
+
+        for item in owned_shop_items:
+            if item._name == shop_item._name:
+                return True
+
+        return False
+    
     def prompt_name(self) -> None:
         '''
             Prompts the user to enter their name upon first boot

@@ -42,8 +42,8 @@ class Game:
     _normal_snack: NormalSnack = NormalSnack()
     _super_snack: SuperSnack = SuperSnack()
     _fake_snack: FakeSnack = FakeSnack()
-    
     _current_snack: Snack = Snack()
+    
     # Powerup related properties
     _recon_snack: ReconSnack = ReconSnack()
     
@@ -52,11 +52,11 @@ class Game:
     _classic_levels: List[Level] = _new_levels._classic_levels_set_1
 
     # Other properties
-    _save_file: SaveFile = SaveFile(consts.SAVE_FILE_PATH)
     _menu_front: MenuFront = MenuFront()
     _account: Account = Account()
 
     def __init__(self) -> None:
+        self._save_file: SaveFile = SaveFile(consts.SAVE_FILE_PATH, self._account)
         self.menu: Menu = Menu(self.game_loop, self._account)
         self._game_utils: game_utils.GameUtils = game_utils.GameUtils(self._snack)
     
@@ -245,11 +245,10 @@ class Game:
         show_menu: bool = True
 
         self.menu.print_welcome_screen()
-        
+        self._save_file.load(self._classic_levels)
+
         if self._account._name == "":
             self.menu.prompt_name()
-            
-        self._save_file.load(self._classic_levels)
 
         # Main menu loop
         while True:

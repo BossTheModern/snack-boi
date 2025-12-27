@@ -16,6 +16,7 @@ SAVE_FILE_PATH: str = 'assets/save_files/save_file.txt'
 # Account configs
 NAME_MIN_LENGTH: int = 1
 NAME_MAX_LENGTH: int = 20
+START_POINTS: int = 100
 
 # points for eating snacks
 NORMAL_SNACK_POINTS: int = 1
