@@ -18,6 +18,9 @@ NAME_MIN_LENGTH: int = 1
 NAME_MAX_LENGTH: int = 20
 START_POINTS: int = 100
 
+# file
+END_OF_ITEMS_FLAG: str = "end_of_items"
+
 # points for eating snacks
 NORMAL_SNACK_POINTS: int = 1
 SUPER_SNACK_POINTS: int = 2
