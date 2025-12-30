@@ -57,7 +57,7 @@ class SaveFile:
                 # Read data from file
                 highest_unlocked_lvl = int(file.readline().strip().split(':')[1])
                 highest_cleared_lvl = int(file.readline().strip().split(':')[1])
-                name = file.readline().strip().split(':')[1]
+                name = file.readline().split(':')[1].strip()
                 balance = file.readline().strip().split(':')[1]
                 current_item_name: str = ""
                 
@@ -167,7 +167,7 @@ class SaveFile:
                 file.write(f"\nbalance: {self._account._points_balance}")
 
                 # Sacing owned shop items
-                for item in Account._owned_shop_items:
+                for item in self._account._owned_shop_items:
                     file.write(f"\n{item._name}: {item._stock}")
                 file.write(f"\n{END_OF_ITEMS_FLAG}")
                 
