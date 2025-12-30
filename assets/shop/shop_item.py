@@ -11,4 +11,16 @@ class ShopItem:
         self._description: str = description
         self._limit: int = limit
         self._stock: int = 0
+        self._active: bool = False
     
+    def activate(self) -> None:
+        pass
+    
+    def reset(self) -> None:
+        pass
+
+    def complete_usage(self) -> None:
+        pass
+
+    def reached_usage_per_game(self) -> bool:
+        pass

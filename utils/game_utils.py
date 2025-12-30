@@ -10,6 +10,7 @@ from assets.printer.fancy_printer import FancyPrinter
 from assets.text_collection import TextCollection
 from assets.levels.level import Level
 from assets.snacks.snack import Snack
+from assets.shop.shop_item import ShopItem
 from boards.board_creator import draw_grid
 
 class GameUtils:
@@ -115,7 +116,8 @@ class GameUtils:
     
     def display_current_state(self, board: List[List[str]], current_lvl_index: int, 
                               levels: List[Level], game_mode: str, 
-                              current_snack_type: str, recon_duration: int, recon_active: bool) -> None:
+                              current_snack_type: str, recon_duration: int, recon_active: bool,
+                              active_powerup: ShopItem) -> None:
         '''
             Displays the current state of the game basd on game mode
         '''
@@ -126,13 +128,20 @@ class GameUtils:
                 self.endless_display_current_state(board, current_lvl_index, levels)
             case _:
                 print("Nothing to display")
-
+        
         print("Move by pressing (w/a/s/d) or press q to quit")
         print("Super snack spawned! Eat it for extra points!") if current_snack_type == 'super' else None
         print(f"Recon duration: {recon_duration} moves") if recon_active else None
+        self.display_active_powerup_status(active_powerup) if active_powerup._name != "None" else None
             
         # Supplementary toggle text
         self.toggleText()
+    
+    def display_active_powerup_status(self, active_powerup: ShopItem) -> None:
+        print(f"{'':-<30}")
+        print(f"Active powerup: {active_powerup._name} ({'ACTIVE' if active_powerup._active else 'INACTIVE'})")
+        print(f"Current duration: {active_powerup._active_duration}")
+        print(f"[E] Activate")
     
     def set_snack_eaten(self, current_snack_type: str) -> None:
         '''

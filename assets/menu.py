@@ -379,3 +379,36 @@ class Menu:
 
         self._account._name = new_name
         print(f"Welcome to the game, {self._account._name}!")
+    
+    def prompt_powerup_selection(self, owned_powerups: List[ShopItem]) -> int:
+        '''
+            Handling logic for prompting user to select a powerup
+            before starting game
+        '''
+        index: int = 0
+        show_menu: bool = True
+
+        while True:
+            if show_menu:
+                self._menu_front.print_owned_powerups(owned_powerups, index)
+                show_menu = False
+
+            key_event: KeyboardEvent = keyboard.read_event(suppress=True)
+
+            if keyboard_utils.check_key_event(key_event, 'w') and index > 0:
+                index -= 1
+                show_menu = True
+
+            if keyboard_utils.check_key_event(key_event, 's') and index < len(owned_powerups)-1:
+                index += 1
+                show_menu = True
+
+            if keyboard_utils.check_key_event(key_event, 'e'):
+                break
+
+            if keyboard_utils.check_key_event(key_event, 'q'):
+                index = -1
+                break
+
+        return index
+        

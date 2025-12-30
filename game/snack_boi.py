@@ -28,6 +28,7 @@ from assets.printer.fancy_printer import FancyPrinter
 from assets.text_collection import TextCollection
 from assets.menu_front import MenuFront
 from account.account import Account
+from assets.shop.shop_item import ShopItem
 
 
 # Game class where the game logic is implemented
@@ -55,6 +56,9 @@ class Game:
     _menu_front: MenuFront = MenuFront()
     _account: Account = Account()
 
+    # Active shop powerup
+    _active_shop_powerup: ShopItem = ShopItem("None", 0, "", 0)
+
     def __init__(self) -> None:
         self._save_file: SaveFile = SaveFile(consts.SAVE_FILE_PATH, self._account)
         self.menu: Menu = Menu(self.game_loop, self._account)
@@ -65,10 +69,24 @@ class Game:
         self._snack.clear_data()
         self._recon_snack.clear_data()
         self._game_utils.clear_toggle_text()
+        self._active_shop_powerup: ShopItem = ShopItem("None", 0, "", 0)
+
+    def clear_owned_items(self, game_mode: str, current_level_index: int) -> None:
+        # Determine if usage of active powerup is complete
+        if game_mode == "classic" and self._snack._count >= self._classic_levels[current_level_index]._win_cap and self._active_shop_powerup.reached_usage_per_game():
+            self._active_shop_powerup.complete_usage()
+        elif game_mode == "endless" and self._active_shop_powerup.reached_usage_per_game():
+            self._active_shop_powerup.complete_usage()
+
+        self._active_shop_powerup.reset()
+
+        # Update with used powerup and erase ones with zero quantity
+        self._account._owned_shop_items = [self._active_shop_powerup if self._active_shop_powerup._name == powerup._name else powerup for powerup in self._account._owned_shop_items ]
+        self._account._owned_shop_items = [powerup for powerup in self._account._owned_shop_items if powerup._stock > 0]
 
     def game_spawn_snack(self, grid: List[List[str]], occupied_positions: List[List[int]], snack_num: int) -> None:
         '''
-            Spawns snack based on the snack number generated on the board
+            Spawns snack based on the snack number generated on the board 
         '''
         match snack_num:
             case 1:
@@ -104,6 +122,10 @@ class Game:
         hunger_traps: List[Trap] = []
         parallel_dimension_traps: List[Trap] = []
         traps: List[Trap] = []
+        
+        owned_powerups: List[ShopItem] = self._account._owned_shop_items
+        print(owned_powerups)
+        powerup_index: int
         
         # Eating flags for one time display
         recon_start_reached: bool = False
@@ -146,6 +168,14 @@ class Game:
         
         levels_unlocked = len([lvl for lvl in self._classic_levels if lvl._unlocked == True])
 
+        # Prompt user to choose a powerup if they have any
+        if owned_powerups:
+            powerup_index = self.menu.prompt_powerup_selection(owned_powerups)
+            if powerup_index >= 0:
+                self._active_shop_powerup = owned_powerups[powerup_index]
+                print(self._active_shop_powerup._name)
+
+
         # Game loop handling both modes
         while True:
             # Intro text before game display
@@ -162,7 +192,8 @@ class Game:
                 self._game_utils.display_current_state(board, current_level_index, 
                                                        self._classic_levels, 
                                                        game_mode, self._current_snack._type, 
-                                                       recon_duration, self._recon_snack._active)
+                                                       recon_duration, self._recon_snack._active,
+                                                       self._active_shop_powerup)
                 
                 # Object tracker for debugging purposes
                 # debug.print_obj_tracker(occupied_positions, self._current_snack, traps, self._recon_snack)
@@ -172,6 +203,11 @@ class Game:
 
             if keyboard_utils.check_key_event(key_event, 'q'):
                 break
+
+            # Toggle active powerup
+            if keyboard_utils.check_key_event(key_event, 'e') and not self._active_shop_powerup._active and not self._active_shop_powerup.reached_usage_per_game():
+                self._active_shop_powerup.activate()
+                show_state = True
             
             # Handle player movement
             if key_event.event_type == keyboard.KEY_DOWN and key_event.name in self._valid_move_keys:
@@ -191,7 +227,11 @@ class Game:
                 if recon_start_reached:
                     self._recon_snack._eaten_counter += 1
                 
-                self._snack.eat_snack(current_level_index, self._current_snack)
+                if self._active_shop_powerup._name == "Doubler" and self._active_shop_powerup._active:
+                    self._active_shop_powerup.double_points(self._snack, self._current_snack)
+                else:
+                    self._snack.eat_snack(current_level_index, self._current_snack)
+                
                 occupied_positions.remove(self._current_snack._position)
                 self._game_utils.set_snack_eaten(self._current_snack._type)
 
@@ -234,6 +274,7 @@ class Game:
                         self._game_utils._parallel_trap_eaten = True
                     case _: print("No type found")                
         
+        self.clear_owned_items(game_mode, current_level_index)
         self.clear_game_data()
         print("Quitting game, back to main menu")
 

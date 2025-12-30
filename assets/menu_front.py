@@ -7,6 +7,7 @@ from typing import List
 from utils import consts
 from assets.levels.level import Level
 from assets.save_file import SaveFile
+from assets.shop.shop_item import ShopItem
 
 class MenuFront:
     _select_char: str = '>'
@@ -122,3 +123,10 @@ class MenuFront:
         print(f"[{valid_options_inputs[0]}] Manage save file")
         print(f"[{valid_options_inputs[1]}] Back to main menu")
         print("-------------------")
+    
+    def print_owned_powerups(self, owned_powerups: List[ShopItem], selected_index: int) -> None:
+        print(f"{'[SELECT SHOP POWERUP]':-^50}")
+        for index, powerup in enumerate(owned_powerups):
+            print('> ' if selected_index == index else '', powerup._name)
+        print(f"{'':-<50}")
+        print("[W] Up [S] Down [E] Select [Q] Skip")
