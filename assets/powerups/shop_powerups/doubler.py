@@ -27,10 +27,13 @@ class Doubler(ShopItem):
         '''
         if self._active_duration > 0:
             match current_snack._type:
-                case 'normal': snack._count += 2 * NORMAL_SNACK_POINTS
-                case 'super': snack._count += 2 * SUPER_SNACK_POINTS
-            
-            self._active_duration -= 1
+                case 'normal': 
+                    snack._count += 2 * NORMAL_SNACK_POINTS
+                    self._active_duration -= 1
+                case 'super': 
+                    snack._count += 2 * SUPER_SNACK_POINTS
+                    self._active_duration -= 1
+
             
             if self._active_duration == 0:
                 self.deactivate()

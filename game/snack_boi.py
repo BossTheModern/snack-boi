@@ -185,7 +185,7 @@ class Game:
             
             # Handle win condition
             if game_mode == 'classic' and self._snack._count >= self._classic_levels[current_level_index]._win_cap:
-                self._game_utils.classic_game_win(current_level_index, self._classic_levels)
+                self._game_utils.classic_game_win(current_level_index, self._classic_levels, self._account)
                 break
             
             if show_state:

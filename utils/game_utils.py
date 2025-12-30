@@ -12,6 +12,7 @@ from assets.levels.level import Level
 from assets.snacks.snack import Snack
 from assets.shop.shop_item import ShopItem
 from boards.board_creator import draw_grid
+from account.account import Account
 
 class GameUtils:
     def __init__(self, snack: Snack) -> None:
@@ -38,12 +39,16 @@ class GameUtils:
         draw_grid(board)
         print("Snack count:", self._snack._count)
         
-    def classic_game_win(self, current_lvl_index: int, levels: List[Level]) -> None:
+    def classic_game_win(self, current_lvl_index: int, levels: List[Level], account: Account) -> None:
         '''
             Handles winning logic for classic game mode
         '''
         next_level_index: int
         print("You win! You have eaten enough snacks!")
+
+        account._points_balance += levels[current_lvl_index]._reward
+        print(f"{levels[current_lvl_index]._reward} points earned!")
+        
 
         if current_lvl_index + 1 <= len(levels)-1:
             next_level_index = current_lvl_index + 1
