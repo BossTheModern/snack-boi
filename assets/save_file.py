@@ -16,6 +16,7 @@ from keyboard import KeyboardEvent
 from account.account import Account
 from utils.consts import START_POINTS
 from utils.consts import END_OF_ITEMS_FLAG
+from utils.consts import SHOP_ITEM_LIMIT
 from assets.shop.shop_items import ShopItems
 from assets.shop.shop_item import ShopItem
 
@@ -81,28 +82,28 @@ class SaveFile:
 
                 # Load owned items to account
                 item = file.readline().strip().split(':')
-                print(item)
                 current_item_name = item[0]
-                print(current_item_name)
 
                 while current_item_name != END_OF_ITEMS_FLAG:
-                    print("fetching items")
                     item_name = current_item_name
                     item_number = int(item[1])
 
-                    # Check for item existence and handle adding items 
-                    # accordingly
-                    for existing_item in existing_shop_items:
-                        if existing_item._name == item_name:
-                            new_item = existing_item
-                            new_item._stock = item_number
-                            Account._owned_shop_items.append(new_item)
-                            item_not_found = False
-                    
-                    if item_not_found:
-                        print("shop item not found, skipping...")
+                    if item_number < 1 or item_number > SHOP_ITEM_LIMIT:
+                        print("shop item has invalid quantity, skipping...")
                     else:
-                        item_not_found = True
+                        # Check for item existence and handle adding items 
+                        # accordingly
+                        for existing_item in existing_shop_items:
+                            if existing_item._name == item_name:
+                                new_item = existing_item
+                                new_item._stock = item_number
+                                Account._owned_shop_items.append(new_item)
+                                item_not_found = False
+                    
+                        if item_not_found:
+                            print("shop item not found, skipping...")
+                        else:
+                            item_not_found = True
 
                     item = file.readline().strip().split(':')
                     current_item_name = item[0]
