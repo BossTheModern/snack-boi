@@ -124,7 +124,6 @@ class Game:
         traps: List[Trap] = []
         
         owned_powerups: List[ShopItem] = self._account._owned_shop_items
-        print(owned_powerups)
         powerup_index: int
         
         # Eating flags for one time display
@@ -188,6 +187,10 @@ class Game:
                 self._game_utils.classic_game_win(current_level_index, self._classic_levels, self._account)
                 break
             
+            # Handle area scan
+            if self._active_shop_powerup._name == "Radar" and self._active_shop_powerup._active:
+                self._active_shop_powerup.scan_area(self._player._position, board, traps)
+
             if show_state:
                 self._game_utils.display_current_state(board, current_level_index, 
                                                        self._classic_levels, 
