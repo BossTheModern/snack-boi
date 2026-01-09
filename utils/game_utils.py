@@ -147,6 +147,7 @@ class GameUtils:
         print(f"Active powerup: {active_powerup._name} ({'ACTIVE' if active_powerup._active else 'INACTIVE'})")
         print(f"Current duration: {active_powerup._active_duration}")
         print(f"[E] Activate")
+        print("[R] Use recall") if active_powerup._name == "Recall" else None
     
     def set_snack_eaten(self, current_snack_type: str) -> None:
         '''

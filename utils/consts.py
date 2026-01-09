@@ -3,7 +3,6 @@
 
     Game related constants for game configs
 '''
-from typing import List
 
 # game settings and configurations
 HUNGER_TRAPS_LIMIT: int = 7
@@ -26,7 +25,6 @@ END_OF_ITEMS_FLAG: str = "end_of_items"
 # points for eating snacks
 NORMAL_SNACK_POINTS: int = 1
 SUPER_SNACK_POINTS: int = 2
-NON_TRAP_TILE_CONTENT: List[str] = ['X', '*', '#', ' ']
 
 # level rewards
 BASE_LEVEL_REWARD: int = 5

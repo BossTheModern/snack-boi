@@ -7,12 +7,11 @@ from typing import List
 from assets.shop.shop_item import ShopItem
 from assets.traps.traps import Trap
 from utils.consts import SHOP_ITEM_LIMIT
-from utils.consts import NON_TRAP_TILE_CONTENT
 import textwrap
 
 class Radar(ShopItem):
     def __init__(self) -> None:
-        super().__init__('Radar', 15, textwrap.fill('Tell the player if a trap is nearby', width=40), SHOP_ITEM_LIMIT)
+        super().__init__('Radar', 15, textwrap.fill('Tell the player if there are traps nearby', width=50), SHOP_ITEM_LIMIT)
         self._active: bool = False
         self._duration: int = 3 # Duration in number of snacks eaten
         self._active_duration: int = 0
