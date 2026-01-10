@@ -17,6 +17,7 @@ from account.account import Account
 from assets.shop.shop_item import ShopItem
 from utils.consts import NAME_MIN_LENGTH
 from utils.consts import NAME_MAX_LENGTH
+from utils.consts import EMPTY_SHOP_ITEM
 
 class Menu:
     _valid_options_inputs: List[str] = ['1', '2']
@@ -320,7 +321,13 @@ class Menu:
         shop_item: ShopItem = self._shop._shop_items[item_num]
         shop_item_limit: int = shop_item._limit
         acc_shop_items: List[ShopItem] = self._account._owned_shop_items
-        shop_item_stock: int = acc_shop_items[item_num]._stock if len(acc_shop_items) > 0 else 0
+
+        acc_shop_item: ShopItem = EMPTY_SHOP_ITEM
+        for item in acc_shop_items:
+            if item._name == shop_item._name:
+                acc_shop_item = item
+
+        shop_item_stock: int = acc_shop_item._stock if len(acc_shop_items) > 0 else 0
 
         # Reject preemptively if the user has insufficient funds
         # or if item stock has reached limit

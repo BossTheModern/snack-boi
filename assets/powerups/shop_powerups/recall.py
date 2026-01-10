@@ -48,16 +48,12 @@ class Recall(ShopItem):
         '''
             records last position the player was in        
         '''
-        #self._previous_positions[1] = self._previous_positions[0].copy()
-        #self._previous_positions[0] = position.copy()
         first_tracked_position: List[int] = tracked_positions[0]
         all_elements_same: bool = all(position == first_tracked_position for position in tracked_positions[1:])
 
         if position not in self._previous_positions or not all_elements_same:
             self._previous_positions.reverse()
             self._previous_positions[1] = position.copy()
-        
-        
 
     def recall(self, player_entity: str, current_position: List[int], board: List[List[int]]) -> None:
         '''

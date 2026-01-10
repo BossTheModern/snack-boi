@@ -20,6 +20,7 @@ class Radar(ShopItem):
         self._revealed_traps: List[Trap] = []
         self._trap_not_found_counter: int = 0
         self._counter_limit: int = 2
+        self._trap_was_found: bool = False
     
     def coord_is_within_range(self, x: int, y: int, min: int, max: int) -> bool:
         return x >= min and x <= max and y >= min and y <= max
@@ -45,11 +46,16 @@ class Radar(ShopItem):
             self._revealed_traps.clear()
             
             self._trap_not_found_counter = 0
-        else:
+            self._trap_was_found = True
+        
+        if self._trap_was_found:
             self._trap_not_found_counter += 1
 
         if self._trap_not_found_counter == self._counter_limit:
-            self._active_duration -= 1       
+            self._active_duration -= 1
+            self._trap_not_found_counter = 0       
+            self._trap_was_found = False
+
 
         # populate target area coords
         for y in range(position[0]-1, position[0]+2):
@@ -103,6 +109,7 @@ class Radar(ShopItem):
         self._active = False
         self._revealed_traps = []
         self._trap_not_found_counter = 0
+        self._trap_was_found = False
     
     def reached_usage_per_game(self) -> bool:
         return self._use_count == self._use_limit

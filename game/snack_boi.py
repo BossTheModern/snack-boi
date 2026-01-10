@@ -29,6 +29,7 @@ from assets.text_collection import TextCollection
 from assets.menu_front import MenuFront
 from account.account import Account
 from assets.shop.shop_item import ShopItem
+from utils.consts import EMPTY_SHOP_ITEM
 import copy
 
 
@@ -58,7 +59,7 @@ class Game:
     _account: Account = Account()
 
     # Active shop powerup
-    _active_shop_powerup: ShopItem = ShopItem("None", 0, "", 0)
+    _active_shop_powerup: ShopItem = EMPTY_SHOP_ITEM
 
     def __init__(self) -> None:
         self._save_file: SaveFile = SaveFile(consts.SAVE_FILE_PATH, self._account)
@@ -70,14 +71,15 @@ class Game:
         self._snack.clear_data()
         self._recon_snack.clear_data()
         self._game_utils.clear_toggle_text()
-        self._active_shop_powerup: ShopItem = ShopItem("None", 0, "", 0)
+        self._active_shop_powerup: ShopItem = EMPTY_SHOP_ITEM
 
     def clear_owned_items(self, game_mode: str, current_level_index: int) -> None:
         # Determine if usage of active powerup is complete
-        if game_mode == "classic" and self._snack._count >= self._classic_levels[current_level_index]._win_cap and self._active_shop_powerup.reached_usage_per_game():
+        if game_mode == "classic" and self._snack._count >= self._classic_levels[current_level_index]._win_cap and (self._active_shop_powerup.reached_usage_per_game() or self._active_shop_powerup._active):
             self._active_shop_powerup.complete_usage()
         elif game_mode == "endless" and self._active_shop_powerup.reached_usage_per_game():
             self._active_shop_powerup.complete_usage()
+        
 
         self._active_shop_powerup.reset()
 
@@ -174,7 +176,6 @@ class Game:
             powerup_index = self.menu.prompt_powerup_selection(owned_powerups)
             if powerup_index >= 0:
                 self._active_shop_powerup = owned_powerups[powerup_index]
-                print(self._active_shop_powerup._name)
         
         # Start precording positions for recall gadget
         if self._active_shop_powerup._name == "Recall":
@@ -194,9 +195,7 @@ class Game:
                 self._game_utils.classic_game_win(current_level_index, self._classic_levels, self._account)
                 break
             
-            # Handle area scan
-            if self._active_shop_powerup._name == "Radar" and self._active_shop_powerup._active:
-                self._active_shop_powerup.scan_area(self._player._position, board, traps)
+            
 
             if show_state:
                 self._game_utils.display_current_state(board, current_level_index, 
@@ -243,11 +242,9 @@ class Game:
 
                     match len(self._active_shop_powerup._previous_positions):
                         case 1:
-                            print("Prerecording")
                             self._active_shop_powerup.prerecord_last_positions(self._player._position.copy())
                             self._active_shop_powerup._previous_positions.reverse()
                         case _:
-                            print("Recording")
                             self._active_shop_powerup.record_last_positions(self._player._position.copy(), tracked_positions.copy())
 
                     # Handle maintaining unit 
@@ -256,10 +253,11 @@ class Game:
                     
                     # Ensure recording order is correct
                     if self._player._position == self._active_shop_powerup._previous_positions[0]:
-                        print("correcting")
                         self._active_shop_powerup._previous_positions.reverse()
 
-
+            # Handle area scan
+            if self._active_shop_powerup._name == "Radar" and self._active_shop_powerup._active:
+                self._active_shop_powerup.scan_area(self._player._position, board, traps)
                     
                         
             # Handle recall usage
@@ -267,19 +265,14 @@ class Game:
             # Press r when recall was placed - teleport to recall
             if keyboard_utils.check_key_event(key_event, 'r') and self._active_shop_powerup._active and self._active_shop_powerup._name == "Recall":
                 if self._active_shop_powerup._placed and len(self._active_shop_powerup._previous_positions) != 0:
-                    print("recalling")
                     self._active_shop_powerup.recall(self._player._entity, self._player._position, board)
                     occupied_positions.remove(self._active_shop_powerup._position)
                     show_state = True
                 elif len(self._active_shop_powerup._previous_positions) > 1:
-                    print("placing")
                     self._active_shop_powerup.place(board)
                     occupied_positions.append(self._active_shop_powerup._position)
                     show_state = True
 
-            print(f"tracked positions: {tracked_positions}")
-            print(self._active_shop_powerup._previous_positions)
-            print(f"player position: {self._player._position}")           
 
             # Handle eating snack
             if self._player._position == self._current_snack._position:

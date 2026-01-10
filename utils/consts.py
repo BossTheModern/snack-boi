@@ -3,6 +3,7 @@
 
     Game related constants for game configs
 '''
+from assets.shop.shop_item import ShopItem
 
 # game settings and configurations
 HUNGER_TRAPS_LIMIT: int = 7
@@ -30,3 +31,5 @@ SUPER_SNACK_POINTS: int = 2
 BASE_LEVEL_REWARD: int = 5
 INTERMEDIATE_LEVEL_REWARD: int = BASE_LEVEL_REWARD * 2
 ADVANCED_LEVEL_REWARD: int = BASE_LEVEL_REWARD * 3
+
+EMPTY_SHOP_ITEM: ShopItem = ShopItem("None", 0, "", 0)
