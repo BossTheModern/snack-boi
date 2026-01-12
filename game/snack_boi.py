@@ -342,6 +342,8 @@ class Game:
 
         if self._account._name == "":
             self.menu.prompt_name()
+        else:
+            print(f"Welcome back {self._account._name}!")
 
         # Main menu loop
         while True:

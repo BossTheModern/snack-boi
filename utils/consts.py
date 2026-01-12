@@ -11,7 +11,7 @@ PARALLEL_TRAPS_LIMIT: int = 4
 TRAP_START_LVL: int = 8
 NEW_SNACKS_START_LVL: int = 5
 SHOP_ITEM_LIMIT: int = 3
-VERSION: str = "0.5.0 alpha"
+VERSION: str = "0.6.0 alpha"
 VERSION_LOG_FILE_PATH: str = 'version_log.txt'
 SAVE_FILE_PATH: str = 'assets/save_files/save_file.txt'
 

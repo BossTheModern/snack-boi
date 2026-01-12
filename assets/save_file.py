@@ -75,7 +75,6 @@ class SaveFile:
                 }
 
                 # Store account data
-                print(f"loaded name: {name}")
                 Account._name = name
                 Account._points_balance = int(balance) if balance else START_POINTS
 
@@ -156,8 +155,6 @@ class SaveFile:
         
         self._data['highest_unlocked_lvl'] = highest_unlocked_level
         self._data['highest_cleared_lvl'] = highest_cleared_level
-
-        print(f"Current name: {self._account._name}")
 
         try:
             with open(self._file_path, 'w') as file:
