@@ -269,7 +269,7 @@ class Game:
                     occupied_positions.remove(self._active_shop_powerup._position)
                     show_state = True
                 elif len(self._active_shop_powerup._previous_positions) > 1:
-                    self._active_shop_powerup.place(board)
+                    self._active_shop_powerup.place(board, occupied_positions)
                     occupied_positions.append(self._active_shop_powerup._position)
                     show_state = True
 

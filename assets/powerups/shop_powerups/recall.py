@@ -23,17 +23,22 @@ class Recall(ShopItem):
         self._entity: str = 'R'
         self._placed: bool = False
 
-    def place(self, board: List[List[int]]) -> None:
+    def place(self, board: List[List[int]], occupied_positions: List[List[int]]) -> None:
         '''
             places recall item at the last recorded position
-            the player was in
+            the player was in given the position is not occupied
+            by anything else
 
             can also be used to maintain placement when player leaves 
             recall's position
         '''    
         self._position = self._previous_positions[0]
-        board[self._position[0]][self._position[1]] = self._entity
-        self._placed = True
+
+        if self._position in occupied_positions:
+            print("Something is preventing you from placing the recall")
+        else:
+            board[self._position[0]][self._position[1]] = self._entity
+            self._placed = True
 
     def prerecord_last_positions(self, position: List[int]) -> None:
         '''
