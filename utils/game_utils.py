@@ -4,11 +4,15 @@
     contains utility functions for game loop
 '''
 
-
 from typing import List
+from utils import consts
+from assets.printer.fancy_printer import FancyPrinter
+from assets.text_collection import TextCollection
 from assets.levels.level import Level
 from assets.snacks.snack import Snack
+from assets.shop.shop_item import ShopItem
 from boards.board_creator import draw_grid
+from account.account import Account
 
 class GameUtils:
     def __init__(self, snack: Snack) -> None:
@@ -22,6 +26,8 @@ class GameUtils:
           self._snack_eaten: bool = False
           self._fake_snack_eaten: bool = False
           self._super_snack_eaten: bool = False
+          self._fancy_print: FancyPrinter = FancyPrinter()
+          self._text_collection: TextCollection = TextCollection()
 
     def classic_display_current_state(self, board: List[List[str]], current_lvl_index: int, levels: List[Level]) -> None:
         print(f"--------[CLASSIC MODE - {levels[current_lvl_index]._level_name}]--------")
@@ -33,12 +39,16 @@ class GameUtils:
         draw_grid(board)
         print("Snack count:", self._snack._count)
         
-    def classic_game_win(self, current_lvl_index: int, levels: List[Level]) -> None:
+    def classic_game_win(self, current_lvl_index: int, levels: List[Level], account: Account) -> None:
         '''
             Handles winning logic for classic game mode
         '''
         next_level_index: int
         print("You win! You have eaten enough snacks!")
+
+        account._points_balance += levels[current_lvl_index]._reward
+        print(f"{levels[current_lvl_index]._reward} points earned!")
+        
 
         if current_lvl_index + 1 <= len(levels)-1:
             next_level_index = current_lvl_index + 1
@@ -95,3 +105,55 @@ class GameUtils:
         self._snack_eaten = False
         self._fake_snack_eaten = False
         self._super_snack_eaten = False
+    
+    def intro_text_display(self, levels_unlocked: int, current_lvl_index: int) -> None:
+        '''
+            Displays intro text based on the current level unlocked
+            TODO: Change the logic so it doesn't play on other levels
+            than the intended level
+        '''
+        if levels_unlocked == 1 and current_lvl_index == 0:
+            self._fancy_print.print_text_line(self._text_collection._start_intro)
+        elif levels_unlocked == consts.NEW_SNACKS_START_LVL and current_lvl_index == consts.NEW_SNACKS_START_LVL - 1:
+            self._fancy_print.print_text_line(self._text_collection._extra_snack_intro)
+        elif levels_unlocked == consts.TRAP_START_LVL and current_lvl_index == consts.TRAP_START_LVL - 1:
+            self._fancy_print.print_text_line(self._text_collection._traps_intro)
+    
+    def display_current_state(self, board: List[List[str]], current_lvl_index: int, 
+                              levels: List[Level], game_mode: str, 
+                              current_snack_type: str, recon_duration: int, recon_active: bool,
+                              active_powerup: ShopItem) -> None:
+        '''
+            Displays the current state of the game basd on game mode
+        '''
+        match game_mode:
+            case 'classic':
+                self.classic_display_current_state(board, current_lvl_index, levels)
+            case 'endless':
+                self.endless_display_current_state(board, current_lvl_index, levels)
+            case _:
+                print("Nothing to display")
+        
+        print("Move by pressing (w/a/s/d) or press q to quit")
+        print("Super snack spawned! Eat it for extra points!") if current_snack_type == 'super' else None
+        print(f"Recon duration: {recon_duration} moves") if recon_active else None
+        self.display_active_powerup_status(active_powerup) if active_powerup._name != "None" else None
+            
+        # Supplementary toggle text
+        self.toggleText()
+    
+    def display_active_powerup_status(self, active_powerup: ShopItem) -> None:
+        print(f"{'':-<30}")
+        print(f"Active powerup: {active_powerup._name} ({'ACTIVE' if active_powerup._active else 'INACTIVE'})")
+        print(f"Current duration: {active_powerup._active_duration}")
+        print(f"[E] Activate")
+        print("[R] Use recall") if active_powerup._name == "Recall" else None
+    
+    def set_snack_eaten(self, current_snack_type: str) -> None:
+        '''
+            Sets appropriate toggle text variables based on snack eaten
+        '''
+        match current_snack_type:
+            case 'normal': self._snack_eaten = True
+            case 'super': self._super_snack_eaten = True
+            case 'fake': self._fake_snack_eaten = True

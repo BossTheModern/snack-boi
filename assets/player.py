@@ -87,3 +87,10 @@ class Player:
                 grid[player_pos[0]][player_pos[1]] = ' '
                 player_pos[1] += 1
                 grid[player_pos[0]][player_pos[1]] = self._entity
+    
+    def clear_data(self) -> None:
+        '''
+            Clears player data
+        '''
+        self._position.clear()
+        self._parallel_position.clear()

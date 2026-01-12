@@ -11,22 +11,28 @@ from assets.save_file import SaveFile
 from keyboard import KeyboardEvent
 from assets.printer.fancy_printer import FancyPrinter
 from assets.levels.level import Level
+from assets.menu_front import MenuFront
+from assets.shop.shop import Shop
+from account.account import Account
+from assets.shop.shop_item import ShopItem
+from utils.consts import NAME_MIN_LENGTH
+from utils.consts import NAME_MAX_LENGTH
+from utils.consts import EMPTY_SHOP_ITEM
 
 class Menu:
-    _valid_min_max_size: List[int] = [5, 30]
     _valid_options_inputs: List[str] = ['1', '2']
-    _valid_modes_inputs: List[str] = ['1', '2', '3']
     _valid_level_menu_inputs: List[str] = ['A', 'D', 'S']
-    _lock_char: str = '(locked)'
-    _select_char: str = '>'
     _game_modes: List[str] = ['classic', 'endless']
     game_loop: Callable[[List[List[str]]], None]
-    _wrap_limit: int = 5
+    _menu_front: MenuFront = MenuFront()
+    _shop: Shop = Shop()
+    _account: Account
     
     _fancy_print: FancyPrinter = FancyPrinter()
 
-    def __init__(self, game_loop: Callable[[List[List[str]]], None]) -> None:
+    def __init__(self, game_loop: Callable[[List[List[str]]], None], account: Account) -> None:
         self.game_loop = game_loop
+        self._account = account
     
     def print_welcome_screen(self) -> None:
         '''
@@ -36,31 +42,6 @@ class Menu:
                     "Press any button to continue"
 
         self._fancy_print.print_text(text)
-
-    def print_game_menu(self, version: str, menu_options: List[str]) -> None:
-        '''
-            Prints the main menu of the game
-        '''
-        print("-----[Snack boi]-----")
-        print(f"[{menu_options[0]}] Start Game")
-        print(f"[{menu_options[1]}] Options")
-        print(f"[{menu_options[2]}] Version log")
-        print(f"[{menu_options[3]}] Quit")
-        print("version:", version)
-        print("---------------------")   
-    
-    def print_version_log(self) -> None:
-        '''
-            Prints the contents of version log file
-        '''
-        file_content: str
-        try:
-            with open(consts.VERSION_LOG_FILE_PATH) as file:
-                file_content = file.read()
-
-            print(file_content)
-        except OSError:
-            print("Error: Could not read file")
     
     def version_log(self) -> None:
         '''
@@ -72,7 +53,7 @@ class Menu:
         
         while True:
             if display_text:
-                self.print_version_log()
+                self._menu_front.print_version_log()
                 print("\nPress Q to return to menu")
                 display_text = False
             
@@ -82,54 +63,6 @@ class Menu:
                 break
         
         print("Returning to menu")
-
-    def print_endless_mode_levels_menu(self, levels: List[Level]) -> None:
-        '''
-            Prints menu for levels on endless mode
-        '''
-        counter: int = 0
-
-        print("-----[ENDLESS MODE LEVELS]-----\n")
-        for level in levels:
-            if level._selected:
-                print(self._select_char, end="")
-            print(f"[{level._level_name}]", end="")
-            if not level._cleared:
-                print(self._lock_char, end="")
-            print(" ", end="")
-
-            counter += 1
-            if counter == self._wrap_limit:
-                print()
-                counter = 0
-        print()
-        print("\n[A] Move left [D] Move right [S] Select")
-        print("[Q] Back to main menu")
-        print("-------------------------------")
-    
-    def print_level_menu(self, levels: List[Level]) -> None:
-        '''
-            Prints menu for levels on classic mode
-        '''
-        counter: int = 0
-
-        print("-----[CLASSIC MODE LEVELS]-----\n")
-        for level in levels:
-            if level._selected:
-                print(self._select_char, end="")
-            print(f"[{level._level_name}]", end="")
-            if not level._unlocked:
-                print(self._lock_char, end="")
-            print(" ", end="")
-
-            counter += 1
-            if counter == self._wrap_limit:
-                print()
-                counter = 0
-        print()
-        print("\n[A] Move left [D] Move right [S] Select")
-        print("[Q] Back to main menu")
-        print("---------------------")
 
     def selected_level(self, levels: List[Level]) -> Level:
         for level in levels:
@@ -142,26 +75,19 @@ class Menu:
         '''
         show_menu: bool = True
 
-        def print_mode_selection_menu() -> None:
-            print("-----[MODES]-----")
-            print(f"[{self._valid_modes_inputs[0]}] Classic Mode")
-            print(f"[{self._valid_modes_inputs[1]}] Endless mode")
-            print(f"[{self._valid_modes_inputs[2]}] Back to main menu")
-            print("-----------------")
-
         while True:
             if show_menu:
-                print_mode_selection_menu()
+                self._menu_front.print_mode_selection_menu()
                 show_menu = False
                 
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
             if keyboard_utils.check_key_event(key_event, '1'):
-                self.level_menu(levels)
+                self.levels_menu(levels, self._game_modes[0])
                 show_menu = True
                 break
             elif keyboard_utils.check_key_event(key_event, '2'):
-                self.endless_mode_levels_menu(levels)
+                self.levels_menu(levels, self._game_modes[1])
                 show_menu = True
                 break
             elif keyboard_utils.check_key_event(key_event, '3'):
@@ -176,24 +102,10 @@ class Menu:
         key_event: KeyboardEvent
         show_text: bool = True
 
-        def print_progress() -> None:
-            print("-----[Currently Saved Progress]-----")
-            print(f"Levels unlocked: {save_file._data['highest_unlocked_lvl']}")
-            print(f"Levels cleared: {save_file._data['highest_cleared_lvl']}")
-            print("Note: This shows the currently saved progress, not the actual current game progress")
-            print("------------------------------------")
-        
-        def print_warning() -> None:
-            print("--------------[WARNING]--------------")
-            print("No file found, nothing to show here")
-            print("Create a save file and try again")
-            print("-------------------------------------")
-            
-
         if os.path.exists(save_file._file_path):
             while True:
                 if show_text:
-                    print_progress()
+                    self._menu_front.print_progress(save_file)
                     print("Press any key to continue")
                     show_text = False
 
@@ -203,14 +115,13 @@ class Menu:
         else:
             while True:
                 if show_text:
-                    print_warning()
+                    self._menu_front.print_warning()
                     print("Press any key to continue")
                     show_text = False
 
                 key_event = keyboard.read_event(suppress=True)    
                 if key_event.event_type == keyboard.KEY_DOWN:
                     break
-
         
         print("Returning to main menu")
         
@@ -222,21 +133,6 @@ class Menu:
         show_menu: bool = True
         show_save_menu: bool = True
         key_event: KeyboardEvent
-
-        # ganme_options specific functions
-        def print_game_options() -> None:
-            print("-----[Options]-----")
-            print(f"[{self._valid_options_inputs[0]}] Manage save file")
-            print(f"[{self._valid_options_inputs[1]}] Back to main menu")
-            print("-------------------")
-        
-        def print_save_file_options() -> None:
-            print("-----[Save file options]-----")
-            print("[1] Load current progress")
-            print("[2] Save current progress")
-            print("[3] Delete save file")
-            print("[4] Back to options menu")
-            print("-----------------------------")
         
         def delete_file() -> None:
             key_event: KeyboardEvent
@@ -255,7 +151,7 @@ class Menu:
         # Game options menu loop
         while True:
             if show_menu:
-                print_game_options()
+                self._menu_front.print_game_options(self._valid_options_inputs)
                 show_menu = False
 
             key_event = keyboard.read_event(suppress=True)
@@ -269,7 +165,7 @@ class Menu:
                 
                 while True:
                     if show_save_menu:
-                        print_save_file_options()
+                        self._menu_front.print_save_file_options()
                         show_save_menu = False
                     
                     key_event = keyboard.read_event(suppress=True)
@@ -321,41 +217,8 @@ class Menu:
             levels[current_lvl_index+1]._selected = True
             levels[current_lvl_index]._selected = False
     
-    def level_menu(self, levels: List[Level]) -> None:
-        '''
-            Logic for handling classic level naviagtion and selection
-        '''
-        selected_level: Level
-        original_grid: List[List[str]]
-        show_menu: bool = True
-
-        while True:
-            if show_menu:
-                self.print_level_menu(levels)
-                show_menu = False
-
-            key_event: KeyboardEvent = keyboard.read_event(suppress=True)
-
-            if keyboard_utils.check_key_event(key_event, 'q'):
-                print("Going back to main menu")
-                break
-
-
-            if keyboard_utils.check_key_event(key_event, 's'):
-                selected_level = self.selected_level(levels)
-                if selected_level._unlocked:
-                    print(f"Running {selected_level._level_name}")
-                    original_grid = copy.deepcopy(selected_level._level_board)
-                    self.game_loop(original_grid, self._game_modes[0])
-                    break
-                else: 
-                    print("Level is locked, clear the previous level first")
-            
-            if keyboard_utils.check_key_event(key_event, 'a') or keyboard_utils.check_key_event(key_event, 'd'):
-                self.navigate_selection(key_event, levels)
-                show_menu = True
-    
-    def endless_mode_levels_menu(self, levels: List[Level]) -> None:
+    # UNDER DEVELOPMENT: Merging menu displays for existing gamemodes
+    def levels_menu(self, levels: List[Level], mode: str) -> None:
         '''
             Logic for handling endless levels navigation and selection
         '''
@@ -365,7 +228,9 @@ class Menu:
 
         while True:
             if show_menu:
-                self.print_endless_mode_levels_menu(levels)
+                match mode:
+                    case 'classic': self._menu_front.print_level_menu(levels)
+                    case 'endless': self._menu_front.print_endless_levels_menu(levels)
                 show_menu = False
 
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
@@ -376,18 +241,181 @@ class Menu:
 
             if keyboard_utils.check_key_event(key_event, 's'):
                 selected_level = self.selected_level(levels)
-                if selected_level._cleared:
-                    print(f"Running {selected_level._level_name}")
-                    original_grid = copy.deepcopy(selected_level._level_board)
-                    self.game_loop(original_grid, self._game_modes[1])
-                    break
-                else: 
-                    print("Level is locked, clear the corresponding level in classic mode first")
+
+                if mode == self._game_modes[0]:
+                    if selected_level._unlocked:
+                        original_grid = copy.deepcopy(selected_level._level_board)
+                        print(f"Running {selected_level._level_name}")
+                        self.game_loop(original_grid, self._game_modes[0])
+                        break
+                    else: 
+                        print("Level is locked, clear the previous level first")
+
+                if mode == self._game_modes[1]:
+                    if selected_level._cleared:
+                        original_grid = copy.deepcopy(selected_level._level_board)
+                        print(f"Running {selected_level._level_name}")
+                        self.game_loop(original_grid, self._game_modes[1])
+                        break
+                    else: 
+                        print("Level is locked, clear the corresponding level in classic mode first")
                 
             if keyboard_utils.check_key_event(key_event, 'a') or keyboard_utils.check_key_event(key_event, 'd'):
                 self.navigate_selection(key_event, levels)
                 show_menu = True
+
+    def shop_menu(self) -> None:
+        '''
+            Logic for handling shop menu display and navigation
+        '''
+        show_menu: bool = True
+
+        while True:
+            if show_menu:
+                self._shop.print_shop_menu(self._account)
+                show_menu = False
+            
+            key_event: KeyboardEvent = keyboard.read_event(suppress=True)
+            if keyboard_utils.check_key_event(key_event, 'q'):
+                print("Returning to main menu")
+                break
+
+            if key_event.event_type == keyboard.KEY_DOWN and key_event.name in [str(x+1) for x in range(len(self._shop._shop_items))]:
+                self.shop_item_details_menu(int(key_event.name))
+                show_menu = True
+            
+
+
+    def shop_item_details_menu(self, item_num: int) -> None:
+        '''
+            Logic for handling shop item detals menu display and navigation
+        '''
+        show_menu: bool = True
+
+        while True:
+            if show_menu:
+                self._shop.show_shop_item_details(item_num)
+                show_menu = False
+            
+            key_event: KeyboardEvent = keyboard.read_event(suppress=True)
+
+            if keyboard_utils.check_key_event(key_event, 'q'):
+                print("Returning to shop menu\n\n")
+                break
+
+            if keyboard_utils.check_key_event(key_event, 'b'):
+                # TODO: Create logic for buying item
+                self.shop_item_purchase(item_num)
+                break
     
-    # UNDER DEVELOPMENT: Merging menu displays for existing gamemodes
-    def merged_levels_menu(self, levels: List[Level], mode: str) -> None:
-        pass
+    def shop_item_purchase(self, item_num: int) -> None:
+        '''
+            Handles the logic of purchasing the shop item,
+            such as linking button presses to corresponding actions
+            such as purchasing or cancelling
+        '''
+        show_menu: bool = True
+        item_num -= 1
+        current_balance: int = self._account._points_balance
+        price: int = self._shop._shop_items[item_num]._price
+        shop_item: ShopItem = self._shop._shop_items[item_num]
+        shop_item_limit: int = shop_item._limit
+        acc_shop_items: List[ShopItem] = self._account._owned_shop_items
+
+        acc_shop_item: ShopItem = EMPTY_SHOP_ITEM
+        for item in acc_shop_items:
+            if item._name == shop_item._name:
+                acc_shop_item = item
+
+        shop_item_stock: int = acc_shop_item._stock if len(acc_shop_items) > 0 else 0
+
+        # Reject preemptively if the user has insufficient funds
+        # or if item stock has reached limit
+        if current_balance < price:
+            print("Insufficient funds, try again later\n\n")
+            return
+        
+        if shop_item_stock == shop_item_limit:
+            print("Stock limit reached, try again later\n\n")
+            return
+
+        
+        while True:
+            if show_menu:
+                self._shop.purchase_item_menu(item_num+1)
+                show_menu = False
+            
+            key_event: KeyboardEvent = keyboard.read_event(suppress=True)
+
+            if keyboard_utils.check_key_event(key_event, 'y'):
+                if not self.shop_item_exists(shop_item):                    
+                    self._account._owned_shop_items.append(shop_item)
+
+                shop_item._stock += 1
+                self._account._points_balance -= price
+                print("Purchase successful\n\n")
+                break
+            
+            if keyboard_utils.check_key_event(key_event, 'n'):
+                print("Canceled purchase\n\n")
+                break
+    
+    def shop_item_exists(self, shop_item: ShopItem) -> bool:
+        owned_shop_items: List[ShopItem] = self._account._owned_shop_items
+
+        if len(owned_shop_items) == 0:
+            return False
+
+        for item in owned_shop_items:
+            if item._name == shop_item._name:
+                return True
+
+        return False
+    
+    def prompt_name(self) -> None:
+        '''
+            Prompts the user to enter their name upon first boot
+            of the game
+        '''
+        new_name: str = input("Enter your name: ")
+
+        # input sanitization
+        while len(new_name) < NAME_MIN_LENGTH or len(new_name) > NAME_MAX_LENGTH:
+            print("Name must be between 1 and 20 characters, try again")
+            new_name = input("Enter your name: ")
+
+        self._account._name = new_name
+        print(f"Welcome to the game, {self._account._name}!")
+    
+    def prompt_powerup_selection(self, owned_powerups: List[ShopItem]) -> int:
+        '''
+            Handling logic for prompting user to select a powerup
+            before starting game
+        '''
+        index: int = 0
+        show_menu: bool = True
+
+        while True:
+            if show_menu:
+                self._menu_front.print_owned_powerups(owned_powerups, index)
+                show_menu = False
+
+            key_event: KeyboardEvent = keyboard.read_event(suppress=True)
+
+            if keyboard_utils.check_key_event(key_event, 'w') and index > 0:
+                index -= 1
+                show_menu = True
+
+            if keyboard_utils.check_key_event(key_event, 's') and index < len(owned_powerups)-1:
+                index += 1
+                show_menu = True
+
+            if keyboard_utils.check_key_event(key_event, 'e'):
+                break
+
+            if keyboard_utils.check_key_event(key_event, 'q'):
+                index = -1
+                break
+
+        return index
+        
