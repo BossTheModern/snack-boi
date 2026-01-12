@@ -18,10 +18,18 @@ Version: v.0.4.0 Alpha
 - Optimized locked message for locked levels
 - Added 5 new levels
 
-Version: v.0.5.0 Alpha (Current Version)
+Version: v.0.5.0 Alpha
 - Added 5 new levels
 - Added new snack types. More yum!
 - Added traps to the game, something to watch out for!
 - Added a powerup. I wonder what it does.
 - Added save file mechanic. I can finally save my progress!
 - Save file management is in options. Finally some use for options!
+
+Version: v.0.6.0 Alpha (Current Version)
+- Added shop with powerups where you can buy them with points. Check them out!
+- To accompany the points system, all classic levels now give a certain number 
+of points upon completion
+- To keep track of points and owned shop powerups, an account system has been
+added to the game
+- Updated save file system to now handle account data
