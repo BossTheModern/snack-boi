@@ -35,7 +35,7 @@ inventory.
 The game is naviagted and played purely by keyboard. Mouse is not needed. 
 The UI for menu and gameplay is made entirely using ASCII characters. The ASCII 
 based UI design is made to tell the user what key does what. If a key does 
-not perform what the UI describes, please report the issue.
+not perform as described, please report the issue.
 
 ## How to play
 WASD keys is used to move up, left, down, and right respectively. This is also
