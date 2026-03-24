@@ -15,9 +15,12 @@ from assets.menu_front import MenuFront
 from assets.shop.shop import Shop
 from account.account import Account
 from assets.shop.shop_item import ShopItem
+from assets.shop.shop_items import ShopItems
 from utils.consts import NAME_MIN_LENGTH
 from utils.consts import NAME_MAX_LENGTH
 from utils.consts import EMPTY_SHOP_ITEM
+from utils.menu_utils import make_pages
+
 
 class Menu:
     _valid_options_inputs: List[str] = ['1', '2']
@@ -269,24 +272,43 @@ class Menu:
             Logic for handling shop menu display and navigation
         '''
         show_menu: bool = True
+        shop_items: List[ShopItem] = ShopItems._shop_items
+        
+        # Makes pages for navigation
+        pages: List[List[ShopItem]] = make_pages(shop_items)
+        current_page_index: int = 0
+        current_page: List[ShopItem] = []
+        
 
         while True:
+            current_page = pages[current_page_index]
             if show_menu:
-                self._shop.print_shop_menu(self._account)
+                self._shop.print_shop_menu(self._account, current_page)
                 show_menu = False
             
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
-            if keyboard_utils.check_key_event(key_event, 'q'):
+            if keyboard_utils.check_key_event(key_event, 'r'):
                 print("Returning to main menu")
                 break
 
-            if key_event.event_type == keyboard.KEY_DOWN and key_event.name in [str(x+1) for x in range(len(self._shop._shop_items))]:
-                self.shop_item_details_menu(int(key_event.name))
+            if keyboard_utils.check_key_event(key_event, 'q'):
+                if current_page_index > 0:
+                    current_page_index -= 1
+                show_menu = True
+
+            if keyboard_utils.check_key_event(key_event, 'e'):
+                if current_page_index < len(pages)-1:
+                    current_page_index += 1
+                show_menu = True
+
+
+            if key_event.event_type == keyboard.KEY_DOWN and key_event.name in [str(x+1) for x in range(len(current_page))]:
+                self.shop_item_details_menu(current_page[int(key_event.name)-1])
                 show_menu = True
             
 
 
-    def shop_item_details_menu(self, item_num: int) -> None:
+    def shop_item_details_menu(self, selected_item: ShopItem) -> None:
         '''
             Logic for handling shop item detals menu display and navigation
         '''
@@ -294,7 +316,7 @@ class Menu:
 
         while True:
             if show_menu:
-                self._shop.show_shop_item_details(item_num)
+                self._shop.show_shop_item_details(selected_item)
                 show_menu = False
             
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
@@ -305,20 +327,20 @@ class Menu:
 
             if keyboard_utils.check_key_event(key_event, 'b'):
                 # TODO: Create logic for buying item
-                self.shop_item_purchase(item_num)
+                self.shop_item_purchase(selected_item)
                 break
     
-    def shop_item_purchase(self, item_num: int) -> None:
+    def shop_item_purchase(self, selected_item: ShopItem) -> None:
         '''
             Handles the logic of purchasing the shop item,
             such as linking button presses to corresponding actions
             such as purchasing or cancelling
         '''
         show_menu: bool = True
-        item_num -= 1
+        #item_num -= 1
         current_balance: int = self._account._points_balance
-        price: int = self._shop._shop_items[item_num]._price
-        shop_item: ShopItem = self._shop._shop_items[item_num]
+        price: int = selected_item._price
+        shop_item: ShopItem = selected_item
         shop_item_limit: int = shop_item._limit
         acc_shop_items: List[ShopItem] = self._account._owned_shop_items
 
@@ -342,7 +364,7 @@ class Menu:
         
         while True:
             if show_menu:
-                self._shop.purchase_item_menu(item_num+1)
+                self._shop.purchase_item_menu(selected_item)
                 show_menu = False
             
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
