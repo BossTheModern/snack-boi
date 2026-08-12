@@ -4,17 +4,18 @@
     Blueprint of individual levels
 '''
 from typing import List
+from boards.board import Board
 
 class Level:
     _level_name: str
-    _level_board: List[List[str]]
+    _level_board: Board
     _unlocked: bool
     _selected: bool
     _cleared: bool
     _win_cap: int
     _reward: int
 
-    def __init__(self, level_name: str, level_board: List[List[str]], 
+    def __init__(self, level_name: str, level_board: Board, 
                  unlocked: bool, selected: bool, cleared: bool, 
                  win_cap: int, reward: int) -> None:
         self._level_name = level_name
