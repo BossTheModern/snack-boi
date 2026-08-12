@@ -71,6 +71,7 @@ class Menu:
         for level in levels:
             if level._selected:
                 return level
+        
 
     def mode_selection_menu(self, levels: List[Level]) -> None:
         '''
