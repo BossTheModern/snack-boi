@@ -40,7 +40,7 @@ class Board:
         print()
 
     def is_within_bounds(self, row: int, col: int) -> bool:
-        return 0 <= row < self.height and 0 <= col < self.width
+        return 1 <= row <= self.height and 1 <= col <= self.width
 
     def add_obstacles_vertically(self, row: int, col: int, length: int, char: str) -> None:
         '''
