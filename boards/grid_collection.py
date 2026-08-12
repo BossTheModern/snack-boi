@@ -13,7 +13,6 @@ from boards.board_creator import add_obstacles_horizontally, add_obstacles_verti
 from boards.board_creator import add_obstacle, OBSTACLE_CHAR, preview_grid
 from typing import List
 
-
 # Grids without obstacles
 empty_grid: List[List[str]] = [[' ' for _ in range(10)] for _ in range(10)]
 #preview_grid(square_grid, "square_grid")
