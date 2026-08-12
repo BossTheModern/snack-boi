@@ -12,6 +12,7 @@ from assets.levels.level import Level
 from assets.snacks.snack import Snack
 from assets.shop.shop_item import ShopItem
 from boards.board_creator import draw_grid
+from boards.board import Board
 from account.account import Account
 
 class GameUtils:
@@ -29,14 +30,14 @@ class GameUtils:
           self._fancy_print: FancyPrinter = FancyPrinter()
           self._text_collection: TextCollection = TextCollection()
 
-    def classic_display_current_state(self, board: List[List[str]], current_lvl_index: int, levels: List[Level]) -> None:
+    def classic_display_current_state(self, board: Board, current_lvl_index: int, levels: List[Level]) -> None:
         print(f"--------[CLASSIC MODE - {levels[current_lvl_index]._level_name}]--------")
-        draw_grid(board)
+        board.display()
         print(f"{self._snack._count}/{levels[current_lvl_index]._win_cap} snacks eaten")
         
-    def endless_display_current_state(self, board: List[List[str]], current_lvl_index: int, levels: List[Level]) -> None:
+    def endless_display_current_state(self, board: Board, current_lvl_index: int, levels: List[Level]) -> None:
         print(f"--------[ENDLESS MODE - {levels[current_lvl_index]._level_name}]--------")
-        draw_grid(board)
+        board.display()
         print("Snack count:", self._snack._count)
         
     def classic_game_win(self, current_lvl_index: int, levels: List[Level], account: Account) -> None:
@@ -119,7 +120,7 @@ class GameUtils:
         elif levels_unlocked == consts.TRAP_START_LVL and current_lvl_index == consts.TRAP_START_LVL - 1:
             self._fancy_print.print_text_line(self._text_collection._traps_intro)
     
-    def display_current_state(self, board: List[List[str]], current_lvl_index: int, 
+    def display_current_state(self, board: Board, current_lvl_index: int, 
                               levels: List[Level], game_mode: str, 
                               current_snack_type: str, recon_duration: int, recon_active: bool,
                               active_powerup: ShopItem) -> None:

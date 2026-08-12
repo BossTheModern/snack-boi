@@ -4,7 +4,8 @@
     Handles logic for recall
 '''
 from assets.shop.shop_item import ShopItem
-from  utils.consts import SHOP_ITEM_LIMIT
+from utils.consts import SHOP_ITEM_LIMIT
+from boards.board import Board
 from typing import List
 import textwrap
 
@@ -23,7 +24,7 @@ class Recall(ShopItem):
         self._entity: str = 'R'
         self._placed: bool = False
 
-    def place(self, board: List[List[int]], occupied_positions: List[List[int]]) -> None:
+    def place(self, board: Board, occupied_positions: List[List[int]]) -> None:
         '''
             places recall item at the last recorded position
             the player was in given the position is not occupied
@@ -37,7 +38,7 @@ class Recall(ShopItem):
         if self._position in occupied_positions:
             print("Something is preventing you from placing the recall")
         else:
-            board[self._position[0]][self._position[1]] = self._entity
+            board.set(self._position[0], self._position[1], self._entity)
             self._placed = True
 
     def prerecord_last_positions(self, position: List[int]) -> None:
@@ -60,14 +61,14 @@ class Recall(ShopItem):
             self._previous_positions.reverse()
             self._previous_positions[1] = position.copy()
 
-    def recall(self, player_entity: str, current_position: List[int], board: List[List[int]]) -> None:
+    def recall(self, player_entity: str, current_position: List[int], board: Board) -> None:
         '''
             teleports player to given position
         '''
         print("teleporting")
         print(current_position)
-        board[current_position[0]][current_position[1]] = ' '
-        board[self._position[0]][self._position[1]] = player_entity
+        board.set(current_position[0], current_position[1], ' ')
+        board.set(self._position[0], self._position[1], player_entity)
         current_position[0] = self._position[0]
         current_position[1] = self._position[1]
         self._position.clear()

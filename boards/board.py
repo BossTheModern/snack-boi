@@ -8,9 +8,15 @@ from typing import List
 
 class Board:
     def __init__(self, width: int, height: int) -> None:
-        self.width: int = abs(width)
-        self.height: int = abs(height)
-        self.board: List[List[str]] = [[' ' for _ in range(width)] for _ in range(height)]
+        self._width: int = abs(width)
+        self._height: int = abs(height)
+        self._board: List[List[str]] = [[' ' for _ in range(width)] for _ in range(height)]
+
+    def at(self, row: int, col: int) -> str:
+        return self._board[row][col]
+
+    def set(self, row: int, col: int, obj: str) -> None:
+        self._board[row][col] = obj
 
     def display(self) -> None:
         '''
@@ -25,13 +31,13 @@ class Board:
                 |---|---|---|---|---|
             '''
             print("|", end="")
-            for _ in range(self.width):
+            for _ in range(self._width):
                 print('---|', end="")
             print()
 
         border_line()
         
-        for row in self.board:
+        for row in self._board:
             print("|", end="")
             for tile in row:
                 print("", tile, "|", end="")
@@ -40,7 +46,7 @@ class Board:
         print()
 
     def is_within_bounds(self, row: int, col: int) -> bool:
-        return 1 <= row <= self.height and 1 <= col <= self.width
+        return 1 <= row <= self._height and 1 <= col <= self._width
 
     def add_obstacles_vertically(self, row: int, col: int, length: int, char: str) -> None:
         '''
@@ -51,9 +57,9 @@ class Board:
             return
     
         for i in range(length):
-            if row-1 + i > len(self.board)-1:
+            if row-1 + i > len(self._board)-1:
                 return
-            self.board[row-1 + i][col-1] = char
+            self._board[row-1 + i][col-1] = char
 
     def add_obstacles_horizontally(self, row: int, col: int, length: int, char: str) -> None:
         '''
@@ -64,9 +70,9 @@ class Board:
             return 
 
         for i in range(length):
-            if col-1 + i > len(self.board[0]) - 1:
+            if col-1 + i > len(self._board[0]) - 1:
                 return
-            self.board[row-1][col-1 + i] = char
+            self._board[row-1][col-1 + i] = char
 
     def add_obstacle(self, row: int, col: int, char: str) -> None:
         '''
@@ -74,7 +80,7 @@ class Board:
         '''
         if not self.is_within_bounds(row, col):
             return
-        self.board[row-1][col-1] = char
+        self._board[row-1][col-1] = char
 
     def empty(self) -> bool:
-        return self.height == 0 and self.width == 0
+        return self._height == 0 and self._width == 0

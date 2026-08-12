@@ -6,6 +6,7 @@
 import random
 from typing import List
 from assets.traps.traps import Trap
+from boards.board import Board
 
 class ReconSnack:
     def __init__(self) -> None:
@@ -18,16 +19,16 @@ class ReconSnack:
         self._duration: int = 4 # Visible for n-1 moves (this case it's 3 moves)
         self._active: bool = False
 
-    def spawn(self, board: List[List[str]], occupied_positions: List[List[int]]) -> None:
-        self._position = [random.randint(0, len(board)-1), random.randint(0, len(board)-1)]
+    def spawn(self, board: Board, occupied_positions: List[List[int]]) -> None:
+        self._position = [random.randint(0, board._width-1), random.randint(0, board._height-1)]
 
-        while self._position in occupied_positions or board[self._position[0]][self._position[1]] != ' ':
-            self._position = [random.randint(0, len(board)-1), random.randint(0, len(board)-1)]
+        while self._position in occupied_positions or board.at(self._position[0], self._position[1]) != ' ':
+            self._position = [random.randint(0, board._width-1), random.randint(0, board._height-1)]
         
-        board[self._position[0]][self._position[1]] = self._entity_char
+        board.set(self._position[0], self._position[1], self._entity_char)
         self._counter += 1
     
-    def reveal_position(self, board: List[List[str]], traps: List[Trap]) -> None:
+    def reveal_position(self, board: Board, traps: List[Trap]) -> None:
         '''
             Reveals position of all traps on the board
 
@@ -43,7 +44,7 @@ class ReconSnack:
         self._position.clear()
         self._active = True
     
-    def undo_effect(self, board: List[List[str]], traps: List[Trap]) -> None:
+    def undo_effect(self, board: Board, traps: List[Trap]) -> None:
         for trap in traps:
             trap.hide(board)
         

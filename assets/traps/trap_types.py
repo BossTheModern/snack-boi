@@ -17,6 +17,7 @@ from boards.grid_collection import empty_grid
 from boards.board_creator import draw_grid, OBSTACLE_CHAR
 from assets.printer.fancy_printer import FancyPrinter
 from assets.snacks.snack import Snack
+from boards.board import Board
 
 class HungerTrap(Trap):
     '''
@@ -28,7 +29,7 @@ class HungerTrap(Trap):
         self._snack: Snack = snack
         self._position: List[int] = []
     
-    def reduce_snack_count(self, board: List[List[str]], occupied_positions: List[List[int]]) -> None:
+    def reduce_snack_count(self, board: Board, occupied_positions: List[List[int]]) -> None:
         '''
             Reduces the snack count by a random amount between 1 and 3.
 
@@ -57,7 +58,7 @@ class ParallelDimensionTrap(Trap):
         self._player: Player = player
         self._trap_entity: str = 'Ø'
         self._type: str = 'parallel dimension'
-        self._parallel_board: List[List[str]] = copy.deepcopy(empty_grid)
+        self._parallel_board: Board = empty_grid
         self._position: List[int] = []
         self._hidden_trigger: HiddenTrigger = HiddenTrigger()
         self._exit: DimensionExit = DimensionExit()
@@ -66,7 +67,7 @@ class ParallelDimensionTrap(Trap):
     
     def print_parallel_dimension(self) -> None:
         print("-----------[PARALLEL DIMENSION]-----------")
-        draw_grid(self._parallel_board)
+        self._parallel_board.display()
         print("Move by pressing (w/a/s/d)")
     
     def teleport_player(self, game_mode: str) -> None:

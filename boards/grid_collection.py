@@ -11,7 +11,7 @@ It includes methods to load grid files, save grid files, and display the content
 
 from boards.board_creator import OBSTACLE_CHAR
 from utils.consts import STD_HEIGHT, STD_WIDTH
-from board import Board
+from boards.board import Board
 
 # Grids without obstacles
 empty_grid: Board = Board(STD_WIDTH, STD_HEIGHT)

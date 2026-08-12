@@ -3,7 +3,6 @@
 
     Blueprint of individual levels
 '''
-from typing import List
 from boards.board import Board
 
 class Level:

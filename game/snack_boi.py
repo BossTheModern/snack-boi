@@ -29,6 +29,7 @@ from assets.text_collection import TextCollection
 from assets.menu_front import MenuFront
 from account.account import Account
 from assets.shop.shop_item import ShopItem
+from boards.board import Board
 from utils.consts import EMPTY_SHOP_ITEM
 import copy
 
@@ -87,26 +88,26 @@ class Game:
         self._account._owned_shop_items = [self._active_shop_powerup if self._active_shop_powerup._name == powerup._name else powerup for powerup in self._account._owned_shop_items ]
         self._account._owned_shop_items = [powerup for powerup in self._account._owned_shop_items if powerup._stock > 0]
 
-    def game_spawn_snack(self, grid: List[List[str]], occupied_positions: List[List[int]], snack_num: int) -> None:
+    def game_spawn_snack(self, board: Board, occupied_positions: List[List[int]], snack_num: int) -> None:
         '''
             Spawns snack based on the snack number generated on the board 
         '''
         match snack_num:
             case 1:
-                self._normal_snack.spawn_snack(grid, occupied_positions)
+                self._normal_snack.spawn_snack(board, occupied_positions)
                 self._current_snack = self._normal_snack
             case 2:
-                self._fake_snack.spawn_snack(grid, occupied_positions)
+                self._fake_snack.spawn_snack(board, occupied_positions)
                 self._current_snack = self._fake_snack
             case 3:
-                self._super_snack.spawn_snack(grid, occupied_positions)
+                self._super_snack.spawn_snack(board, occupied_positions)
                 self._current_snack = self._super_snack
 
     def activate_parallel_trap(self, parallel_trap: ParallelDimensionTrap, game_mode: str) -> None:
             parallel_trap.teleport_player(game_mode)
         
     
-    def game_loop(self, board: List[List[str]], game_mode: str) -> None:
+    def game_loop(self, board: Board, game_mode: str) -> None:
         '''
             Main game loop that runs based on game mode
             Game mode is classic: the game has a set win cap to collect to
@@ -249,7 +250,7 @@ class Game:
 
                     # Handle maintaining unit 
                     if self._player._position != self._active_shop_powerup._position and self._active_shop_powerup._placed:
-                        board[self._active_shop_powerup._position[0]][self._active_shop_powerup._position[1]] = self._active_shop_powerup._entity                    
+                        board.set(self._active_shop_powerup._position[0], self._active_shop_powerup._position[1], self._active_shop_powerup._entity)
                     
                     # Ensure recording order is correct
                     if self._player._position == self._active_shop_powerup._previous_positions[0]:
