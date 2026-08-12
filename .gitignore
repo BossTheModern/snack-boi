@@ -1,1 +1,5 @@
 assets/save_files/save_file_test.txt
+
+__pycache__/
+*.py[cod]
+*$py.class
