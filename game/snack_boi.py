@@ -259,6 +259,8 @@ class Game:
             # Handle area scan
             if self._active_shop_powerup._name == "Radar" and self._active_shop_powerup._active:
                 self._active_shop_powerup.scan_area(self._player._position, board, traps)
+                if board.at(self._player._position[0], self._player._position[1]) == ' ':
+                    board.set(self._player._position[0], self._player._position[1], self._player._entity)
                     
                         
             # Handle recall usage
