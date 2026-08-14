@@ -38,6 +38,14 @@ class Player:
         '''
         self._parallel_position = [random.randint(0, board._width-1), random.randint(0, board._height-1)]
         board.set(self._parallel_position[0], self._parallel_position[1], self._entity)
+
+    def parallell_despawn_player(self, board: Board) -> None:
+        '''
+            Despawns player from the parallell dimension,
+            used upon exiting the dimension
+        '''
+        board.set(self._parallel_position[0], self._parallel_position[1], ' ')
+        self._parallel_position.clear()
     
     def move_player(self, move_input: KeyboardEvent, board: Board, obstacle_char: str, player_pos: List[int]) -> None:
         '''
