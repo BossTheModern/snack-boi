@@ -23,6 +23,8 @@ from assets.traps.traps import Trap
 from assets.traps.trap_types import HungerTrap
 from assets.traps.trap_types import ParallelDimensionTrap
 from assets.player import Player
+from assets.position.position2d import Position2D
+from boards.board import Board
 from assets.snacks.snack import Snack
 from assets.snacks.snack_types import NormalSnack
 from utils.consts import HUNGER_TRAPS_LIMIT
@@ -38,11 +40,11 @@ class TestPowerup(unittest.TestCase):
         '''
         
         # Initial setup
-        board: List[List[str]] = copy.deepcopy(square_obstacle_grid)
+        board: Board = square_obstacle_grid
         player: Player = Player()
         snack: Snack = NormalSnack()
         traps: List[Trap] = []
-        occupied_positions: List[List[int]] = []
+        occupied_positions: List[Position2D] = []
         recon_snack: ReconSnack = ReconSnack()
 
         # spawn setup
@@ -53,24 +55,26 @@ class TestPowerup(unittest.TestCase):
             traps.append(HungerTrap(snack))
         
         for _ in range(PARALLEL_TRAPS_LIMIT):
-            traps.append(ParallelDimensionTrap(Player))
+            traps.append(ParallelDimensionTrap(Player()))
         
         for trap in traps:
             trap.spawn_trap(board, occupied_positions)
             trap.reveal_trap(board)
             occupied_positions.append(trap._position)
         
-        preview_grid(board, 'board before powerup spawned')
+        print('board before powerup spawned')
+        board.display()
         recon_snack.spawn(board, occupied_positions)
-        preview_grid(board, 'board after powerup spawned')
+        print('board before powerup spawned')
+        board.display()
 
-        self.assertIn(recon_snack._entity_char, board[recon_snack._position[0]])
-        self.assertNotEqual(board[recon_snack._position[0]][recon_snack._position[1]], HungerTrap(snack)._trap_entity)
-        self.assertNotEqual(board[recon_snack._position[0]][recon_snack._position[1]], ParallelDimensionTrap(player)._trap_entity)
-        self.assertNotEqual(board[recon_snack._position[0]][recon_snack._position[1]], OBSTACLE_CHAR)
-        self.assertNotEqual(board[recon_snack._position[0]][recon_snack._position[1]], player._entity)
-        self.assertNotEqual(board[recon_snack._position[0]][recon_snack._position[1]], snack._entity)
-        self.assertEqual(board[recon_snack._position[0]][recon_snack._position[1]], recon_snack._entity_char)
+        self.assertEqual(recon_snack._entity_char, board.at(recon_snack._position.x, recon_snack._position.y))
+        self.assertNotEqual(board.at(recon_snack._position.x, recon_snack._position.y), HungerTrap(snack)._trap_entity)
+        self.assertNotEqual(board.at(recon_snack._position.x, recon_snack._position.y), ParallelDimensionTrap(player)._trap_entity)
+        self.assertNotEqual(board.at(recon_snack._position.x, recon_snack._position.y), OBSTACLE_CHAR)
+        self.assertNotEqual(board.at(recon_snack._position.x, recon_snack._position.y), player._entity)
+        self.assertNotEqual(board.at(recon_snack._position.x, recon_snack._position.y), snack._entity)
+        self.assertEqual(board.at(recon_snack._position.x, recon_snack._position.y), recon_snack._entity_char)
 
 
 if __name__ == "__main__":
