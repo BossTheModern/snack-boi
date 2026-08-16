@@ -6,7 +6,6 @@
 '''
 from typing import List
 import random
-import snack
 from utils.consts import NORMAL_SNACK_POINTS
 from utils.consts import SUPER_SNACK_POINTS
 from utils.consts import NEW_SNACKS_START_LVL
@@ -46,7 +45,7 @@ class Snack:
         self._position.clear()
         self._count = 0
 
-    def eat_snack(self, current_lvl_index: int, target_snack: snack) -> None:
+    def eat_snack(self, current_lvl_index: int, target_snack: Snack) -> None:
         '''
             Handles eating snack based on whether the player have reached
             a minimum level for newer snacks or not
