@@ -4,6 +4,8 @@
     Handles logic for recall
 '''
 from assets.shop.shop_item import ShopItem
+from assets.position.position2d import Position2D
+from utils.queue import Queue
 from utils.consts import SHOP_ITEM_LIMIT
 from boards.board import Board
 from typing import List
@@ -19,12 +21,12 @@ class Recall(ShopItem):
         self._use_limit: int = 1 
         self._use_count: int = 0
 
-        self._previous_positions: List[List[int]] = []
-        self._position: List[int] = []
+        self._previous_positions: Queue = Queue(2)
+        self._position: Position2D = Position2D()
         self._entity: str = 'R'
         self._placed: bool = False
 
-    def place(self, board: Board, occupied_positions: List[List[int]]) -> None:
+    def place(self, board: Board, occupied_positions: List[Position2D]) -> None:
         '''
             places recall item at the last recorded position
             the player was in given the position is not occupied
@@ -33,51 +35,49 @@ class Recall(ShopItem):
             can also be used to maintain placement when player leaves 
             recall's position
         '''    
-        self._position = self._previous_positions[0]
+        self._position = self.get_last_position()
 
-        if self._position in occupied_positions:
+        print("position: ", self._position.x, self._position.y)
+
+        if self._position.is_in(occupied_positions):
             print("Something is preventing you from placing the recall")
         else:
-            board.set(self._position[0], self._position[1], self._entity)
+            board.set(self._position.x, self._position.y, self._entity)
             self._placed = True
 
-    def prerecord_last_positions(self, position: List[int]) -> None:
-        '''
-            Adds positions to record. Used until there are two
-            positions recorded
-        '''
-        if position not in self._previous_positions:
-            self._previous_positions.append(position.copy())
-            self._previous_positions.reverse()
-    
-    def record_last_positions(self, position: List[int], tracked_positions: List[List[int]]) -> None:
-        '''
-            records last position the player was in        
-        '''
-        first_tracked_position: List[int] = tracked_positions[0]
-        all_elements_same: bool = all(position == first_tracked_position for position in tracked_positions[1:])
+    def record_last_position(self, position: Position2D) -> None:
+        new_record: Position2D = Position2D(position.x, position.y)
 
-        if position not in self._previous_positions or not all_elements_same:
-            self._previous_positions.reverse()
-            self._previous_positions[1] = position.copy()
+        if self._previous_positions.is_full():
+            print("shuffling record")
+            self._previous_positions.dequeue()
 
-    def recall(self, player_entity: str, current_position: List[int], board: Board) -> None:
+        self._previous_positions.enqueue(new_record)
+        print(f"length previous positions: {len(self._previous_positions)}")
+
+    def get_last_position(self) -> Position2D:
+        return self._previous_positions.peek()
+
+    def get_position(self) -> Position2D:
+        return self._position
+
+    def recall(self, player_entity: str, current_position: Position2D, board: Board) -> None:
         '''
             teleports player to given position
         '''
         print("teleporting")
         print(current_position)
-        board.set(current_position[0], current_position[1], ' ')
-        board.set(self._position[0], self._position[1], player_entity)
-        current_position[0] = self._position[0]
-        current_position[1] = self._position[1]
+        board.set(current_position.x, current_position.y, ' ')
+        board.set(self._position.x, self._position.y, player_entity)
+        current_position.x = self._position.x
+        current_position.y = self._position.y
         self._position.clear()
         self._placed = False
 
         self._active_duration -= 1 
         if self._active_duration == 0:
             self.deactivate()
-                   
+               
 
     def activate(self) -> None:
         '''
