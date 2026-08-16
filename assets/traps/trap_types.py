@@ -10,6 +10,7 @@ from assets.player import Player
 from keyboard import KeyboardEvent
 from assets.traps.hidden_trigger import HiddenTrigger
 from assets.traps.dimension_exit import DimensionExit
+from assets.position.position2d import Position2D
 import keyboard
 import random
 import copy
@@ -27,9 +28,9 @@ class HungerTrap(Trap):
         self._trap_entity: str = 'H'
         self._type: str = 'hunger'
         self._snack: Snack = snack
-        self._position: List[int] = []
+        self._position: Position2D = Position2D()
     
-    def reduce_snack_count(self, board: Board, occupied_positions: List[List[int]]) -> None:
+    def reduce_snack_count(self, board: Board, occupied_positions: List[Position2D]) -> None:
         '''
             Reduces the snack count by a random amount between 1 and 3.
 
@@ -59,7 +60,7 @@ class ParallelDimensionTrap(Trap):
         self._trap_entity: str = 'Ø'
         self._type: str = 'parallel dimension'
         self._parallell_board: Board = empty_grid
-        self._position: List[int] = []
+        self._position: Position2D = Position2D()
         self._hidden_trigger: HiddenTrigger = HiddenTrigger()
         self._exit: DimensionExit = DimensionExit()
         self._valid_move_keys: List[str] = ['w', 'a', 's', 'd']

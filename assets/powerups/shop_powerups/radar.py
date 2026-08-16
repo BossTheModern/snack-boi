@@ -6,6 +6,7 @@
 from typing import List
 from assets.shop.shop_item import ShopItem
 from assets.traps.traps import Trap
+from assets.position.position2d import Position2D
 from boards.board import Board
 from utils.consts import SHOP_ITEM_LIMIT
 import textwrap
@@ -26,19 +27,19 @@ class Radar(ShopItem):
     def coord_is_within_range(self, x: int, y: int, min: int, max: int) -> bool:
         return x >= min and x <= max and y >= min and y <= max
     
-    def coord_is_trapped(self, position: List[int], traps: List[Trap]) -> bool:
+    def coord_is_trapped(self, position: Position2D, traps: List[Trap]) -> bool:
         for trap in traps:
             if trap._position == position:
                 return True
         return False
     
-    def scan_area(self, position: List[int], board: Board, traps: List[Trap]) -> None:
+    def scan_area(self, position: Position2D, board: Board, traps: List[Trap]) -> None:
         '''
             Scans the area around for traps        
         '''
         trap_found: bool = False
 
-        target_area: List[List[int]] = []
+        target_area: List[Position2D] = []
 
         # Clear previously found traps
         if len(self._revealed_traps) > 0:
@@ -59,10 +60,10 @@ class Radar(ShopItem):
 
 
         # populate target area coords
-        for y in range(position[0]-1, position[0]+2):
-            for x in range(position[1]-1, position[1]+2):
-                if [y, x] != position and self.coord_is_within_range(x, y, 0, board._width-1):
-                    target_area.append([y, x])
+        for y in range(position.y-1, position.y+2):
+            for x in range(position.x-1, position.x+2):
+                if Position2D(x, y) != position and self.coord_is_within_range(x, y, 0, board._width-1):
+                    target_area.append(Position2D(x, y))
         
         # iterate through target area coords for objs
         for area_pos in target_area:

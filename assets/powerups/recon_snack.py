@@ -7,10 +7,11 @@ import random
 from typing import List
 from assets.traps.traps import Trap
 from boards.board import Board
+from assets.position.position2d import Position2D
 
 class ReconSnack:
     def __init__(self) -> None:
-        self._position: List[int] = []
+        self._position: Position2D = Position2D()
         self._entity_char: str = 'Q'
         self._counter: int = 0
         self._max_number: int = 1
@@ -19,13 +20,17 @@ class ReconSnack:
         self._duration: int = 4 # Visible for n-1 moves (this case it's 3 moves)
         self._active: bool = False
 
-    def spawn(self, board: Board, occupied_positions: List[List[int]]) -> None:
-        self._position = [random.randint(0, board._width-1), random.randint(0, board._height-1)]
+    def spawn(self, board: Board, occupied_positions: List[Position2D]) -> None:
+        random_x: int = random.randint(0, board._width-1)
+        random_y: int = random.randint(0, board._height-1)
+        self._position.set(random_x, random_y)
 
-        while self._position in occupied_positions or board.at(self._position[0], self._position[1]) != ' ':
-            self._position = [random.randint(0, board._width-1), random.randint(0, board._height-1)]
+        while self._position in occupied_positions or board.at(self._position.x, self._position.y) != ' ':
+            random_x = random.randint(0, board._width-1)
+            random_y = random.randint(0, board._height-1)
+            self._position.set(random_x, random_y)
         
-        board.set(self._position[0], self._position[1], self._entity_char)
+        board.set(self._position.x, self._position.y, self._entity_char)
         self._counter += 1
     
     def reveal_position(self, board: Board, traps: List[Trap]) -> None:

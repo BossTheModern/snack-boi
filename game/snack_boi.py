@@ -26,6 +26,7 @@ from assets.traps.trap_types import HungerTrap, ParallelDimensionTrap
 from assets.powerups.recon_snack import ReconSnack
 from assets.printer.fancy_printer import FancyPrinter
 from assets.text_collection import TextCollection
+from assets.position.position2d import Position2D
 from assets.menu_front import MenuFront
 from account.account import Account
 from assets.shop.shop_item import ShopItem
@@ -80,7 +81,6 @@ class Game:
             self._active_shop_powerup.complete_usage()
         elif game_mode == "endless" and self._active_shop_powerup.reached_usage_per_game():
             self._active_shop_powerup.complete_usage()
-        
 
         self._active_shop_powerup.reset()
 
@@ -88,7 +88,7 @@ class Game:
         self._account._owned_shop_items = [self._active_shop_powerup if self._active_shop_powerup._name == powerup._name else powerup for powerup in self._account._owned_shop_items ]
         self._account._owned_shop_items = [powerup for powerup in self._account._owned_shop_items if powerup._stock > 0]
 
-    def game_spawn_snack(self, board: Board, occupied_positions: List[List[int]], snack_num: int) -> None:
+    def game_spawn_snack(self, board: Board, occupied_positions: List[Position2D], snack_num: int) -> None:
         '''
             Spawns snack based on the snack number generated on the board 
         '''
@@ -121,7 +121,7 @@ class Game:
         intro_show_state: bool = True
         recon_duration: int = self._recon_snack._duration
         trap: Trap
-        occupied_positions: List[List[int]] = []
+        occupied_positions: List[Position2D] = []
         levels_unlocked: int = 0
         hunger_traps: List[Trap] = []
         parallel_dimension_traps: List[Trap] = []
@@ -129,7 +129,6 @@ class Game:
         
         owned_powerups: List[ShopItem] = self._account._owned_shop_items
         powerup_index: int
-        tracked_positions: List[List[int]] = []
 
         # Eating flags for one time display
         recon_start_reached: bool = False
@@ -180,9 +179,7 @@ class Game:
         
         # Start precording positions for recall gadget
         if self._active_shop_powerup._name == "Recall":
-            self._active_shop_powerup.prerecord_last_positions(self._player._position)
-            tracked_positions.append(self._player._position.copy())
-
+            self._active_shop_powerup.record_last_position(self._player._position)
 
         # Game loop handling both modes
         while True:
@@ -195,7 +192,6 @@ class Game:
             if game_mode == 'classic' and self._snack._count >= self._classic_levels[current_level_index]._win_cap:
                 self._game_utils.classic_game_win(current_level_index, self._classic_levels, self._account)
                 break
-            
             
 
             if show_state:
@@ -219,7 +215,7 @@ class Game:
                 self._active_shop_powerup.activate()
                 show_state = True
             
-             # Handle player movement
+
             if key_event.event_type == keyboard.KEY_DOWN and key_event.name in self._valid_move_keys:
                 self._player.move_player(key_event, board, OBSTACLE_CHAR, self._player._position)
 
@@ -234,33 +230,17 @@ class Game:
                 
                 # Handle registering previous position
                 if self._active_shop_powerup._name == "Recall":
-                    if len(tracked_positions) == 2:
-                        tracked_positions[1] = tracked_positions[0].copy()
-                        tracked_positions[0] = self._player._position.copy()
-                    else:
-                        tracked_positions.append(self._player._position.copy())
-                    
-
-                    match len(self._active_shop_powerup._previous_positions):
-                        case 1:
-                            self._active_shop_powerup.prerecord_last_positions(self._player._position.copy())
-                            self._active_shop_powerup._previous_positions.reverse()
-                        case _:
-                            self._active_shop_powerup.record_last_positions(self._player._position.copy(), tracked_positions.copy())
+                    self._active_shop_powerup.record_last_position(self._player._position)
 
                     # Handle maintaining unit 
-                    if self._player._position != self._active_shop_powerup._position and self._active_shop_powerup._placed:
-                        board.set(self._active_shop_powerup._position[0], self._active_shop_powerup._position[1], self._active_shop_powerup._entity)
-                    
-                    # Ensure recording order is correct
-                    if self._player._position == self._active_shop_powerup._previous_positions[0]:
-                        self._active_shop_powerup._previous_positions.reverse()
+                    if self._player._position != self._active_shop_powerup.get_position() and self._active_shop_powerup._placed:
+                        board.set(self._active_shop_powerup._position.x, self._active_shop_powerup._position.y, self._active_shop_powerup._entity)
 
             # Handle area scan
             if self._active_shop_powerup._name == "Radar" and self._active_shop_powerup._active:
                 self._active_shop_powerup.scan_area(self._player._position, board, traps)
-                if board.at(self._player._position[0], self._player._position[1]) == ' ':
-                    board.set(self._player._position[0], self._player._position[1], self._player._entity)
+                if board.at(self._player._position.x, self._player._position.y) == ' ':
+                    board.set(self._player._position.x, self._player._position.y, self._player._entity)
                     
                         
             # Handle recall usage
@@ -268,7 +248,9 @@ class Game:
             # Press r when recall was placed - teleport to recall
             if keyboard_utils.check_key_event(key_event, 'r') and self._active_shop_powerup._active and self._active_shop_powerup._name == "Recall":
                 if self._active_shop_powerup._placed and len(self._active_shop_powerup._previous_positions) != 0:
+                    self._active_shop_powerup.record_last_position(self._player._position)
                     self._active_shop_powerup.recall(self._player._entity, self._player._position, board)
+                    self._active_shop_powerup.record_last_position(self._player._position)
                     occupied_positions.remove(self._active_shop_powerup._position)
                     show_state = True
                 elif len(self._active_shop_powerup._previous_positions) > 1:

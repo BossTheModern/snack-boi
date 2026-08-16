@@ -12,10 +12,10 @@ class Board:
         self._height: int = abs(height)
         self._board: List[List[str]] = [[' ' for _ in range(width)] for _ in range(height)]
 
-    def at(self, row: int, col: int) -> str:
+    def at(self, col: int, row: int) -> str:
         return self._board[row][col]
 
-    def set(self, row: int, col: int, obj: str) -> None:
+    def set(self, col: int, row: int, obj: str) -> None:
         self._board[row][col] = obj
 
     def display(self) -> None:
