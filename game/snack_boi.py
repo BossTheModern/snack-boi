@@ -30,6 +30,7 @@ from assets.position.position2d import Position2D
 from assets.menu_front import MenuFront
 from account.account import Account
 from assets.shop.shop_item import ShopItem
+from assets.enums.enums import MainMenuOptions, MovementKeys
 from boards.board import Board
 from utils.consts import EMPTY_SHOP_ITEM
 import copy
@@ -37,10 +38,6 @@ import copy
 
 # Game class where the game logic is implemented
 class Game:    
-    # Validation properties 
-    _valid_move_keys: List[str] = ['w', 'a', 's', 'd']
-    _main_menu_options: List[str] = ['1', '2', '3', '4', '5', '6']
-
     # Player and snack related properties
     _player: Player = Player()
     _snack: Snack = Snack()
@@ -85,7 +82,7 @@ class Game:
         self._active_shop_powerup.reset()
 
         # Update with used powerup and erase ones with zero quantity
-        self._account._owned_shop_items = [self._active_shop_powerup if self._active_shop_powerup._name == powerup._name else powerup for powerup in self._account._owned_shop_items ]
+        self._account._owned_shop_items = [self._active_shop_powerup if self._active_shop_powerup._name == powerup._name else powerup for powerup in self._account._owned_shop_items]
         self._account._owned_shop_items = [powerup for powerup in self._account._owned_shop_items if powerup._stock > 0]
 
     def game_spawn_snack(self, board: Board, occupied_positions: List[Position2D], snack_num: int) -> None:
@@ -216,7 +213,7 @@ class Game:
                 show_state = True
             
 
-            if key_event.event_type == keyboard.KEY_DOWN and key_event.name in self._valid_move_keys:
+            if key_event.event_type == keyboard.KEY_DOWN and key_event.name in MovementKeys._value2member_map_:
                 self._player.move_player(key_event, board, OBSTACLE_CHAR, self._player._position)
 
                 if self._recon_snack._active:
@@ -333,28 +330,27 @@ class Game:
         # Main menu loop
         while True:
             if show_menu:
-                self._menu_front.print_game_menu(consts.VERSION, self._main_menu_options)
+                self._menu_front.print_game_menu()
                 show_menu = False
 
             key_event = keyboard.read_event(suppress=True)
 
-            if keyboard_utils.check_key_event(key_event, self._main_menu_options[0]):
+            if keyboard_utils.check_key_event(key_event, MainMenuOptions.START_GAME.value):
                 self.menu.mode_selection_menu(self._classic_levels)
                 show_menu = True
-            elif keyboard_utils.check_key_event(key_event, self._main_menu_options[1]):
+            elif keyboard_utils.check_key_event(key_event, MainMenuOptions.SHOP_MENU.value):
                 self.menu.shop_menu()
                 show_menu = True
-            elif keyboard_utils.check_key_event(key_event, self._main_menu_options[2]):
-                print("entering account")
+            elif keyboard_utils.check_key_event(key_event, MainMenuOptions.ACCOUNT.value):
                 self._account.account_display()
                 show_menu = True
-            elif keyboard_utils.check_key_event(key_event, self._main_menu_options[3]):
+            elif keyboard_utils.check_key_event(key_event, MainMenuOptions.OPTIONS.value):
                 self.menu.game_options(self._classic_levels, self._save_file)
                 show_menu = True
-            elif keyboard_utils.check_key_event(key_event, self._main_menu_options[4]):
+            elif keyboard_utils.check_key_event(key_event, MainMenuOptions.VERSION_LOG.value):
                 self.menu.version_log()
                 show_menu = True
-            elif keyboard_utils.check_key_event(key_event, self._main_menu_options[5]):
+            elif keyboard_utils.check_key_event(key_event, MainMenuOptions.QUIT.value):
                 break
         
         self._save_file.save_prompt(key_event, self._classic_levels) if not self._save_file._already_saved else None
