@@ -9,6 +9,7 @@ import random
 import keyboard
 from keyboard import KeyboardEvent
 from assets.position.position2d import Position2D
+from assets.enums.enums import MovementKeys
 
 class Player:
     _entity: str = 'O'
@@ -56,7 +57,7 @@ class Player:
             Handles player movement on the board ensuring the player does not
             go outside the board nor stepping on top of obstacles
         '''
-        if keyboard_utils.check_key_event(move_input, 'w'):
+        if keyboard_utils.check_key_event(move_input, MovementKeys.UP.value):
             if (player_pos.y - 1 < 0):
                 print("Out of bounds, try again")
                 move_input = keyboard.read_event(suppress=True)
@@ -67,7 +68,7 @@ class Player:
                 board.set(player_pos.x, player_pos.y, ' ')
                 player_pos.move_up()
                 board.set(player_pos.x, player_pos.y, self._entity)
-        elif keyboard_utils.check_key_event(move_input, 'a'):
+        elif keyboard_utils.check_key_event(move_input, MovementKeys.LEFT.value):
             if (player_pos.x - 1 < 0):
                 print("Out of bounds, try again")
                 move_input = keyboard.read_event(suppress=True)
@@ -78,7 +79,7 @@ class Player:
                 board.set(player_pos.x, player_pos.y, ' ')
                 player_pos.move_left()
                 board.set(player_pos.x, player_pos.y, self._entity)
-        elif keyboard_utils.check_key_event(move_input, 's'):
+        elif keyboard_utils.check_key_event(move_input, MovementKeys.DOWN.value):
             if (player_pos.y + 1 > board._height-1):
                 print("Out of bounds, try again")
                 move_input = keyboard.read_event(suppress=True)
@@ -89,7 +90,7 @@ class Player:
                 board.set(player_pos.x, player_pos.y, ' ')
                 player_pos.move_down()
                 board.set(player_pos.x, player_pos.y, self._entity)
-        elif keyboard_utils.check_key_event(move_input, 'd'):
+        elif keyboard_utils.check_key_event(move_input, MovementKeys.RIGHT.value):
             if (player_pos.x + 1 > board._width-1):
                 print("Out of bounds, try again")
                 move_input = keyboard.read_event(suppress=True)

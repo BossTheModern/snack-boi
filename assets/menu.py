@@ -17,7 +17,7 @@ from account.account import Account
 from assets.shop.shop_item import ShopItem
 from assets.shop.shop_items import ShopItems
 from boards.board import Board
-from assets.enums.enums import Gamemodes, SaveFileOptions, ModeSelection, OptionsSelection
+from assets.enums.enums import Gamemodes, SaveFileOptions, ModeSelection, OptionsSelection, Confirmation
 from utils.consts import NAME_MIN_LENGTH
 from utils.consts import NAME_MAX_LENGTH
 from utils.consts import EMPTY_SHOP_ITEM
@@ -146,10 +146,10 @@ class Menu:
 
             while True: 
                 key_event = keyboard.read_event(suppress=True)
-                if key_event.event_type == keyboard.KEY_DOWN and key_event.name in ['y', 'n']:
+                if key_event.event_type == keyboard.KEY_DOWN and key_event.name in Confirmation._value2member_map_:
                     break
 
-            save_file.delete() if keyboard_utils.check_key_event(key_event, 'y') else print("Save file not deleted")
+            save_file.delete() if keyboard_utils.check_key_event(key_event, Confirmation.YES.value) else print("Save file not deleted")
 
         # Game options menu loop
         while True:
@@ -369,7 +369,7 @@ class Menu:
             
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
-            if keyboard_utils.check_key_event(key_event, 'y'):
+            if keyboard_utils.check_key_event(key_event, Confirmation.YES.value):
                 if not self.shop_item_exists(shop_item):                    
                     self._account._owned_shop_items.append(shop_item)
 
@@ -378,7 +378,7 @@ class Menu:
                 print("Purchase successful\n\n")
                 break
             
-            if keyboard_utils.check_key_event(key_event, 'n'):
+            if keyboard_utils.check_key_event(key_event, Confirmation.NO.value):
                 print("Canceled purchase\n\n")
                 break
     

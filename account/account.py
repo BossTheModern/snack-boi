@@ -10,6 +10,7 @@ from utils import keyboard_utils
 from typing import List
 from assets.shop.shop_items import ShopItems
 from assets.shop.shop_item import ShopItem
+from assets.enums.enums import Confirmation
 from utils.consts import NAME_MIN_LENGTH
 from utils.consts import NAME_MAX_LENGTH
 
@@ -85,12 +86,12 @@ class Account:
             
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
-            if keyboard_utils.check_key_event(key_event, 'y'):
+            if keyboard_utils.check_key_event(key_event, Confirmation.YES.value):
                 self._name = new_name
                 print("Name changed successfully")
                 break
         
-            if keyboard_utils.check_key_event(key_event, 'n'):
+            if keyboard_utils.check_key_event(key_event, Confirmation.NO.value):
                 print("Canceled name change")
                 break
 
