@@ -11,7 +11,7 @@ from assets.text_collection import TextCollection
 from assets.levels.level import Level
 from assets.snacks.snack import Snack
 from assets.shop.shop_item import ShopItem
-from assets.enums.enums import Gamemodes
+from assets.enums.enums import Gamemodes, SnackTypes
 from boards.board_creator import draw_grid
 from boards.board import Board
 from account.account import Account
@@ -137,7 +137,7 @@ class GameUtils:
                 print("Nothing to display")
         
         print("Move by pressing (w/a/s/d) or press q to quit")
-        print("Super snack spawned! Eat it for extra points!") if current_snack_type == 'super' else None
+        print("Super snack spawned! Eat it for extra points!") if current_snack_type == SnackTypes.SUPER.value else None
         print(f"Recon duration: {recon_duration} moves") if recon_active else None
         self.display_active_powerup_status(active_powerup) if active_powerup._name != "None" else None
             
@@ -156,6 +156,6 @@ class GameUtils:
             Sets appropriate toggle text variables based on snack eaten
         '''
         match current_snack_type:
-            case 'normal': self._snack_eaten = True
-            case 'super': self._super_snack_eaten = True
-            case 'fake': self._fake_snack_eaten = True
+            case SnackTypes.NORMAL.value: self._snack_eaten = True
+            case SnackTypes.SUPER.value: self._super_snack_eaten = True
+            case SnackTypes.FAKE.value: self._fake_snack_eaten = True
