@@ -11,6 +11,7 @@ from assets.text_collection import TextCollection
 from assets.levels.level import Level
 from assets.snacks.snack import Snack
 from assets.shop.shop_item import ShopItem
+from assets.enums.enums import Gamemodes
 from boards.board_creator import draw_grid
 from boards.board import Board
 from account.account import Account
@@ -128,9 +129,9 @@ class GameUtils:
             Displays the current state of the game basd on game mode
         '''
         match game_mode:
-            case 'classic':
+            case Gamemodes.CLASSIC.value:
                 self.classic_display_current_state(board, current_lvl_index, levels)
-            case 'endless':
+            case Gamemodes.ENDLESS.value:
                 self.endless_display_current_state(board, current_lvl_index, levels)
             case _:
                 print("Nothing to display")

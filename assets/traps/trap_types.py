@@ -11,6 +11,7 @@ from keyboard import KeyboardEvent
 from assets.traps.hidden_trigger import HiddenTrigger
 from assets.traps.dimension_exit import DimensionExit
 from assets.position.position2d import Position2D
+from assets.enums.enums import Gamemodes, MovementKeys
 import keyboard
 import random
 import copy
@@ -63,7 +64,6 @@ class ParallelDimensionTrap(Trap):
         self._position: Position2D = Position2D()
         self._hidden_trigger: HiddenTrigger = HiddenTrigger()
         self._exit: DimensionExit = DimensionExit()
-        self._valid_move_keys: List[str] = ['w', 'a', 's', 'd']
         self._fancy_printer: FancyPrinter = FancyPrinter(interval = 0.02, line_interval = 0.5)
     
     def print_parallel_dimension(self) -> None:
@@ -101,7 +101,7 @@ class ParallelDimensionTrap(Trap):
                 self.print_parallel_dimension()
                 show_board = False
             
-            if not printed_dialogue and game_mode == 'classic':
+            if not printed_dialogue and game_mode == Gamemodes.CLASSIC.value:
                 show_initial_dialogue()
                 printed_dialogue = True    
             
@@ -112,7 +112,7 @@ class ParallelDimensionTrap(Trap):
             key_event = keyboard.read_event(suppress=True)
 
             # Handle player movement in parallel dimension
-            if key_event.event_type == keyboard.KEY_DOWN and key_event.name in self._valid_move_keys:
+            if key_event.event_type == keyboard.KEY_DOWN and key_event.name in MovementKeys._value2member_map_:
                 self._player.move_player(key_event, self._parallell_board, OBSTACLE_CHAR, self._player._parallel_position)
                 show_board = True
 

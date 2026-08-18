@@ -30,7 +30,7 @@ from assets.position.position2d import Position2D
 from assets.menu_front import MenuFront
 from account.account import Account
 from assets.shop.shop_item import ShopItem
-from assets.enums.enums import MainMenuOptions, MovementKeys
+from assets.enums.enums import MainMenuOptions, MovementKeys, Gamemodes
 from boards.board import Board
 from utils.consts import EMPTY_SHOP_ITEM
 import copy
@@ -181,12 +181,12 @@ class Game:
         # Game loop handling both modes
         while True:
             # Intro text before game display
-            if intro_show_state and game_mode == 'classic':
+            if intro_show_state and game_mode == Gamemodes.CLASSIC.value:
                 self._game_utils.intro_text_display(levels_unlocked, current_level_index)
                 intro_show_state = False
             
             # Handle win condition
-            if game_mode == 'classic' and self._snack._count >= self._classic_levels[current_level_index]._win_cap:
+            if game_mode == Gamemodes.CLASSIC.value and self._snack._count >= self._classic_levels[current_level_index]._win_cap:
                 self._game_utils.classic_game_win(current_level_index, self._classic_levels, self._account)
                 break
             
