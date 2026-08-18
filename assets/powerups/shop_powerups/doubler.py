@@ -6,6 +6,7 @@
 from assets.shop.shop_item import ShopItem
 from utils.consts import SHOP_ITEM_LIMIT
 from assets.snacks.snack import Snack
+from assets.enums.enums import SnackTypes
 from utils.consts import NORMAL_SNACK_POINTS
 from utils.consts import SUPER_SNACK_POINTS
 import textwrap
@@ -27,10 +28,10 @@ class Doubler(ShopItem):
         '''
         if self._active_duration > 0:
             match current_snack._type:
-                case 'normal': 
+                case SnackTypes.NORMAL.value: 
                     snack._count += 2 * NORMAL_SNACK_POINTS
                     self._active_duration -= 1
-                case 'super': 
+                case SnackTypes.SUPER.value: 
                     snack._count += 2 * SUPER_SNACK_POINTS
                     self._active_duration -= 1
 

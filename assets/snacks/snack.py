@@ -11,6 +11,7 @@ from utils.consts import SUPER_SNACK_POINTS
 from utils.consts import NEW_SNACKS_START_LVL
 from boards.board import Board
 from assets.position.position2d import Position2D
+from assets.enums.enums import SnackTypes
 
 class Snack:
     _position: Position2D = Position2D()
@@ -53,8 +54,8 @@ class Snack:
         print("Eating snack...")
         if current_lvl_index >= NEW_SNACKS_START_LVL-1:
             match target_snack._type:
-                case 'normal': self._count += NORMAL_SNACK_POINTS
-                case 'super': self._count += SUPER_SNACK_POINTS
+                case SnackTypes.NORMAL.value: self._count += NORMAL_SNACK_POINTS
+                case SnackTypes.SUPER.value: self._count += SUPER_SNACK_POINTS
             self._position.clear()
         else:
             print("Sanck eaten!")
