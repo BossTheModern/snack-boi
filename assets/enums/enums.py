@@ -37,3 +37,7 @@ class SaveFileOptions(Enum):
 class Gamemodes(Enum):
     CLASSIC = 'classic'
     ENDLESS = 'endless'
+
+class Confirmation(Enum):
+    YES = 'y'
+    NO = 'n'
