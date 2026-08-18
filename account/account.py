@@ -94,27 +94,3 @@ class Account:
             if keyboard_utils.check_key_event(key_event, Confirmation.NO.value):
                 print("Canceled name change")
                 break
-
-    
-    def account_menu(self) -> None:
-        '''
-            Handles account display logic
-        '''
-
-        show_menu: bool = True
-
-        while True:
-            if show_menu:
-                self.show_account()
-                show_menu = False
-            
-            key_event: KeyboardEvent = keyboard.read_event(suppress=True)
-
-            if keyboard_utils.check_key_event(key_event, 'b'):
-                print("Changing name...")
-
-            if keyboard_utils.check_key_event(key_event, 'q'):
-                print("Returning to main menu...")
-                break
-
-            show_menu = True
