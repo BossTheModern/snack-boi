@@ -10,7 +10,7 @@ from utils import keyboard_utils
 from typing import List
 from assets.shop.shop_items import ShopItems
 from assets.shop.shop_item import ShopItem
-from assets.enums.enums import Confirmation
+from assets.enums.enums import Confirmation, AccountOptions
 from utils.consts import NAME_MIN_LENGTH
 from utils.consts import NAME_MAX_LENGTH
 
@@ -59,11 +59,11 @@ class Account:
             
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
-            if keyboard_utils.check_key_event(key_event, 'e'):
+            if keyboard_utils.check_key_event(key_event, AccountOptions.CHANGE_NAME.value):
                 self.change_name()
                 show_menu = True
             
-            if keyboard_utils.check_key_event(key_event, 'q'):
+            if keyboard_utils.check_key_event(key_event, AccountOptions.BACK.value):
                 print("Back to main menu")
                 break           
     
