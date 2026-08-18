@@ -46,3 +46,7 @@ class SnackTypes(Enum):
     NORMAL = 'normal'
     FAKE = 'fake'
     SUPER = 'super'
+
+class AccountOptions(Enum):
+    CHANGE_NAME = 'e'
+    BACK = 'q'
