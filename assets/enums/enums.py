@@ -50,3 +50,9 @@ class SnackTypes(Enum):
 class AccountOptions(Enum):
     CHANGE_NAME = 'e'
     BACK = 'q'
+
+class StdNavigationOptions(Enum):
+    LEFT = 'a'
+    RIGHT = 'd'
+    BACK = 'q'
+    SELECT = 's'
