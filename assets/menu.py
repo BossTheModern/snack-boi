@@ -17,7 +17,7 @@ from account.account import Account
 from assets.shop.shop_item import ShopItem
 from assets.shop.shop_items import ShopItems
 from boards.board import Board
-from assets.enums.enums import Gamemodes, SaveFileOptions, ModeSelection, OptionsSelection, Confirmation
+from assets.enums.enums import Gamemodes, SaveFileOptions, ModeSelection, OptionsSelection, Confirmation, StdNavigationOptions
 from utils.consts import NAME_MIN_LENGTH
 from utils.consts import NAME_MAX_LENGTH
 from utils.consts import EMPTY_SHOP_ITEM
@@ -207,20 +207,19 @@ class Menu:
             current_lvl_index += 1
         
         # Handle keyboard input
-        if keyboard_utils.check_key_event(input, 'a'):
+        if keyboard_utils.check_key_event(input, StdNavigationOptions.LEFT.value):
             if current_lvl_index - 1 < 0:
                 return
             
             levels[current_lvl_index-1]._selected = True
             levels[current_lvl_index]._selected = False
-        elif keyboard_utils.check_key_event(input, 'd'):
+        elif keyboard_utils.check_key_event(input, StdNavigationOptions.RIGHT.value):
             if current_lvl_index + 1 > len(levels)-1:
                 return
-            
+
             levels[current_lvl_index+1]._selected = True
             levels[current_lvl_index]._selected = False
-    
-    # UNDER DEVELOPMENT: Merging menu displays for existing gamemodes
+
     def levels_menu(self, levels: List[Level], mode: str) -> None:
         '''
             Logic for handling endless levels navigation and selection
@@ -231,18 +230,16 @@ class Menu:
 
         while True:
             if show_menu:
-                match mode:
-                    case Gamemodes.CLASSIC.value: self._menu_front.print_level_menu(levels)
-                    case Gamemodes.ENDLESS.value: self._menu_front.print_endless_levels_menu(levels)
+                self._menu_front.print_levels_menu(levels, mode)
                 show_menu = False
 
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
-            if keyboard_utils.check_key_event(key_event, 'q'):
+            if keyboard_utils.check_key_event(key_event, StdNavigationOptions.BACK.value):
                 print("Going back to main menu")
                 break
 
-            if keyboard_utils.check_key_event(key_event, 's'):
+            if keyboard_utils.check_key_event(key_event, StdNavigationOptions.SELECT.value):
                 selected_level = self.selected_level(levels)
 
                 if mode == Gamemodes.CLASSIC.value:
@@ -263,7 +260,7 @@ class Menu:
                     else: 
                         print("Level is locked, clear the corresponding level in classic mode first")
                 
-            if keyboard_utils.check_key_event(key_event, 'a') or keyboard_utils.check_key_event(key_event, 'd'):
+            if keyboard_utils.check_key_event(key_event, StdNavigationOptions.LEFT.value) or keyboard_utils.check_key_event(key_event, StdNavigationOptions.RIGHT.value):
                 self.navigate_selection(key_event, levels)
                 show_menu = True
 
@@ -287,16 +284,16 @@ class Menu:
                 show_menu = False
             
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
-            if keyboard_utils.check_key_event(key_event, 'r'):
+            if keyboard_utils.check_key_event(key_event, StdNavigationOptions.BACK.value):
                 print("Returning to main menu")
                 break
 
-            if keyboard_utils.check_key_event(key_event, 'q'):
+            if keyboard_utils.check_key_event(key_event, StdNavigationOptions.LEFT.value):
                 if current_page_index > 0:
                     current_page_index -= 1
                 show_menu = True
 
-            if keyboard_utils.check_key_event(key_event, 'e'):
+            if keyboard_utils.check_key_event(key_event, StdNavigationOptions.RIGHT.value):
                 if current_page_index < len(pages)-1:
                     current_page_index += 1
                 show_menu = True

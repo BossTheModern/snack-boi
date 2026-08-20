@@ -6,6 +6,7 @@
 from typing import List
 from assets.shop.shop_item import ShopItem
 from assets.shop.shop_items import ShopItems
+from assets.enums.enums import StdNavigationOptions
 from account.account import Account
 
 class Shop:
@@ -30,7 +31,7 @@ class Shop:
         print(f"\n\n{'':-<50}")
         print(f"Balance: {account._points_balance}")
         print("Select item number to view details")
-        print("[Q] left [E] right [R] Return to main menu")
+        print(f"[{StdNavigationOptions.LEFT.value.upper()}] left [{StdNavigationOptions.RIGHT.value.upper()}] right [{StdNavigationOptions.BACK.value.upper()}] Return to main menu")
 
     def show_shop_item_details(self, selected_item: ShopItem) -> None:
         '''
