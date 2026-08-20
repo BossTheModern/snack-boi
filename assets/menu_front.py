@@ -42,30 +42,6 @@ class MenuFront:
         except OSError:
             print("Error: Could not read file")
     
-    def print_endless_levels_menu(self, levels: List[Level]) -> None:
-        '''
-            Prints menu for levels on endless mode
-        '''
-        counter: int = 0
-
-        print("-----[ENDLESS MODE LEVELS]-----\n")
-        for level in levels:
-            if level._selected:
-                print(self._select_char, end="")
-            print(f"[{level._level_name}]", end="")
-            if not level._cleared:
-                print(self._lock_char, end="")
-            print(" ", end="")
-
-            counter += 1
-            if counter == self._wrap_limit:
-                print()
-                counter = 0
-        print()
-        print("\n[A] Move left [D] Move right [S] Select")
-        print("[Q] Back to main menu")
-        print("-------------------------------")
-    
     def print_levels_menu(self, levels: List[Level], mode: str) -> None:
         '''
             Prints menu for levels on classic mode
