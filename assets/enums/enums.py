@@ -56,3 +56,8 @@ class StdNavigationOptions(Enum):
     RIGHT = 'd'
     BACK = 'q'
     SELECT = 's'
+
+class MiscGameControls(Enum):
+    USE_POWERUP = 'e'
+    USE_RECALL = 'r'
+    QUIT = 'q'
