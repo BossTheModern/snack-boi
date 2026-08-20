@@ -32,8 +32,8 @@ class Account:
 
         self.show_owned_powerups()
         print(f"{'':-<40}")
-        print("[E] change name")
-        print("[Q] back to main menu")
+        print(f"[{AccountOptions.CHANGE_NAME.value.upper()}] change name")
+        print(f"[{AccountOptions.BACK.value.upper()}] back to main menu")
     
     def show_owned_powerups(self) -> None:
         print("Owned powerups: ")
