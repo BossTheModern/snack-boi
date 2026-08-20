@@ -8,7 +8,7 @@ from utils import consts
 from assets.levels.level import Level
 from assets.save_file import SaveFile
 from assets.shop.shop_item import ShopItem
-from assets.enums.enums import MainMenuOptions, ModeSelection, OptionsSelection, SaveFileOptions
+from assets.enums.enums import MainMenuOptions, ModeSelection, OptionsSelection, SaveFileOptions, StdNavigationOptions, Gamemodes
 
 class MenuFront:
     _select_char: str = '>'
@@ -66,18 +66,26 @@ class MenuFront:
         print("[Q] Back to main menu")
         print("-------------------------------")
     
-    def print_level_menu(self, levels: List[Level]) -> None:
+    def print_levels_menu(self, levels: List[Level], mode: str) -> None:
         '''
             Prints menu for levels on classic mode
         '''
         counter: int = 0
+        lock_condition: bool = False
 
-        print("-----[CLASSIC MODE LEVELS]-----\n")
+        if mode == Gamemodes.CLASSIC.value:
+            print("-----[CLASSIC MODE LEVELS]-----\n")
+        if mode == Gamemodes.ENDLESS.value:
+            print("-----[ENDLESS MODE LEVELS]-----\n")
+        
         for level in levels:
             if level._selected:
                 print(self._select_char, end="")
             print(f"[{level._level_name}]", end="")
-            if not level._unlocked:
+
+            lock_condition = not level._unlocked if mode == Gamemodes.CLASSIC.value else not level._cleared
+
+            if lock_condition:
                 print(self._lock_char, end="")
             print(" ", end="")
 
@@ -86,8 +94,8 @@ class MenuFront:
                 print()
                 counter = 0
         print()
-        print("\n[A] Move left [D] Move right [S] Select")
-        print("[Q] Back to main menu")
+        print(f"\n[{StdNavigationOptions.LEFT.value.upper()}] Move left [{StdNavigationOptions.RIGHT.value.upper()}] Move right [{StdNavigationOptions.SELECT.value.upper()}] Select")
+        print(f"[{StdNavigationOptions.BACK.value.upper()}] Back to main menu")
         print("---------------------")
     
     def print_mode_selection_menu(self) -> None:
