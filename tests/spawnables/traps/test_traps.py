@@ -23,7 +23,8 @@ from assets.traps.trap_types import HungerTrap
 from assets.traps.trap_types import ParallelDimensionTrap
 from assets.snacks.snack import Snack
 from assets.player import Player
-from boards.board_creator import preview_grid
+from boards.board import Board
+from assets.position.position2d import Position2D
 from utils.consts import HUNGER_TRAPS_LIMIT
 from utils.consts import PARALLEL_TRAPS_LIMIT
 
@@ -36,11 +37,11 @@ class TestTraps(unittest.TestCase):
 
         snack: Snack = Snack()
         player: Player = Player()
-        board: List[List[str]] = copy.deepcopy(square_obstacle_grid)
+        board: Board = copy.deepcopy(square_obstacle_grid)
         traps: List[Trap] = []
         hunger_traps: List[Trap] = []
         parallel_dimension_traps: List[Trap] = []
-        occupied_positions: List[List[int]] = []
+        occupied_positions: List[Position2D] = []
 
         for _ in range(HUNGER_TRAPS_LIMIT):
             hunger_traps.append(HungerTrap(snack))
@@ -55,7 +56,8 @@ class TestTraps(unittest.TestCase):
             occupied_positions.append(trap._position)
             trap.reveal_trap(board)
 
-        preview_grid(board, 'board with traps spawned')
+        board.display()
+        print('board with traps spawned')
 
         self.assertEqual(len(occupied_positions), HUNGER_TRAPS_LIMIT + PARALLEL_TRAPS_LIMIT)
         self.assertEqual(len(hunger_traps), HUNGER_TRAPS_LIMIT)
