@@ -30,7 +30,7 @@ from assets.position.position2d import Position2D
 from assets.menu_front import MenuFront
 from account.account import Account
 from assets.shop.shop_item import ShopItem
-from assets.enums.enums import MainMenuOptions, MovementKeys, Gamemodes, MiscGameControls
+from assets.enums.enums import MainMenuOptions, MovementKeys, Gamemodes, MiscGameControls, SnackTypes
 from boards.board import Board
 from utils.consts import EMPTY_SHOP_ITEM
 import copy
@@ -85,18 +85,18 @@ class Game:
         self._account._owned_shop_items = [self._active_shop_powerup if self._active_shop_powerup._name == powerup._name else powerup for powerup in self._account._owned_shop_items]
         self._account._owned_shop_items = [powerup for powerup in self._account._owned_shop_items if powerup._stock > 0]
 
-    def game_spawn_snack(self, board: Board, occupied_positions: List[Position2D], snack_num: int) -> None:
+    def game_spawn_snack(self, board: Board, occupied_positions: List[Position2D], snack_type: SnackTypes) -> None:
         '''
             Spawns snack based on the snack number generated on the board 
         '''
-        match snack_num:
-            case 1:
+        match snack_type:
+            case SnackTypes.NORMAL:
                 self._normal_snack.spawn_snack(board, occupied_positions)
                 self._current_snack = self._normal_snack
-            case 2:
+            case SnackTypes.FAKE:
                 self._fake_snack.spawn_snack(board, occupied_positions)
                 self._current_snack = self._fake_snack
-            case 3:
+            case SnackTypes.SUPER:
                 self._super_snack.spawn_snack(board, occupied_positions)
                 self._current_snack = self._super_snack
 
@@ -112,11 +112,11 @@ class Game:
                                   press q to quit endless mode
         '''
         current_level_index: int = 0
-        random_snack_num: int = 0
         key_event: KeyboardEvent
         show_state: bool = True
         intro_show_state: bool = True
         recon_duration: int = self._recon_snack._duration
+        random_snack_type: SnackTypes
         trap: Trap
         occupied_positions: List[Position2D] = []
         levels_unlocked: int = 0
@@ -140,8 +140,8 @@ class Game:
         
         # Add new snack logic available starting from certain levels
         if current_level_index >= consts.NEW_SNACKS_START_LVL-1:
-            random_snack_num = random.randint(1, 3)
-            self.game_spawn_snack(board, occupied_positions, random_snack_num)
+            random_snack_type = random.choice(list(SnackTypes))
+            self.game_spawn_snack(board, occupied_positions, random_snack_type)
             occupied_positions.append(self._current_snack._position)
         else:
             self._normal_snack.spawn_snack(board, occupied_positions)
@@ -271,8 +271,8 @@ class Game:
 
                 # Spawn new snack and handle new snacks starting from a set level
                 if current_level_index >= consts.NEW_SNACKS_START_LVL-1:
-                    random_snack_num = random.randint(1, 3)
-                    self.game_spawn_snack(board, occupied_positions, random_snack_num)
+                    random_snack_type = random.choice(list(SnackTypes))
+                    self.game_spawn_snack(board, occupied_positions, random_snack_type)
                     occupied_positions.append(self._current_snack._position)
                 else:
                     self._normal_snack.spawn_snack(board, occupied_positions)
