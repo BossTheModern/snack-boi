@@ -30,7 +30,7 @@ from assets.position.position2d import Position2D
 from assets.menu_front import MenuFront
 from account.account import Account
 from assets.shop.shop_item import ShopItem
-from assets.enums.enums import MainMenuOptions, MovementKeys, Gamemodes
+from assets.enums.enums import MainMenuOptions, MovementKeys, Gamemodes, MiscGameControls
 from boards.board import Board
 from utils.consts import EMPTY_SHOP_ITEM
 import copy
@@ -204,11 +204,11 @@ class Game:
 
             key_event = keyboard.read_event(suppress=True)
 
-            if keyboard_utils.check_key_event(key_event, 'q'):
+            if keyboard_utils.check_key_event(key_event, MiscGameControls.QUIT.value):
                 break
 
             # Toggle active powerup
-            if keyboard_utils.check_key_event(key_event, 'e') and not self._active_shop_powerup._active and not self._active_shop_powerup.reached_usage_per_game():
+            if keyboard_utils.check_key_event(key_event, MiscGameControls.USE_POWERUP.value) and not self._active_shop_powerup._active and not self._active_shop_powerup.reached_usage_per_game():
                 self._active_shop_powerup.activate()
                 show_state = True
             
@@ -243,7 +243,7 @@ class Game:
             # Handle recall usage
             # Press r for the first time - place recall
             # Press r when recall was placed - teleport to recall
-            if keyboard_utils.check_key_event(key_event, 'r') and self._active_shop_powerup._active and self._active_shop_powerup._name == "Recall":
+            if keyboard_utils.check_key_event(key_event, MiscGameControls.USE_RECALL.value) and self._active_shop_powerup._active and self._active_shop_powerup._name == "Recall":
                 if self._active_shop_powerup._placed and len(self._active_shop_powerup._previous_positions) != 0:
                     self._active_shop_powerup.record_last_position(self._player._position)
                     self._active_shop_powerup.recall(self._player._entity, self._player._position, board)

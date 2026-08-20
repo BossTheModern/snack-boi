@@ -11,7 +11,7 @@ from assets.text_collection import TextCollection
 from assets.levels.level import Level
 from assets.snacks.snack import Snack
 from assets.shop.shop_item import ShopItem
-from assets.enums.enums import Gamemodes, SnackTypes
+from assets.enums.enums import Gamemodes, SnackTypes, MiscGameControls
 from boards.board_creator import draw_grid
 from boards.board import Board
 from account.account import Account
@@ -148,8 +148,8 @@ class GameUtils:
         print(f"{'':-<30}")
         print(f"Active powerup: {active_powerup._name} ({'ACTIVE' if active_powerup._active else 'INACTIVE'})")
         print(f"Current duration: {active_powerup._active_duration}")
-        print(f"[E] Activate")
-        print("[R] Use recall") if active_powerup._name == "Recall" else None
+        print(f"[{MiscGameControls.USE_POWERUP.value.upper()}] Activate")
+        print(f"[{MiscGameControls.USE_RECALL.value.upper()}] Use recall") if active_powerup._name == "Recall" else None
     
     def set_snack_eaten(self, current_snack_type: str) -> None:
         '''
