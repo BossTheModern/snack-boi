@@ -18,25 +18,6 @@ class Snack(Spawnable):
     _position: Position2D = Position2D()
     _count: int = 0
     _type: str = ''
-    
-    def spawn_snack(self, board: Board, occupied_positions: List[Position2D]) -> None:
-        '''
-            spawns snack on the grid
-
-            Args:
-                board: The board where the snack will be spawned.
-        '''
-        random_x: int = random.randint(0, board._width-1)
-        random_y: int = random.randint(0, board._height-1)
-        self._position.set(random_x, random_y)
-        
-        while self._position in occupied_positions or board.at(self._position.x, self._position.y) != ' ':
-            print("looping")
-            random_x = random.randint(0, board._width-1)
-            random_y = random.randint(0, board._height-1)
-            self._position.set(random_x, random_y)
-        
-        board.set(self._position.x, self._position.y, self._entity)
 
     def spawn(self, board: Board, occupied_positions: List[Position2D] = []) -> None:
         super().spawn(board, occupied_positions)
