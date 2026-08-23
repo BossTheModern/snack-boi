@@ -12,8 +12,9 @@ from utils.consts import NEW_SNACKS_START_LVL
 from boards.board import Board
 from assets.position.position2d import Position2D
 from assets.enums.enums import SnackTypes
+from assets.spawnable.spawnable import Spawnable
 
-class Snack:
+class Snack(Spawnable):
     _position: Position2D = Position2D()
     _count: int = 0
     _type: str = ''
@@ -34,9 +35,11 @@ class Snack:
             random_x = random.randint(0, board._width-1)
             random_y = random.randint(0, board._height-1)
             self._position.set(random_x, random_y)
-
-        print("new snack pos: ", random_x, random_y)
         
+        board.set(self._position.x, self._position.y, self._entity)
+
+    def spawn(self, board: Board, occupied_positions: List[Position2D] = []) -> None:
+        super().spawn(board, occupied_positions)
         board.set(self._position.x, self._position.y, self._entity)
     
     def clear_data(self) -> None:
