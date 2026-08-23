@@ -26,10 +26,9 @@ class HungerTrap(Trap):
         Hunger trap that reduces snack count upon stepping on it
     '''
     def __init__(self, snack: Snack) -> None:
-        self._trap_entity: str = 'H'
+        super().__init__('H')
         self._type: str = 'hunger'
         self._snack: Snack = snack
-        self._position: Position2D = Position2D()
     
     def reduce_snack_count(self, board: Board, occupied_positions: List[Position2D]) -> None:
         '''
@@ -57,11 +56,10 @@ class ParallelDimensionTrap(Trap):
         dimension upon triggering it
     '''
     def __init__(self, player: Player) -> None:
+        super().__init__('Ø')
         self._player: Player = player
-        self._trap_entity: str = 'Ø'
         self._type: str = 'parallel dimension'
         self._parallell_board: Board = empty_grid
-        self._position: Position2D = Position2D()
         self._hidden_trigger: HiddenTrigger = HiddenTrigger()
         self._exit: DimensionExit = DimensionExit()
         self._fancy_printer: FancyPrinter = FancyPrinter(interval = 0.02, line_interval = 0.5)

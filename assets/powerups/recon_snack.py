@@ -3,7 +3,6 @@
 
     Handles logic for powerup recon snack
 '''
-import random
 from typing import List
 from assets.traps.traps import Trap
 from assets.spawnable.spawnable import Spawnable
@@ -12,8 +11,7 @@ from assets.position.position2d import Position2D
 
 class ReconSnack(Spawnable):
     def __init__(self) -> None:
-        self._position: Position2D = Position2D()
-        self._entity_char: str = 'Q'
+        super().__init__('Q')
         self._counter: int = 0
         self._max_number: int = 1
         self._required_eaten_snacks: int = 5
@@ -23,7 +21,6 @@ class ReconSnack(Spawnable):
 
     def spawn(self, board: Board, occupied_positions: List[Position2D]) -> None:
         super().spawn(board, occupied_positions)
-        board.set(self._position.x, self._position.y, self._entity_char)
         self._counter += 1
     
     def reveal_position(self, board: Board, traps: List[Trap]) -> None:
