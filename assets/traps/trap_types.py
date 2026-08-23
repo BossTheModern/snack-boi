@@ -48,7 +48,7 @@ class HungerTrap(Trap):
         print(f"Snack count reduced by {reduce_amount}. Current snack count: {self._snack._count}")
 
         self._position.clear()
-        self.spawn_trap(board, occupied_positions)
+        self.spawn(board, occupied_positions)
 
 
 class ParallelDimensionTrap(Trap):
