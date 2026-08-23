@@ -6,10 +6,11 @@
 import random
 from typing import List
 from assets.traps.traps import Trap
+from assets.spawnable.spawnable import Spawnable
 from boards.board import Board
 from assets.position.position2d import Position2D
 
-class ReconSnack:
+class ReconSnack(Spawnable):
     def __init__(self) -> None:
         self._position: Position2D = Position2D()
         self._entity_char: str = 'Q'
@@ -21,15 +22,7 @@ class ReconSnack:
         self._active: bool = False
 
     def spawn(self, board: Board, occupied_positions: List[Position2D]) -> None:
-        random_x: int = random.randint(0, board._width-1)
-        random_y: int = random.randint(0, board._height-1)
-        self._position.set(random_x, random_y)
-
-        while self._position in occupied_positions or board.at(self._position.x, self._position.y) != ' ':
-            random_x = random.randint(0, board._width-1)
-            random_y = random.randint(0, board._height-1)
-            self._position.set(random_x, random_y)
-        
+        super().spawn(board, occupied_positions)
         board.set(self._position.x, self._position.y, self._entity_char)
         self._counter += 1
     
