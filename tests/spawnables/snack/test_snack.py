@@ -40,7 +40,7 @@ class TestSnack(unittest.TestCase):
         board: Board = copy.deepcopy(square_obstacle_grid)
 
         snack: Snack = NormalSnack()
-        snack.spawn_snack(board, [])
+        snack.spawn(board, [])
         board.display()
         print('board with normal snack spawned')
 
@@ -57,13 +57,13 @@ class TestSnack(unittest.TestCase):
 
         for _ in range(HUNGER_TRAPS_LIMIT):
             trap: HungerTrap = HungerTrap(snack)
-            trap.spawn_trap(board, occupied_positions)
+            trap.spawn(board, occupied_positions)
             trap.reveal_trap(board)
             occupied_positions.append(trap._position)
         
         board.display()
         print('board with traps spawned')
-        snack.spawn_snack(board, occupied_positions)
+        snack.spawn(board, occupied_positions)
         board.display()
         print('board with snack spawned')
 

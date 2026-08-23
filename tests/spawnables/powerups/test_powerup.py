@@ -48,8 +48,8 @@ class TestPowerup(unittest.TestCase):
         recon_snack: ReconSnack = ReconSnack()
 
         # spawn setup
-        player.spawn_player(board, OBSTACLE_CHAR)
-        snack.spawn_snack(board, occupied_positions)
+        player.spawn(board)
+        snack.spawn(board, occupied_positions)
 
         for _ in range(HUNGER_TRAPS_LIMIT):
             traps.append(HungerTrap(snack))
@@ -58,7 +58,7 @@ class TestPowerup(unittest.TestCase):
             traps.append(ParallelDimensionTrap(Player()))
         
         for trap in traps:
-            trap.spawn_trap(board, occupied_positions)
+            trap.spawn(board, occupied_positions)
             trap.reveal_trap(board)
             occupied_positions.append(trap._position)
         
@@ -68,13 +68,13 @@ class TestPowerup(unittest.TestCase):
         print('board before powerup spawned')
         board.display()
 
-        self.assertEqual(recon_snack._entity_char, board.at(recon_snack._position.x, recon_snack._position.y))
-        self.assertNotEqual(board.at(recon_snack._position.x, recon_snack._position.y), HungerTrap(snack)._trap_entity)
-        self.assertNotEqual(board.at(recon_snack._position.x, recon_snack._position.y), ParallelDimensionTrap(player)._trap_entity)
+        self.assertEqual(recon_snack._entity, board.at(recon_snack._position.x, recon_snack._position.y))
+        self.assertNotEqual(board.at(recon_snack._position.x, recon_snack._position.y), HungerTrap(snack)._entity)
+        self.assertNotEqual(board.at(recon_snack._position.x, recon_snack._position.y), ParallelDimensionTrap(player)._entity)
         self.assertNotEqual(board.at(recon_snack._position.x, recon_snack._position.y), OBSTACLE_CHAR)
         self.assertNotEqual(board.at(recon_snack._position.x, recon_snack._position.y), player._entity)
         self.assertNotEqual(board.at(recon_snack._position.x, recon_snack._position.y), snack._entity)
-        self.assertEqual(board.at(recon_snack._position.x, recon_snack._position.y), recon_snack._entity_char)
+        self.assertEqual(board.at(recon_snack._position.x, recon_snack._position.y), recon_snack._entity)
 
 
 if __name__ == "__main__":
