@@ -18,10 +18,6 @@ class Snack(Spawnable):
     _position: Position2D = Position2D()
     _count: int = 0
     _type: str = ''
-
-    def spawn(self, board: Board, occupied_positions: List[Position2D] = []) -> None:
-        super().spawn(board, occupied_positions)
-        board.set(self._position.x, self._position.y, self._entity)
     
     def clear_data(self) -> None:
         '''

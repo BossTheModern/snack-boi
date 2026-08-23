@@ -14,30 +14,6 @@ from assets.spawnable.spawnable import Spawnable
 
 class Player(Spawnable):
     _parallel_position: Position2D = Position2D()
-
-    def spawn(self, board: Board) -> None:
-        super().spawn(board)
-        board.set(self._position.x, self._position.y, self._entity)
-
-    def spawn_player(self, board: Board, obstacle_char: str) -> None:
-        '''
-            Spawns player on the grid ensuring there are no obstacles on
-            the way
-
-            NOTE: Because it only checks for obstacles upon spawning, it
-                  must be used first before spawning anything else once
-                  the game starts
-        '''
-        random_x: int = random.randint(0, board._width-1)
-        random_y: int = random.randint(0, board._height-1)
-        self._position.set(random_x, random_y)
-        
-        while board.at(self._position.x, self._position.y) == obstacle_char:
-            random_x = random.randint(0, board._width-1)
-            random_y = random.randint(0, board._height-1)
-            self._position.set(random_x, random_y) 
-        
-        board.set(self._position.x, self._position.y, self._entity)
     
     def parallel_spawn_player(self, board: Board) -> None:
         '''
