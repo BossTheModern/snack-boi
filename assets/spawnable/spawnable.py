@@ -16,7 +16,11 @@ class Spawnable:
 
     def spawn(self, board: Board, occupied_positions: List[Position2D] = []) -> None:
         '''
-            spawns the entity at the board
+            randomly assigns a position to spawnable
+
+            NOTE: This only assigns a random position to spawnable and does not
+            add the entity explicitly to the board due to traps existing. Explicitly
+            adding the entity to the board requires overriding.
         '''
         random_x: int = random.randint(0, board._width-1)
         random_y: int = random.randint(0, board._height-1)
