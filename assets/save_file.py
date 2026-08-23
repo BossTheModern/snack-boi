@@ -19,6 +19,7 @@ from utils.consts import END_OF_ITEMS_FLAG
 from utils.consts import SHOP_ITEM_LIMIT
 from assets.shop.shop_items import ShopItems
 from assets.shop.shop_item import ShopItem
+from assets.enums.enums import Confirmation
 
 
 class SaveFile:
@@ -191,10 +192,10 @@ class SaveFile:
             print("Do you want to save your progress? (y/n)")
             while True:
                 key_event = keyboard.read_event(suppress=True)
-                if key_event.event_type == keyboard.KEY_DOWN and key_event.name in ['y', 'n']:
+                if key_event.event_type == keyboard.KEY_DOWN and key_event.name in Confirmation._value2member_map_:
                     break
-            if key_event.name == 'y':
+            if key_event.name == Confirmation.YES.value:
                 print("Saving progress...")
                 self.save(levels)
-            elif key_event.name == 'n':
+            elif key_event.name == Confirmation.NO.value:
                 print("Progress kept as it is")

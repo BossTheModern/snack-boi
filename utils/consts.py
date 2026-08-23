@@ -14,6 +14,8 @@ SHOP_ITEM_LIMIT: int = 3
 VERSION: str = "0.6.0 alpha"
 VERSION_LOG_FILE_PATH: str = 'version_log.txt'
 SAVE_FILE_PATH: str = 'assets/save_files/save_file.txt'
+STD_WIDTH: int = 10
+STD_HEIGHT: int = 10
 
 # Account configs
 NAME_MIN_LENGTH: int = 1
@@ -34,3 +36,8 @@ ADVANCED_LEVEL_REWARD: int = BASE_LEVEL_REWARD * 3
 
 EMPTY_SHOP_ITEM: ShopItem = ShopItem("None", 0, "", 0)
 PAGE_SIZE: int = 3
+EMPTY_SPACE: str = ' '
+
+PLAYER_ENTITY: str = 'O'
+SNACK_ENTITY: str = '*'
+SUPER_SNACK_ENTITY: str = '#'

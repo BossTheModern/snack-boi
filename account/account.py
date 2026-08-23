@@ -10,6 +10,7 @@ from utils import keyboard_utils
 from typing import List
 from assets.shop.shop_items import ShopItems
 from assets.shop.shop_item import ShopItem
+from assets.enums.enums import Confirmation, AccountOptions
 from utils.consts import NAME_MIN_LENGTH
 from utils.consts import NAME_MAX_LENGTH
 
@@ -31,8 +32,8 @@ class Account:
 
         self.show_owned_powerups()
         print(f"{'':-<40}")
-        print("[E] change name")
-        print("[Q] back to main menu")
+        print(f"[{AccountOptions.CHANGE_NAME.value.upper()}] change name")
+        print(f"[{AccountOptions.BACK.value.upper()}] back to main menu")
     
     def show_owned_powerups(self) -> None:
         print("Owned powerups: ")
@@ -58,11 +59,11 @@ class Account:
             
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
-            if keyboard_utils.check_key_event(key_event, 'e'):
+            if keyboard_utils.check_key_event(key_event, AccountOptions.CHANGE_NAME.value):
                 self.change_name()
                 show_menu = True
             
-            if keyboard_utils.check_key_event(key_event, 'q'):
+            if keyboard_utils.check_key_event(key_event, AccountOptions.BACK.value):
                 print("Back to main menu")
                 break           
     
@@ -85,35 +86,11 @@ class Account:
             
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
-            if keyboard_utils.check_key_event(key_event, 'y'):
+            if keyboard_utils.check_key_event(key_event, Confirmation.YES.value):
                 self._name = new_name
                 print("Name changed successfully")
                 break
         
-            if keyboard_utils.check_key_event(key_event, 'n'):
+            if keyboard_utils.check_key_event(key_event, Confirmation.NO.value):
                 print("Canceled name change")
                 break
-
-    
-    def account_menu(self) -> None:
-        '''
-            Handles account display logic
-        '''
-
-        show_menu: bool = True
-
-        while True:
-            if show_menu:
-                self.show_account()
-                show_menu = False
-            
-            key_event: KeyboardEvent = keyboard.read_event(suppress=True)
-
-            if keyboard_utils.check_key_event(key_event, 'b'):
-                print("Changing name...")
-
-            if keyboard_utils.check_key_event(key_event, 'q'):
-                print("Returning to main menu...")
-                break
-
-            show_menu = True

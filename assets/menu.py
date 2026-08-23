@@ -16,6 +16,8 @@ from assets.shop.shop import Shop
 from account.account import Account
 from assets.shop.shop_item import ShopItem
 from assets.shop.shop_items import ShopItems
+from boards.board import Board
+from assets.enums.enums import Gamemodes, SaveFileOptions, ModeSelection, OptionsSelection, Confirmation, StdNavigationOptions
 from utils.consts import NAME_MIN_LENGTH
 from utils.consts import NAME_MAX_LENGTH
 from utils.consts import EMPTY_SHOP_ITEM
@@ -23,17 +25,14 @@ from utils.menu_utils import make_pages
 
 
 class Menu:
-    _valid_options_inputs: List[str] = ['1', '2']
-    _valid_level_menu_inputs: List[str] = ['A', 'D', 'S']
-    _game_modes: List[str] = ['classic', 'endless']
-    game_loop: Callable[[List[List[str]]], None]
+    game_loop: Callable[[Board, str], None]
     _menu_front: MenuFront = MenuFront()
     _shop: Shop = Shop()
     _account: Account
     
     _fancy_print: FancyPrinter = FancyPrinter()
 
-    def __init__(self, game_loop: Callable[[List[List[str]]], None], account: Account) -> None:
+    def __init__(self, game_loop: Callable[[Board, str], None], account: Account) -> None:
         self.game_loop = game_loop
         self._account = account
     
@@ -71,6 +70,7 @@ class Menu:
         for level in levels:
             if level._selected:
                 return level
+        
 
     def mode_selection_menu(self, levels: List[Level]) -> None:
         '''
@@ -85,15 +85,15 @@ class Menu:
                 
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
-            if keyboard_utils.check_key_event(key_event, '1'):
-                self.levels_menu(levels, self._game_modes[0])
+            if keyboard_utils.check_key_event(key_event, ModeSelection.CLASSIC_MODE.value):
+                self.levels_menu(levels, Gamemodes.CLASSIC.value)
                 show_menu = True
                 break
-            elif keyboard_utils.check_key_event(key_event, '2'):
-                self.levels_menu(levels, self._game_modes[1])
+            elif keyboard_utils.check_key_event(key_event, ModeSelection.ENDLESS_MODE.value):
+                self.levels_menu(levels, Gamemodes.ENDLESS.value)
                 show_menu = True
                 break
-            elif keyboard_utils.check_key_event(key_event, '3'):
+            elif keyboard_utils.check_key_event(key_event, ModeSelection.BACK.value):
                 print("Returning to main menu")
                 show_menu = True
                 break 
@@ -146,24 +146,24 @@ class Menu:
 
             while True: 
                 key_event = keyboard.read_event(suppress=True)
-                if key_event.event_type == keyboard.KEY_DOWN and key_event.name in ['y', 'n']:
+                if key_event.event_type == keyboard.KEY_DOWN and key_event.name in Confirmation._value2member_map_:
                     break
 
-            save_file.delete() if keyboard_utils.check_key_event(key_event, 'y') else print("Save file not deleted")
+            save_file.delete() if keyboard_utils.check_key_event(key_event, Confirmation.YES.value) else print("Save file not deleted")
 
         # Game options menu loop
         while True:
             if show_menu:
-                self._menu_front.print_game_options(self._valid_options_inputs)
+                self._menu_front.print_game_options()
                 show_menu = False
 
             key_event = keyboard.read_event(suppress=True)
 
-            if keyboard_utils.check_key_event(key_event, '2'):
+            if keyboard_utils.check_key_event(key_event, OptionsSelection.BACK.value):
                 break
             
             # Manage save file options
-            if keyboard_utils.check_key_event(key_event, '1'): 
+            if keyboard_utils.check_key_event(key_event, OptionsSelection.MANAGE_SAVE_FILE.value): 
                 show_menu = True
                 
                 while True:
@@ -173,21 +173,21 @@ class Menu:
                     
                     key_event = keyboard.read_event(suppress=True)
                     
-                    if keyboard_utils.check_key_event(key_event, '1'):
+                    if keyboard_utils.check_key_event(key_event, SaveFileOptions.LOAD_PROGRESS.value):
                         print("Loading current progress...")
                         self.fetch_progress(save_file)
                         show_save_menu = True
                     
-                    if keyboard_utils.check_key_event(key_event, '2'):
+                    if keyboard_utils.check_key_event(key_event, SaveFileOptions.SAVE_PROGRESS.value):
                         print("Saving current progress...")
                         save_file.save(board)
                         show_save_menu = True
                     
-                    if keyboard_utils.check_key_event(key_event, '3'):
+                    if keyboard_utils.check_key_event(key_event, SaveFileOptions.DELETE_SAVE.value):
                         delete_file()
                         show_save_menu = True
                     
-                    if keyboard_utils.check_key_event(key_event, '4'):
+                    if keyboard_utils.check_key_event(key_event, SaveFileOptions.BACK.value):
                         print("Returning to options menu")
                         show_save_menu = True
                         break
@@ -207,63 +207,60 @@ class Menu:
             current_lvl_index += 1
         
         # Handle keyboard input
-        if keyboard_utils.check_key_event(input, 'a'):
+        if keyboard_utils.check_key_event(input, StdNavigationOptions.LEFT.value):
             if current_lvl_index - 1 < 0:
                 return
             
             levels[current_lvl_index-1]._selected = True
             levels[current_lvl_index]._selected = False
-        elif keyboard_utils.check_key_event(input, 'd'):
+        elif keyboard_utils.check_key_event(input, StdNavigationOptions.RIGHT.value):
             if current_lvl_index + 1 > len(levels)-1:
                 return
-            
+
             levels[current_lvl_index+1]._selected = True
             levels[current_lvl_index]._selected = False
-    
-    # UNDER DEVELOPMENT: Merging menu displays for existing gamemodes
+
     def levels_menu(self, levels: List[Level], mode: str) -> None:
         '''
             Logic for handling endless levels navigation and selection
         '''
         selected_level: Level
-        original_grid: List[List[str]]
+        original_grid: Board
         show_menu: bool = True
 
         while True:
             if show_menu:
-                match mode:
-                    case 'classic': self._menu_front.print_level_menu(levels)
-                    case 'endless': self._menu_front.print_endless_levels_menu(levels)
+                self._menu_front.print_levels_menu(levels, mode)
                 show_menu = False
 
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
-            if keyboard_utils.check_key_event(key_event, 'q'):
+            if keyboard_utils.check_key_event(key_event, StdNavigationOptions.BACK.value):
                 print("Going back to main menu")
                 break
 
-            if keyboard_utils.check_key_event(key_event, 's'):
+            if keyboard_utils.check_key_event(key_event, StdNavigationOptions.SELECT.value):
                 selected_level = self.selected_level(levels)
 
-                if mode == self._game_modes[0]:
+                if mode == Gamemodes.CLASSIC.value:
                     if selected_level._unlocked:
                         original_grid = copy.deepcopy(selected_level._level_board)
                         print(f"Running {selected_level._level_name}")
-                        self.game_loop(original_grid, self._game_modes[0])
+                        self.game_loop(original_grid, Gamemodes.CLASSIC.value)
                         break
                     else: 
                         print("Level is locked, clear the previous level first")
 
-                if mode == self._game_modes[1]:
+                if mode == Gamemodes.ENDLESS.value:
                     if selected_level._cleared:
                         original_grid = copy.deepcopy(selected_level._level_board)
                         print(f"Running {selected_level._level_name}")
-                        self.game_loop(original_grid, self._game_modes[1])
+                        self.game_loop(original_grid, Gamemodes.ENDLESS.value)
                         break
                     else: 
                         print("Level is locked, clear the corresponding level in classic mode first")
                 
-            if keyboard_utils.check_key_event(key_event, 'a') or keyboard_utils.check_key_event(key_event, 'd'):
+            if keyboard_utils.check_key_event(key_event, StdNavigationOptions.LEFT.value) or keyboard_utils.check_key_event(key_event, StdNavigationOptions.RIGHT.value):
                 self.navigate_selection(key_event, levels)
                 show_menu = True
 
@@ -287,16 +284,16 @@ class Menu:
                 show_menu = False
             
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
-            if keyboard_utils.check_key_event(key_event, 'r'):
+            if keyboard_utils.check_key_event(key_event, StdNavigationOptions.BACK.value):
                 print("Returning to main menu")
                 break
 
-            if keyboard_utils.check_key_event(key_event, 'q'):
+            if keyboard_utils.check_key_event(key_event, StdNavigationOptions.LEFT.value):
                 if current_page_index > 0:
                     current_page_index -= 1
                 show_menu = True
 
-            if keyboard_utils.check_key_event(key_event, 'e'):
+            if keyboard_utils.check_key_event(key_event, StdNavigationOptions.RIGHT.value):
                 if current_page_index < len(pages)-1:
                     current_page_index += 1
                 show_menu = True
@@ -369,7 +366,7 @@ class Menu:
             
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
-            if keyboard_utils.check_key_event(key_event, 'y'):
+            if keyboard_utils.check_key_event(key_event, Confirmation.YES.value):
                 if not self.shop_item_exists(shop_item):                    
                     self._account._owned_shop_items.append(shop_item)
 
@@ -378,7 +375,7 @@ class Menu:
                 print("Purchase successful\n\n")
                 break
             
-            if keyboard_utils.check_key_event(key_event, 'n'):
+            if keyboard_utils.check_key_event(key_event, Confirmation.NO.value):
                 print("Canceled purchase\n\n")
                 break
     

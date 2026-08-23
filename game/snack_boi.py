@@ -26,21 +26,20 @@ from assets.traps.trap_types import HungerTrap, ParallelDimensionTrap
 from assets.powerups.recon_snack import ReconSnack
 from assets.printer.fancy_printer import FancyPrinter
 from assets.text_collection import TextCollection
+from assets.position.position2d import Position2D
 from assets.menu_front import MenuFront
 from account.account import Account
 from assets.shop.shop_item import ShopItem
-from utils.consts import EMPTY_SHOP_ITEM
+from assets.enums.enums import MainMenuOptions, MovementKeys, Gamemodes, MiscGameControls, SnackTypes
+from boards.board import Board
+from utils.consts import EMPTY_SHOP_ITEM, PLAYER_ENTITY, SNACK_ENTITY
 import copy
 
 
 # Game class where the game logic is implemented
 class Game:    
-    # Validation properties 
-    _valid_move_keys: List[str] = ['w', 'a', 's', 'd']
-    _main_menu_options: List[str] = ['1', '2', '3', '4', '5', '6']
-
     # Player and snack related properties
-    _player: Player = Player()
+    _player: Player = Player(PLAYER_ENTITY)
     _snack: Snack = Snack()
     _normal_snack: NormalSnack = NormalSnack()
     _super_snack: SuperSnack = SuperSnack()
@@ -79,34 +78,33 @@ class Game:
             self._active_shop_powerup.complete_usage()
         elif game_mode == "endless" and self._active_shop_powerup.reached_usage_per_game():
             self._active_shop_powerup.complete_usage()
-        
 
         self._active_shop_powerup.reset()
 
         # Update with used powerup and erase ones with zero quantity
-        self._account._owned_shop_items = [self._active_shop_powerup if self._active_shop_powerup._name == powerup._name else powerup for powerup in self._account._owned_shop_items ]
+        self._account._owned_shop_items = [self._active_shop_powerup if self._active_shop_powerup._name == powerup._name else powerup for powerup in self._account._owned_shop_items]
         self._account._owned_shop_items = [powerup for powerup in self._account._owned_shop_items if powerup._stock > 0]
 
-    def game_spawn_snack(self, grid: List[List[str]], occupied_positions: List[List[int]], snack_num: int) -> None:
+    def game_spawn_snack(self, board: Board, occupied_positions: List[Position2D], snack_type: SnackTypes) -> None:
         '''
             Spawns snack based on the snack number generated on the board 
         '''
-        match snack_num:
-            case 1:
-                self._normal_snack.spawn_snack(grid, occupied_positions)
+        match snack_type:
+            case SnackTypes.NORMAL:
+                self._normal_snack.spawn(board, occupied_positions)
                 self._current_snack = self._normal_snack
-            case 2:
-                self._fake_snack.spawn_snack(grid, occupied_positions)
+            case SnackTypes.FAKE:
+                self._fake_snack.spawn(board, occupied_positions)
                 self._current_snack = self._fake_snack
-            case 3:
-                self._super_snack.spawn_snack(grid, occupied_positions)
+            case SnackTypes.SUPER:
+                self._super_snack.spawn(board, occupied_positions)
                 self._current_snack = self._super_snack
 
     def activate_parallel_trap(self, parallel_trap: ParallelDimensionTrap, game_mode: str) -> None:
             parallel_trap.teleport_player(game_mode)
         
     
-    def game_loop(self, board: List[List[str]], game_mode: str) -> None:
+    def game_loop(self, board: Board, game_mode: str) -> None:
         '''
             Main game loop that runs based on game mode
             Game mode is classic: the game has a set win cap to collect to
@@ -114,13 +112,13 @@ class Game:
                                   press q to quit endless mode
         '''
         current_level_index: int = 0
-        random_snack_num: int = 0
         key_event: KeyboardEvent
         show_state: bool = True
         intro_show_state: bool = True
         recon_duration: int = self._recon_snack._duration
+        random_snack_type: SnackTypes
         trap: Trap
-        occupied_positions: List[List[int]] = []
+        occupied_positions: List[Position2D] = []
         levels_unlocked: int = 0
         hunger_traps: List[Trap] = []
         parallel_dimension_traps: List[Trap] = []
@@ -128,7 +126,6 @@ class Game:
         
         owned_powerups: List[ShopItem] = self._account._owned_shop_items
         powerup_index: int
-        tracked_positions: List[List[int]] = []
 
         # Eating flags for one time display
         recon_start_reached: bool = False
@@ -139,15 +136,15 @@ class Game:
             current_level_index += 1
         
         # Game setup
-        self._player.spawn_player(board, OBSTACLE_CHAR)
+        self._player.spawn(board)
         
         # Add new snack logic available starting from certain levels
         if current_level_index >= consts.NEW_SNACKS_START_LVL-1:
-            random_snack_num = random.randint(1, 3)
-            self.game_spawn_snack(board, occupied_positions, random_snack_num)
+            random_snack_type = random.choice(list(SnackTypes))
+            self.game_spawn_snack(board, occupied_positions, random_snack_type)
             occupied_positions.append(self._current_snack._position)
         else:
-            self._normal_snack.spawn_snack(board, occupied_positions)
+            self._normal_snack.spawn(board, occupied_positions)
             self._current_snack = self._normal_snack
             occupied_positions.append(self._current_snack._position)
 
@@ -164,7 +161,7 @@ class Game:
             traps = hunger_traps + parallel_dimension_traps
 
             for trap in traps:
-                trap.spawn_trap(board, occupied_positions)
+                trap.spawn(board, occupied_positions)
                 occupied_positions.append(trap._position)
             
             recon_start_reached = True
@@ -179,22 +176,19 @@ class Game:
         
         # Start precording positions for recall gadget
         if self._active_shop_powerup._name == "Recall":
-            self._active_shop_powerup.prerecord_last_positions(self._player._position)
-            tracked_positions.append(self._player._position.copy())
-
+            self._active_shop_powerup.record_last_position(self._player._position)
 
         # Game loop handling both modes
         while True:
             # Intro text before game display
-            if intro_show_state and game_mode == 'classic':
+            if intro_show_state and game_mode == Gamemodes.CLASSIC.value:
                 self._game_utils.intro_text_display(levels_unlocked, current_level_index)
                 intro_show_state = False
             
             # Handle win condition
-            if game_mode == 'classic' and self._snack._count >= self._classic_levels[current_level_index]._win_cap:
+            if game_mode == Gamemodes.CLASSIC.value and self._snack._count >= self._classic_levels[current_level_index]._win_cap:
                 self._game_utils.classic_game_win(current_level_index, self._classic_levels, self._account)
                 break
-            
             
 
             if show_state:
@@ -210,16 +204,16 @@ class Game:
 
             key_event = keyboard.read_event(suppress=True)
 
-            if keyboard_utils.check_key_event(key_event, 'q'):
+            if keyboard_utils.check_key_event(key_event, MiscGameControls.QUIT.value):
                 break
 
             # Toggle active powerup
-            if keyboard_utils.check_key_event(key_event, 'e') and not self._active_shop_powerup._active and not self._active_shop_powerup.reached_usage_per_game():
+            if keyboard_utils.check_key_event(key_event, MiscGameControls.USE_POWERUP.value) and not self._active_shop_powerup._active and not self._active_shop_powerup.reached_usage_per_game():
                 self._active_shop_powerup.activate()
                 show_state = True
             
-             # Handle player movement
-            if key_event.event_type == keyboard.KEY_DOWN and key_event.name in self._valid_move_keys:
+
+            if key_event.event_type == keyboard.KEY_DOWN and key_event.name in MovementKeys._value2member_map_:
                 self._player.move_player(key_event, board, OBSTACLE_CHAR, self._player._position)
 
                 if self._recon_snack._active:
@@ -233,39 +227,27 @@ class Game:
                 
                 # Handle registering previous position
                 if self._active_shop_powerup._name == "Recall":
-                    if len(tracked_positions) == 2:
-                        tracked_positions[1] = tracked_positions[0].copy()
-                        tracked_positions[0] = self._player._position.copy()
-                    else:
-                        tracked_positions.append(self._player._position.copy())
-                    
-
-                    match len(self._active_shop_powerup._previous_positions):
-                        case 1:
-                            self._active_shop_powerup.prerecord_last_positions(self._player._position.copy())
-                            self._active_shop_powerup._previous_positions.reverse()
-                        case _:
-                            self._active_shop_powerup.record_last_positions(self._player._position.copy(), tracked_positions.copy())
+                    self._active_shop_powerup.record_last_position(self._player._position)
 
                     # Handle maintaining unit 
-                    if self._player._position != self._active_shop_powerup._position and self._active_shop_powerup._placed:
-                        board[self._active_shop_powerup._position[0]][self._active_shop_powerup._position[1]] = self._active_shop_powerup._entity                    
-                    
-                    # Ensure recording order is correct
-                    if self._player._position == self._active_shop_powerup._previous_positions[0]:
-                        self._active_shop_powerup._previous_positions.reverse()
+                    if self._player._position != self._active_shop_powerup.get_position() and self._active_shop_powerup._placed:
+                        board.set(self._active_shop_powerup._position.x, self._active_shop_powerup._position.y, self._active_shop_powerup._entity)
 
             # Handle area scan
             if self._active_shop_powerup._name == "Radar" and self._active_shop_powerup._active:
                 self._active_shop_powerup.scan_area(self._player._position, board, traps)
+                if board.at(self._player._position.x, self._player._position.y) == ' ':
+                    board.set(self._player._position.x, self._player._position.y, self._player._entity)
                     
                         
             # Handle recall usage
             # Press r for the first time - place recall
             # Press r when recall was placed - teleport to recall
-            if keyboard_utils.check_key_event(key_event, 'r') and self._active_shop_powerup._active and self._active_shop_powerup._name == "Recall":
+            if keyboard_utils.check_key_event(key_event, MiscGameControls.USE_RECALL.value) and self._active_shop_powerup._active and self._active_shop_powerup._name == "Recall":
                 if self._active_shop_powerup._placed and len(self._active_shop_powerup._previous_positions) != 0:
+                    self._active_shop_powerup.record_last_position(self._player._position)
                     self._active_shop_powerup.recall(self._player._entity, self._player._position, board)
+                    self._active_shop_powerup.record_last_position(self._player._position)
                     occupied_positions.remove(self._active_shop_powerup._position)
                     show_state = True
                 elif len(self._active_shop_powerup._previous_positions) > 1:
@@ -289,11 +271,11 @@ class Game:
 
                 # Spawn new snack and handle new snacks starting from a set level
                 if current_level_index >= consts.NEW_SNACKS_START_LVL-1:
-                    random_snack_num = random.randint(1, 3)
-                    self.game_spawn_snack(board, occupied_positions, random_snack_num)
+                    random_snack_type = random.choice(list(SnackTypes))
+                    self.game_spawn_snack(board, occupied_positions, random_snack_type)
                     occupied_positions.append(self._current_snack._position)
                 else:
-                    self._normal_snack.spawn_snack(board, occupied_positions)
+                    self._normal_snack.spawn(board, occupied_positions)
                     self._current_snack = self._normal_snack
                     occupied_positions.append(self._current_snack._position)
 
@@ -348,28 +330,27 @@ class Game:
         # Main menu loop
         while True:
             if show_menu:
-                self._menu_front.print_game_menu(consts.VERSION, self._main_menu_options)
+                self._menu_front.print_game_menu()
                 show_menu = False
 
             key_event = keyboard.read_event(suppress=True)
 
-            if keyboard_utils.check_key_event(key_event, self._main_menu_options[0]):
+            if keyboard_utils.check_key_event(key_event, MainMenuOptions.START_GAME.value):
                 self.menu.mode_selection_menu(self._classic_levels)
                 show_menu = True
-            elif keyboard_utils.check_key_event(key_event, self._main_menu_options[1]):
+            elif keyboard_utils.check_key_event(key_event, MainMenuOptions.SHOP_MENU.value):
                 self.menu.shop_menu()
                 show_menu = True
-            elif keyboard_utils.check_key_event(key_event, self._main_menu_options[2]):
-                print("entering account")
+            elif keyboard_utils.check_key_event(key_event, MainMenuOptions.ACCOUNT.value):
                 self._account.account_display()
                 show_menu = True
-            elif keyboard_utils.check_key_event(key_event, self._main_menu_options[3]):
+            elif keyboard_utils.check_key_event(key_event, MainMenuOptions.OPTIONS.value):
                 self.menu.game_options(self._classic_levels, self._save_file)
                 show_menu = True
-            elif keyboard_utils.check_key_event(key_event, self._main_menu_options[4]):
+            elif keyboard_utils.check_key_event(key_event, MainMenuOptions.VERSION_LOG.value):
                 self.menu.version_log()
                 show_menu = True
-            elif keyboard_utils.check_key_event(key_event, self._main_menu_options[5]):
+            elif keyboard_utils.check_key_event(key_event, MainMenuOptions.QUIT.value):
                 break
         
         self._save_file.save_prompt(key_event, self._classic_levels) if not self._save_file._already_saved else None

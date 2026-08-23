@@ -3,14 +3,15 @@
 
     Handles logic for powerup recon snack
 '''
-import random
 from typing import List
 from assets.traps.traps import Trap
+from assets.spawnable.spawnable import Spawnable
+from boards.board import Board
+from assets.position.position2d import Position2D
 
-class ReconSnack:
+class ReconSnack(Spawnable):
     def __init__(self) -> None:
-        self._position: List[int] = []
-        self._entity_char: str = 'Q'
+        super().__init__('Q')
         self._counter: int = 0
         self._max_number: int = 1
         self._required_eaten_snacks: int = 5
@@ -18,16 +19,11 @@ class ReconSnack:
         self._duration: int = 4 # Visible for n-1 moves (this case it's 3 moves)
         self._active: bool = False
 
-    def spawn(self, board: List[List[str]], occupied_positions: List[List[int]]) -> None:
-        self._position = [random.randint(0, len(board)-1), random.randint(0, len(board)-1)]
-
-        while self._position in occupied_positions or board[self._position[0]][self._position[1]] != ' ':
-            self._position = [random.randint(0, len(board)-1), random.randint(0, len(board)-1)]
-        
-        board[self._position[0]][self._position[1]] = self._entity_char
+    def spawn(self, board: Board, occupied_positions: List[Position2D]) -> None:
+        super().spawn(board, occupied_positions)
         self._counter += 1
     
-    def reveal_position(self, board: List[List[str]], traps: List[Trap]) -> None:
+    def reveal_position(self, board: Board, traps: List[Trap]) -> None:
         '''
             Reveals position of all traps on the board
 
@@ -43,7 +39,7 @@ class ReconSnack:
         self._position.clear()
         self._active = True
     
-    def undo_effect(self, board: List[List[str]], traps: List[Trap]) -> None:
+    def undo_effect(self, board: Board, traps: List[Trap]) -> None:
         for trap in traps:
             trap.hide(board)
         

@@ -8,25 +8,25 @@ from utils import consts
 from assets.levels.level import Level
 from assets.save_file import SaveFile
 from assets.shop.shop_item import ShopItem
+from assets.enums.enums import MainMenuOptions, ModeSelection, OptionsSelection, SaveFileOptions, StdNavigationOptions, Gamemodes
 
 class MenuFront:
     _select_char: str = '>'
     _lock_char: str = '(locked)'
     _wrap_limit: int = 5
-    _valid_modes_inputs: List[str] = ['1', '2', '3']
 
-    def print_game_menu(self, version: str, menu_options: List[str]) -> None:
+    def print_game_menu(self) -> None:
         '''
             Prints the main menu of the game
         '''
         print("-----[Snack boi]-----")
-        print(f"[{menu_options[0]}] Start Game")
-        print(f"[{menu_options[1]}] Shop")
-        print(f"[{menu_options[2]}] Account")
-        print(f"[{menu_options[3]}] Options")
-        print(f"[{menu_options[4]}] Version log")
-        print(f"[{menu_options[5]}] Quit")
-        print("version:", version)
+        print(f"[{MainMenuOptions.START_GAME.value}] Start Game")
+        print(f"[{MainMenuOptions.SHOP_MENU.value}] Shop")
+        print(f"[{MainMenuOptions.ACCOUNT.value}] Account")
+        print(f"[{MainMenuOptions.OPTIONS.value}] Options")
+        print(f"[{MainMenuOptions.VERSION_LOG.value}] Version log")
+        print(f"[{MainMenuOptions.QUIT.value}] Quit")
+        print("version:", consts.VERSION)
         print("---------------------")
     
     def print_version_log(self) -> None:
@@ -42,42 +42,26 @@ class MenuFront:
         except OSError:
             print("Error: Could not read file")
     
-    def print_endless_levels_menu(self, levels: List[Level]) -> None:
-        '''
-            Prints menu for levels on endless mode
-        '''
-        counter: int = 0
-
-        print("-----[ENDLESS MODE LEVELS]-----\n")
-        for level in levels:
-            if level._selected:
-                print(self._select_char, end="")
-            print(f"[{level._level_name}]", end="")
-            if not level._cleared:
-                print(self._lock_char, end="")
-            print(" ", end="")
-
-            counter += 1
-            if counter == self._wrap_limit:
-                print()
-                counter = 0
-        print()
-        print("\n[A] Move left [D] Move right [S] Select")
-        print("[Q] Back to main menu")
-        print("-------------------------------")
-    
-    def print_level_menu(self, levels: List[Level]) -> None:
+    def print_levels_menu(self, levels: List[Level], mode: str) -> None:
         '''
             Prints menu for levels on classic mode
         '''
         counter: int = 0
+        lock_condition: bool = False
 
-        print("-----[CLASSIC MODE LEVELS]-----\n")
+        if mode == Gamemodes.CLASSIC.value:
+            print("-----[CLASSIC MODE LEVELS]-----\n")
+        if mode == Gamemodes.ENDLESS.value:
+            print("-----[ENDLESS MODE LEVELS]-----\n")
+        
         for level in levels:
             if level._selected:
                 print(self._select_char, end="")
             print(f"[{level._level_name}]", end="")
-            if not level._unlocked:
+
+            lock_condition = not level._unlocked if mode == Gamemodes.CLASSIC.value else not level._cleared
+
+            if lock_condition:
                 print(self._lock_char, end="")
             print(" ", end="")
 
@@ -86,16 +70,16 @@ class MenuFront:
                 print()
                 counter = 0
         print()
-        print("\n[A] Move left [D] Move right [S] Select")
-        print("[Q] Back to main menu")
+        print(f"\n[{StdNavigationOptions.LEFT.value.upper()}] Move left [{StdNavigationOptions.RIGHT.value.upper()}] Move right [{StdNavigationOptions.SELECT.value.upper()}] Select")
+        print(f"[{StdNavigationOptions.BACK.value.upper()}] Back to main menu")
         print("---------------------")
     
     def print_mode_selection_menu(self) -> None:
-            print("-----[MODES]-----")
-            print(f"[{self._valid_modes_inputs[0]}] Classic Mode")
-            print(f"[{self._valid_modes_inputs[1]}] Endless mode")
-            print(f"[{self._valid_modes_inputs[2]}] Back to main menu")
-            print("-----------------")
+        print("-----[MODES]-----")
+        print(f"[{ModeSelection.CLASSIC_MODE.value}] Classic Mode")
+        print(f"[{ModeSelection.ENDLESS_MODE.value}] Endless mode")
+        print(f"[{ModeSelection.BACK.value}] Back to main menu")
+        print("-----------------")
     
     def print_progress(self, save_file: SaveFile) -> None:
         print("-----[Currently Saved Progress]-----")
@@ -112,16 +96,16 @@ class MenuFront:
 
     def print_save_file_options(self) -> None:
         print("-----[Save file options]-----")
-        print("[1] Load current progress")
-        print("[2] Save current progress")
-        print("[3] Delete save file")
-        print("[4] Back to options menu")
+        print(f"[{SaveFileOptions.LOAD_PROGRESS.value}] Load current progress")
+        print(f"[{SaveFileOptions.SAVE_PROGRESS.value}] Save current progress")
+        print(f"[{SaveFileOptions.DELETE_SAVE.value}] Delete save file")
+        print(f"[{SaveFileOptions.BACK.value}] Back to options menu")
         print("-----------------------------")
     
-    def print_game_options(self, valid_options_inputs: List[int]) -> None:
+    def print_game_options(self) -> None:
         print("-----[Options]-----")
-        print(f"[{valid_options_inputs[0]}] Manage save file")
-        print(f"[{valid_options_inputs[1]}] Back to main menu")
+        print(f"[{OptionsSelection.MANAGE_SAVE_FILE.value}] Manage save file")
+        print(f"[{OptionsSelection.BACK.value}] Back to main menu")
         print("-------------------")
     
     def print_owned_powerups(self, owned_powerups: List[ShopItem], selected_index: int) -> None:

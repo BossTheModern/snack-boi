@@ -10,25 +10,27 @@ from assets.player import Player
 from keyboard import KeyboardEvent
 from assets.traps.hidden_trigger import HiddenTrigger
 from assets.traps.dimension_exit import DimensionExit
+from assets.position.position2d import Position2D
+from assets.enums.enums import Gamemodes, MovementKeys
 import keyboard
 import random
 import copy
 from boards.grid_collection import empty_grid
-from boards.board_creator import draw_grid, OBSTACLE_CHAR
+from boards.board_creator import OBSTACLE_CHAR
 from assets.printer.fancy_printer import FancyPrinter
 from assets.snacks.snack import Snack
+from boards.board import Board
 
 class HungerTrap(Trap):
     '''
         Hunger trap that reduces snack count upon stepping on it
     '''
     def __init__(self, snack: Snack) -> None:
-        self._trap_entity: str = 'H'
+        super().__init__('H')
         self._type: str = 'hunger'
         self._snack: Snack = snack
-        self._position: List[int] = []
     
-    def reduce_snack_count(self, board: List[List[str]], occupied_positions: List[List[int]]) -> None:
+    def reduce_snack_count(self, board: Board, occupied_positions: List[Position2D]) -> None:
         '''
             Reduces the snack count by a random amount between 1 and 3.
 
@@ -45,7 +47,7 @@ class HungerTrap(Trap):
         print(f"Snack count reduced by {reduce_amount}. Current snack count: {self._snack._count}")
 
         self._position.clear()
-        self.spawn_trap(board, occupied_positions)
+        self.spawn(board, occupied_positions)
 
 
 class ParallelDimensionTrap(Trap):
@@ -54,19 +56,17 @@ class ParallelDimensionTrap(Trap):
         dimension upon triggering it
     '''
     def __init__(self, player: Player) -> None:
+        super().__init__('Ø')
         self._player: Player = player
-        self._trap_entity: str = 'Ø'
         self._type: str = 'parallel dimension'
-        self._parallel_board: List[List[str]] = copy.deepcopy(empty_grid)
-        self._position: List[int] = []
+        self._parallell_board: Board = empty_grid
         self._hidden_trigger: HiddenTrigger = HiddenTrigger()
         self._exit: DimensionExit = DimensionExit()
-        self._valid_move_keys: List[str] = ['w', 'a', 's', 'd']
         self._fancy_printer: FancyPrinter = FancyPrinter(interval = 0.02, line_interval = 0.5)
     
     def print_parallel_dimension(self) -> None:
         print("-----------[PARALLEL DIMENSION]-----------")
-        draw_grid(self._parallel_board)
+        self._parallell_board.display()
         print("Move by pressing (w/a/s/d)")
     
     def teleport_player(self, game_mode: str) -> None:
@@ -90,8 +90,8 @@ class ParallelDimensionTrap(Trap):
             self._fancy_printer.print_text_line(text)
 
         # Initial spawn
-        self._player.parallel_spawn_player(self._parallel_board)
-        self._hidden_trigger.spawn(self._parallel_board)
+        self._player.parallel_spawn_player(self._parallell_board)
+        self._hidden_trigger.spawn(self._parallell_board)
 
         # Parallel dimension loop
         while True:
@@ -99,7 +99,7 @@ class ParallelDimensionTrap(Trap):
                 self.print_parallel_dimension()
                 show_board = False
             
-            if not printed_dialogue and game_mode == 'classic':
+            if not printed_dialogue and game_mode == Gamemodes.CLASSIC.value:
                 show_initial_dialogue()
                 printed_dialogue = True    
             
@@ -110,17 +110,18 @@ class ParallelDimensionTrap(Trap):
             key_event = keyboard.read_event(suppress=True)
 
             # Handle player movement in parallel dimension
-            if key_event.event_type == keyboard.KEY_DOWN and key_event.name in self._valid_move_keys:
-                self._player.move_player(key_event, self._parallel_board, OBSTACLE_CHAR, self._player._parallel_position)
+            if key_event.event_type == keyboard.KEY_DOWN and key_event.name in MovementKeys._value2member_map_:
+                self._player.move_player(key_event, self._parallell_board, OBSTACLE_CHAR, self._player._parallel_position)
                 show_board = True
 
             # Handle player finding hidden trigger
             if self._player._parallel_position == self._hidden_trigger._position:
-                self._exit.spawn(self._parallel_board)
+                self._exit.spawn(self._parallell_board)
                 self._hidden_trigger._position.clear()
                 found_trigger = True
             
             # Handle player finding the exit
             if self._player._parallel_position == self._exit._position:
                 self._exit._position.clear()
+                self._player.parallell_despawn_player(self._parallell_board)
                 break
