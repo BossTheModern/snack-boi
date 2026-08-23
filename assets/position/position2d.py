@@ -7,8 +7,8 @@ from collections.abc import Iterable
 
 class Position2D:
     def __init__(self, x: int = -1, y: int = -1) -> None:
-        self.x = x
-        self.y = y
+        self.x: int = x
+        self.y: int = y
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, Position2D):
