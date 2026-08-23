@@ -20,7 +20,7 @@ class Board:
     def set(self, col: int, row: int, obj: str) -> None:
         self._board[row][col] = obj
 
-    def is_available(self, position: Position2D) -> bool:
+    def is_available_at(self, position: Position2D) -> bool:
         return self.at(position.x, position.y) == EMPTY_SPACE
 
     def display(self) -> None:
