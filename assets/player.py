@@ -10,11 +10,14 @@ import keyboard
 from keyboard import KeyboardEvent
 from assets.position.position2d import Position2D
 from assets.enums.enums import MovementKeys
+from assets.spawnable.spawnable import Spawnable
 
-class Player:
-    _entity: str = 'O'
-    _position: Position2D = Position2D()
+class Player(Spawnable):
     _parallel_position: Position2D = Position2D()
+
+    def spawn(self, board: Board) -> None:
+        super().spawn(board)
+        board.set(self._position.x, self._position.y, self._entity)
 
     def spawn_player(self, board: Board, obstacle_char: str) -> None:
         '''
