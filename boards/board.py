@@ -5,18 +5,23 @@
     can add obstacles to it
 '''
 from typing import List
+from assets.position.position2d import Position2D
+from utils.consts import EMPTY_SPACE
 
 class Board:
     def __init__(self, width: int, height: int) -> None:
         self._width: int = abs(width)
         self._height: int = abs(height)
-        self._board: List[List[str]] = [[' ' for _ in range(width)] for _ in range(height)]
+        self._board: List[List[str]] = [[EMPTY_SPACE for _ in range(width)] for _ in range(height)]
 
     def at(self, col: int, row: int) -> str:
         return self._board[row][col]
 
     def set(self, col: int, row: int, obj: str) -> None:
         self._board[row][col] = obj
+
+    def is_available(self, position: Position2D) -> bool:
+        return self.at(position.x, position.y) == EMPTY_SPACE
 
     def display(self) -> None:
         '''
