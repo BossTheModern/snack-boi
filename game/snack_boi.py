@@ -32,14 +32,14 @@ from account.account import Account
 from assets.shop.shop_item import ShopItem
 from assets.enums.enums import MainMenuOptions, MovementKeys, Gamemodes, MiscGameControls, SnackTypes
 from boards.board import Board
-from utils.consts import EMPTY_SHOP_ITEM
+from utils.consts import EMPTY_SHOP_ITEM, PLAYER_ENTITY, SNACK_ENTITY
 import copy
 
 
 # Game class where the game logic is implemented
 class Game:    
     # Player and snack related properties
-    _player: Player = Player()
+    _player: Player = Player(PLAYER_ENTITY)
     _snack: Snack = Snack()
     _normal_snack: NormalSnack = NormalSnack()
     _super_snack: SuperSnack = SuperSnack()
@@ -91,13 +91,13 @@ class Game:
         '''
         match snack_type:
             case SnackTypes.NORMAL:
-                self._normal_snack.spawn_snack(board, occupied_positions)
+                self._normal_snack.spawn(board, occupied_positions)
                 self._current_snack = self._normal_snack
             case SnackTypes.FAKE:
-                self._fake_snack.spawn_snack(board, occupied_positions)
+                self._fake_snack.spawn(board, occupied_positions)
                 self._current_snack = self._fake_snack
             case SnackTypes.SUPER:
-                self._super_snack.spawn_snack(board, occupied_positions)
+                self._super_snack.spawn(board, occupied_positions)
                 self._current_snack = self._super_snack
 
     def activate_parallel_trap(self, parallel_trap: ParallelDimensionTrap, game_mode: str) -> None:
@@ -136,7 +136,7 @@ class Game:
             current_level_index += 1
         
         # Game setup
-        self._player.spawn_player(board, OBSTACLE_CHAR)
+        self._player.spawn(board)
         
         # Add new snack logic available starting from certain levels
         if current_level_index >= consts.NEW_SNACKS_START_LVL-1:
@@ -144,7 +144,7 @@ class Game:
             self.game_spawn_snack(board, occupied_positions, random_snack_type)
             occupied_positions.append(self._current_snack._position)
         else:
-            self._normal_snack.spawn_snack(board, occupied_positions)
+            self._normal_snack.spawn(board, occupied_positions)
             self._current_snack = self._normal_snack
             occupied_positions.append(self._current_snack._position)
 
@@ -275,7 +275,7 @@ class Game:
                     self.game_spawn_snack(board, occupied_positions, random_snack_type)
                     occupied_positions.append(self._current_snack._position)
                 else:
-                    self._normal_snack.spawn_snack(board, occupied_positions)
+                    self._normal_snack.spawn(board, occupied_positions)
                     self._current_snack = self._normal_snack
                     occupied_positions.append(self._current_snack._position)
 
