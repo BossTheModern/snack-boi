@@ -36,3 +36,8 @@ ADVANCED_LEVEL_REWARD: int = BASE_LEVEL_REWARD * 3
 
 EMPTY_SHOP_ITEM: ShopItem = ShopItem("None", 0, "", 0)
 PAGE_SIZE: int = 3
+EMPTY_SPACE: str = ' '
+
+PLAYER_ENTITY: str = 'O'
+SNACK_ENTITY: str = '*'
+SUPER_SNACK_ENTITY: str = '#'
