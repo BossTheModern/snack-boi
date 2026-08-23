@@ -161,7 +161,7 @@ class Game:
             traps = hunger_traps + parallel_dimension_traps
 
             for trap in traps:
-                trap.spawn_trap(board, occupied_positions)
+                trap.spawn(board, occupied_positions)
                 occupied_positions.append(trap._position)
             
             recon_start_reached = True
