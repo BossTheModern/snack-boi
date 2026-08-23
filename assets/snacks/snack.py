@@ -4,12 +4,9 @@
     Parent class containing fields and methods that is shared across all types
     of snacks
 '''
-from typing import List
-import random
 from utils.consts import NORMAL_SNACK_POINTS
 from utils.consts import SUPER_SNACK_POINTS
 from utils.consts import NEW_SNACKS_START_LVL
-from boards.board import Board
 from assets.position.position2d import Position2D
 from assets.enums.enums import SnackTypes
 from assets.spawnable.spawnable import Spawnable
