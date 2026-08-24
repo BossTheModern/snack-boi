@@ -3,30 +3,27 @@
 
     Shop module handling shop logic 
 '''
-from typing import List
 from assets.shop.shop_item import ShopItem
 from assets.shop.shop_items import ShopItems
 from assets.enums.enums import StdNavigationOptions
+from assets.shop.shop_items import ShopItems
 from account.account import Account
 
 class Shop:
-    #_shop_items: List[ShopItem] = ShopItems._shop_items
-
-    def print_shop_menu(self, account: Account, items_page: List[ShopItem]) -> None:
+    def print_shop_menu(self, account: Account, items_page: ShopItems) -> None:
         '''
             Prints shop menu
         '''
         print(f"{"[SHOP]":-^50}\n")
 
         # Print names
-        for index, item in enumerate(items_page):
+        for index, item in enumerate(items_page.get_items()):
             print(f"[{index + 1}] {item._name:<15}", end='')
         
         print()
         
-        for item in items_page:
+        for item in items_page.get_items():
             print(f"Stock: {item._stock}/{item._limit:<10}", end='')
-
         
         print(f"\n\n{'':-<50}")
         print(f"Balance: {account._points_balance}")

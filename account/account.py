@@ -18,7 +18,7 @@ from utils.consts import NAME_MAX_LENGTH
 class Account:
     _name: str = ""
     _points_balance: int = 100
-    _owned_shop_items: List[ShopItem] = []
+    _owned_shop_items: ShopItems = ShopItems()
 
     def show_account(self) -> None:
         '''
@@ -38,10 +38,10 @@ class Account:
     def show_owned_powerups(self) -> None:
         print("Owned powerups: ")
         
-        if len(self._owned_shop_items) == 0:
+        if self._owned_shop_items.is_empty():
             print("None")
         else: 
-            for item in self._owned_shop_items:
+            for item in self._owned_shop_items.get_items():
                 if item._stock > 0:
                     print(f"{item._name}: {item._stock:<10}")
         

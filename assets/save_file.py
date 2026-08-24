@@ -17,6 +17,7 @@ from account.account import Account
 from utils.consts import START_POINTS
 from utils.consts import END_OF_ITEMS_FLAG
 from utils.consts import SHOP_ITEM_LIMIT
+from assets.shop.shop_items_collection import shop_item_collection
 from assets.shop.shop_items import ShopItems
 from assets.shop.shop_item import ShopItem
 from assets.enums.enums import Confirmation
@@ -41,7 +42,7 @@ class SaveFile:
         balance: int = 0
         lvl_format_error: bool = False
 
-        existing_shop_items: List[ShopItem] = ShopItems._shop_items
+        existing_shop_items: ShopItems = shop_item_collection
         new_item: ShopItem
         item: str
         item_name: str
@@ -93,11 +94,11 @@ class SaveFile:
                     else:
                         # Check for item existence and handle adding items 
                         # accordingly
-                        for existing_item in existing_shop_items:
+                        for existing_item in existing_shop_items.get_items():
                             if existing_item._name == item_name:
                                 new_item = existing_item
                                 new_item._stock = item_number
-                                Account._owned_shop_items.append(new_item)
+                                Account._owned_shop_items.add_item(new_item)
                                 item_not_found = False
                     
                         if item_not_found:
@@ -166,7 +167,7 @@ class SaveFile:
                 file.write(f"\nbalance: {self._account._points_balance}")
 
                 # Sacing owned shop items
-                for item in self._account._owned_shop_items:
+                for item in self._account._owned_shop_items.get_items():
                     file.write(f"\n{item._name}: {item._stock}")
                 file.write(f"\n{END_OF_ITEMS_FLAG}")
                 
