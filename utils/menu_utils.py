@@ -4,18 +4,18 @@
     collection of menu related helper functions
 '''
 from typing import List
-from assets.shop.shop_item import ShopItem
+from assets.shop.shop_items import ShopItems
 from utils.consts import PAGE_SIZE
 
-def make_pages(items: List[ShopItem]) -> List[List[ShopItem]]:
-    pages: List[List[ShopItem]] = []
-    page: List[ShopItem] = []
+def make_pages(items: ShopItems) -> List[ShopItems]:
+    pages: List[ShopItems] = []
+    page: ShopItems = ShopItems()
 
-    for index, item in enumerate(items):
-        page.append(item)
+    for index, item in enumerate(items.get_items()):
+        page.add_item(item)
 
-        if len(page) == PAGE_SIZE or index == len(items)-1:
-            pages.append(page.copy())
-            page.clear()
+        if page.size() == PAGE_SIZE or index == items.size()-1:
+            pages.append(ShopItems(page.get_items().copy()))
+            page.clear_items()
 
     return pages

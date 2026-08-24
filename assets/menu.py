@@ -18,6 +18,8 @@ from assets.shop.shop_item import ShopItem
 from assets.shop.shop_items import ShopItems
 from boards.board import Board
 from assets.enums.enums import Gamemodes, SaveFileOptions, ModeSelection, OptionsSelection, Confirmation, StdNavigationOptions
+from assets.shop.shop_items_collection import shop_item_collection
+from assets.shop.shop_items import ShopItems
 from utils.consts import NAME_MIN_LENGTH
 from utils.consts import NAME_MAX_LENGTH
 from utils.consts import EMPTY_SHOP_ITEM
@@ -269,18 +271,16 @@ class Menu:
             Logic for handling shop menu display and navigation
         '''
         show_menu: bool = True
-        shop_items: List[ShopItem] = ShopItems._shop_items
         
         # Makes pages for navigation
-        pages: List[List[ShopItem]] = make_pages(shop_items)
+        pages: List[ShopItems] = make_pages(ShopItems(shop_item_collection.get_items()))
         current_page_index: int = 0
-        current_page: List[ShopItem] = []
-        
+        current_page: ShopItems = ShopItems()
 
         while True:
             current_page = pages[current_page_index]
             if show_menu:
-                self._shop.print_shop_menu(self._account, current_page)
+                self._shop.print_shop_menu(self._account, pages[current_page_index])
                 show_menu = False
             
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
@@ -299,8 +299,8 @@ class Menu:
                 show_menu = True
 
 
-            if key_event.event_type == keyboard.KEY_DOWN and key_event.name in [str(x+1) for x in range(len(current_page))]:
-                self.shop_item_details_menu(current_page[int(key_event.name)-1])
+            if key_event.event_type == keyboard.KEY_DOWN and key_event.name in [str(x+1) for x in range(current_page.size())]:
+                self.shop_item_details_menu(current_page.get_items()[int(key_event.name)-1])
                 show_menu = True
             
 
@@ -339,14 +339,14 @@ class Menu:
         price: int = selected_item._price
         shop_item: ShopItem = selected_item
         shop_item_limit: int = shop_item._limit
-        acc_shop_items: List[ShopItem] = self._account._owned_shop_items
+        acc_shop_items: ShopItems = self._account._owned_shop_items
 
         acc_shop_item: ShopItem = EMPTY_SHOP_ITEM
-        for item in acc_shop_items:
+        for item in acc_shop_items.get_items():
             if item._name == shop_item._name:
                 acc_shop_item = item
 
-        shop_item_stock: int = acc_shop_item._stock if len(acc_shop_items) > 0 else 0
+        shop_item_stock: int = acc_shop_item._stock if acc_shop_items.size() > 0 else 0
 
         # Reject preemptively if the user has insufficient funds
         # or if item stock has reached limit
@@ -368,7 +368,7 @@ class Menu:
 
             if keyboard_utils.check_key_event(key_event, Confirmation.YES.value):
                 if not self.shop_item_exists(shop_item):                    
-                    self._account._owned_shop_items.append(shop_item)
+                    self._account._owned_shop_items.add_item(shop_item)
 
                 shop_item._stock += 1
                 self._account._points_balance -= price
@@ -380,12 +380,12 @@ class Menu:
                 break
     
     def shop_item_exists(self, shop_item: ShopItem) -> bool:
-        owned_shop_items: List[ShopItem] = self._account._owned_shop_items
+        owned_shop_items: ShopItems = self._account._owned_shop_items
 
-        if len(owned_shop_items) == 0:
+        if owned_shop_items.is_empty():
             return False
 
-        for item in owned_shop_items:
+        for item in owned_shop_items.get_items():
             if item._name == shop_item._name:
                 return True
 

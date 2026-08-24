@@ -30,6 +30,7 @@ from assets.position.position2d import Position2D
 from assets.menu_front import MenuFront
 from account.account import Account
 from assets.shop.shop_item import ShopItem
+from assets.shop.shop_items import ShopItems
 from assets.enums.enums import MainMenuOptions, MovementKeys, Gamemodes, MiscGameControls, SnackTypes
 from boards.board import Board
 from utils.consts import EMPTY_SHOP_ITEM, PLAYER_ENTITY, SNACK_ENTITY
@@ -82,8 +83,8 @@ class Game:
         self._active_shop_powerup.reset()
 
         # Update with used powerup and erase ones with zero quantity
-        self._account._owned_shop_items = [self._active_shop_powerup if self._active_shop_powerup._name == powerup._name else powerup for powerup in self._account._owned_shop_items]
-        self._account._owned_shop_items = [powerup for powerup in self._account._owned_shop_items if powerup._stock > 0]
+        self._account._owned_shop_items = ShopItems([self._active_shop_powerup if self._active_shop_powerup._name == powerup._name else powerup for powerup in self._account._owned_shop_items.get_items()])
+        self._account._owned_shop_items = ShopItems([powerup for powerup in self._account._owned_shop_items.get_items() if powerup._stock > 0])
 
     def game_spawn_snack(self, board: Board, occupied_positions: List[Position2D], snack_type: SnackTypes) -> None:
         '''
@@ -124,7 +125,7 @@ class Game:
         parallel_dimension_traps: List[Trap] = []
         traps: List[Trap] = []
         
-        owned_powerups: List[ShopItem] = self._account._owned_shop_items
+        owned_powerups: List[ShopItem] = self._account._owned_shop_items.get_items()
         powerup_index: int
 
         # Eating flags for one time display
