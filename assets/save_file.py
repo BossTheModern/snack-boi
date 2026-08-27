@@ -39,12 +39,12 @@ class SaveFile:
         highest_unlocked_lvl: int = 0
         highest_cleared_lvl: int = 0
         name: str = ""
-        balance: int = 0
+        balance: str = ""
         lvl_format_error: bool = False
 
         existing_shop_items: ShopItems = shop_item_collection
         new_item: ShopItem
-        item: str
+        item: List[str]
         item_name: str
         item_number: int
         item_not_found: bool = True
