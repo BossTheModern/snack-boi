@@ -29,7 +29,7 @@ class TestSaveFile(unittest.TestCase):
             Testing if loading a normal save file works as intended
         '''
         account: Account = Account()
-        save_file: SaveFile = SaveFile("save_file_tests/test_save_normal.txt", account)
+        save_file: SaveFile = SaveFile("tests/savefile/save_file_tests/test_save_normal.txt", account)
         levels: List[Level] = copy.deepcopy(Levels._levels)
         save_file.load(levels)
         output: StringIO = mock_stdout.getvalue()
@@ -45,7 +45,7 @@ class TestSaveFile(unittest.TestCase):
             correctly
         '''
         account: Account = Account()
-        save_file: SaveFile = SaveFile("save_file_tests/test_save_invalid_format.txt", account)
+        save_file: SaveFile = SaveFile("tests/savefile/save_file_tests/test_save_invalid_format.txt", account)
         levels: List[Level] = copy.deepcopy(Levels._levels)
         save_file.load(levels)
         output: StringIO = mock_stdout.getvalue()
@@ -60,7 +60,7 @@ class TestSaveFile(unittest.TestCase):
             Testing if a nonexistant save file is handled accordingly
         '''
         account: Account = Account()
-        save_file: SaveFile = SaveFile("save_files/nonexistant.txt", account)
+        save_file: SaveFile = SaveFile("tests/savefile/save_files/nonexistant.txt", account)
         levels: List[Level] = copy.deepcopy(Levels._levels)
         save_file.load(levels)
         output: StringIO = mock_stdout.getvalue()
@@ -79,7 +79,7 @@ class TestSaveFile(unittest.TestCase):
         expected_highest_cleared: int = 4
 
         account: Account = Account()
-        save_file: SaveFile = SaveFile("save_file_tests/test_new_save.txt", account)
+        save_file: SaveFile = SaveFile("tests/savefile/save_file_tests/test_new_save.txt", account)
         levels: List[Level] = copy.deepcopy(Levels._levels)
         for i in range(expected_highest_unlocked):
             levels[i]._unlocked = True
@@ -100,7 +100,7 @@ class TestSaveFile(unittest.TestCase):
             Tests if save file deletes correctly
         '''
         account: Account = Account()
-        save_file: SaveFile = SaveFile("save_file_tests/test_deleted_save.txt", account)
+        save_file: SaveFile = SaveFile("tests/savefile/save_file_tests/test_deleted_save.txt", account)
         levels: List[Level] = copy.deepcopy(Levels._levels)
         output: StringIO
 
@@ -117,7 +117,7 @@ class TestSaveFile(unittest.TestCase):
             Tests if deleting a nonexistent file is handled correctly    
         '''
         account: Account = Account()
-        save_file: SaveFile = SaveFile("save_file_tests/test_nonexistent_delete_file.txt", account)
+        save_file: SaveFile = SaveFile("tests/savefile/save_file_tests/test_nonexistent_delete_file.txt", account)
         save_file.delete()
         output: StringIO = mock_stdout.getvalue()
 
