@@ -1,2 +1,5 @@
 highest_unlocked_level: 5
 highest_cleared_level: 4
+name: Test
+balance: 0
+end_of_items
