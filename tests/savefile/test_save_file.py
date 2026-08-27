@@ -30,7 +30,7 @@ class TestSaveFile(unittest.TestCase):
         '''
         account: Account = Account()
         save_file: SaveFile = SaveFile("save_file_tests/test_save_normal.txt", account)
-        levels: List[Level] = copy.deepcopy(Levels._classic_levels_set_1)
+        levels: List[Level] = copy.deepcopy(Levels._levels)
         save_file.load(levels)
         output: StringIO = mock_stdout.getvalue()
 
@@ -46,7 +46,7 @@ class TestSaveFile(unittest.TestCase):
         '''
         account: Account = Account()
         save_file: SaveFile = SaveFile("save_file_tests/test_save_invalid_format.txt", account)
-        levels: List[Level] = copy.deepcopy(Levels._classic_levels_set_1)
+        levels: List[Level] = copy.deepcopy(Levels._levels)
         save_file.load(levels)
         output: StringIO = mock_stdout.getvalue()
 
@@ -61,7 +61,7 @@ class TestSaveFile(unittest.TestCase):
         '''
         account: Account = Account()
         save_file: SaveFile = SaveFile("save_files/nonexistant.txt", account)
-        levels: List[Level] = copy.deepcopy(Levels._classic_levels_set_1)
+        levels: List[Level] = copy.deepcopy(Levels._levels)
         save_file.load(levels)
         output: StringIO = mock_stdout.getvalue()
 
@@ -80,7 +80,7 @@ class TestSaveFile(unittest.TestCase):
 
         account: Account = Account()
         save_file: SaveFile = SaveFile("save_file_tests/test_new_save.txt", account)
-        levels: List[Level] = copy.deepcopy(Levels._classic_levels_set_1)
+        levels: List[Level] = copy.deepcopy(Levels._levels)
         for i in range(expected_highest_unlocked):
             levels[i]._unlocked = True
         for i in range(expected_highest_cleared):
@@ -101,7 +101,7 @@ class TestSaveFile(unittest.TestCase):
         '''
         account: Account = Account()
         save_file: SaveFile = SaveFile("save_file_tests/test_deleted_save.txt", account)
-        levels: List[Level] = copy.deepcopy(Levels._classic_levels_set_1)
+        levels: List[Level] = copy.deepcopy(Levels._levels)
         output: StringIO
 
         save_file.save(levels)

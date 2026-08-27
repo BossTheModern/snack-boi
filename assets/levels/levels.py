@@ -40,7 +40,7 @@ class Levels:
     '''
     _win_cap: int = 10
     _cap_increase_interval: int = 5
-    _classic_levels_set_1: List[Level] = [Level("Level 1", square_obstacle_grid, True, True, False, _win_cap, BASE_LEVEL_REWARD), 
+    _levels: List[Level] = [Level("Level 1", square_obstacle_grid, True, True, False, _win_cap, BASE_LEVEL_REWARD), 
                                           Level("Level 2", square_obstacle_grid_2, False, False, False, _win_cap, BASE_LEVEL_REWARD),
                                           Level("Level 3", square_obstacle_grid_3, False, False, False, _win_cap, BASE_LEVEL_REWARD),
                                           Level("Level 4", square_obstacle_grid_4, False, False, False, _win_cap, BASE_LEVEL_REWARD),
