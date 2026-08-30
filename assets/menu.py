@@ -283,12 +283,16 @@ class Menu:
         pages: List[ShopItems] = make_pages(ShopItems(shop_item_collection.get_items()))
         current_page_index: int = 0
         current_page: ShopItems = ShopItems()
+        message: str = ""
 
         while True:
             current_page = pages[current_page_index]
             if show_menu:
                 terminal_clearing.clear_terminal()
                 self._shop.print_shop_menu(self._account, pages[current_page_index])
+                if message != "":
+                    print(message)
+                    message = ""
                 show_menu = False
             
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
@@ -308,16 +312,17 @@ class Menu:
 
 
             if key_event.event_type == keyboard.KEY_DOWN and key_event.name in [str(x+1) for x in range(current_page.size())]:
-                self.shop_item_details_menu(current_page.get_items()[int(key_event.name)-1])
+                message = self.shop_item_details_menu(current_page.get_items()[int(key_event.name)-1])
                 show_menu = True
             
 
 
-    def shop_item_details_menu(self, selected_item: ShopItem) -> None:
+    def shop_item_details_menu(self, selected_item: ShopItem) -> str:
         '''
             Logic for handling shop item detals menu display and navigation
         '''
         show_menu: bool = True
+        message: str = ""
 
         while True:
             if show_menu:
@@ -328,22 +333,19 @@ class Menu:
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
             if keyboard_utils.check_key_event(key_event, 'q'):
-                print("Returning to shop menu\n\n")
-                break
+                return "Returned to shop menu\n\n"
 
             if keyboard_utils.check_key_event(key_event, 'b'):
-                # TODO: Create logic for buying item
-                self.shop_item_purchase(selected_item)
-                break
+                message = self.shop_item_purchase(selected_item)
+                return message
     
-    def shop_item_purchase(self, selected_item: ShopItem) -> None:
+    def shop_item_purchase(self, selected_item: ShopItem) -> str:
         '''
             Handles the logic of purchasing the shop item,
             such as linking button presses to corresponding actions
             such as purchasing or cancelling
         '''
         show_menu: bool = True
-        #item_num -= 1
         current_balance: int = self._account._points_balance
         price: int = selected_item._price
         shop_item: ShopItem = selected_item
@@ -360,12 +362,10 @@ class Menu:
         # Reject preemptively if the user has insufficient funds
         # or if item stock has reached limit
         if current_balance < price:
-            print("Insufficient funds, try again later\n\n")
-            return
+            return "Insufficient funds, try again later\n\n"
         
         if shop_item_stock == shop_item_limit:
-            print("Stock limit reached, try again later\n\n")
-            return
+            return "Stock limit reached, try again later\n\n"
 
         
         while True:
@@ -382,12 +382,10 @@ class Menu:
 
                 shop_item._stock += 1
                 self._account._points_balance -= price
-                print("Purchase successful\n\n")
-                break
+                return "Purchase successful\n\n"
             
             if keyboard_utils.check_key_event(key_event, Confirmation.NO.value):
-                print("Canceled purchase\n\n")
-                break
+                return "Canceled purchase\n\n"
     
     def shop_item_exists(self, shop_item: ShopItem) -> bool:
         owned_shop_items: ShopItems = self._account._owned_shop_items

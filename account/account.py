@@ -52,24 +52,27 @@ class Account:
             Handles account display logic
         '''
         show_menu: bool = True
+        message: str = ""
 
         while True:
             if show_menu:
                 terminal_clearing.clear_terminal()
                 self.show_account()
+                if message != "":
+                    print(message)
                 show_menu = False
             
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
             if keyboard_utils.check_key_event(key_event, AccountOptions.CHANGE_NAME.value):
-                self.change_name()
+                message = self.change_name()
                 show_menu = True
             
             if keyboard_utils.check_key_event(key_event, AccountOptions.BACK.value):
                 print("Back to main menu")
                 break           
     
-    def change_name(self) -> None:
+    def change_name(self) -> str:
         '''
             Handles logic of changing account name
         '''
@@ -92,9 +95,7 @@ class Account:
 
             if keyboard_utils.check_key_event(key_event, Confirmation.YES.value):
                 self._name = new_name
-                print("Name changed successfully")
-                break
+                return "Name changed successfully"
         
             if keyboard_utils.check_key_event(key_event, Confirmation.NO.value):
-                print("Canceled name change")
-                break
+                return "Canceled name change"
