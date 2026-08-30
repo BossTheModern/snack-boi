@@ -24,6 +24,8 @@ from utils.consts import NAME_MIN_LENGTH
 from utils.consts import NAME_MAX_LENGTH
 from utils.consts import EMPTY_SHOP_ITEM
 from utils.menu_utils import make_pages
+from utils import terminal_clearing
+
 
 
 class Menu:
@@ -57,6 +59,7 @@ class Menu:
         
         while True:
             if display_text:
+                terminal_clearing.clear_terminal()
                 self._menu_front.print_version_log()
                 print("\nPress Q to return to menu")
                 display_text = False
@@ -82,6 +85,7 @@ class Menu:
 
         while True:
             if show_menu:
+                terminal_clearing.clear_terminal()
                 self._menu_front.print_mode_selection_menu()
                 show_menu = False
                 
@@ -156,6 +160,7 @@ class Menu:
         # Game options menu loop
         while True:
             if show_menu:
+                terminal_clearing.clear_terminal()
                 self._menu_front.print_game_options()
                 show_menu = False
 
@@ -170,6 +175,7 @@ class Menu:
                 
                 while True:
                     if show_save_menu:
+                        terminal_clearing.clear_terminal()
                         self._menu_front.print_save_file_options()
                         show_save_menu = False
                     
@@ -232,6 +238,7 @@ class Menu:
 
         while True:
             if show_menu:
+                terminal_clearing.clear_terminal()
                 self._menu_front.print_levels_menu(levels, mode)
                 show_menu = False
 
@@ -280,6 +287,7 @@ class Menu:
         while True:
             current_page = pages[current_page_index]
             if show_menu:
+                terminal_clearing.clear_terminal()
                 self._shop.print_shop_menu(self._account, pages[current_page_index])
                 show_menu = False
             
@@ -313,6 +321,7 @@ class Menu:
 
         while True:
             if show_menu:
+                terminal_clearing.clear_terminal()
                 self._shop.show_shop_item_details(selected_item)
                 show_menu = False
             
@@ -361,6 +370,7 @@ class Menu:
         
         while True:
             if show_menu:
+                terminal_clearing.clear_terminal()
                 self._shop.purchase_item_menu(selected_item)
                 show_menu = False
             
@@ -416,6 +426,7 @@ class Menu:
 
         while True:
             if show_menu:
+                terminal_clearing.clear_terminal()
                 self._menu_front.print_owned_powerups(owned_powerups, index)
                 show_menu = False
 

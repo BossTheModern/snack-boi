@@ -34,6 +34,7 @@ from assets.shop.shop_items import ShopItems
 from assets.enums.enums import MainMenuOptions, MovementKeys, Gamemodes, MiscGameControls, SnackTypes
 from boards.board import Board
 from utils.consts import EMPTY_SHOP_ITEM, PLAYER_ENTITY, SNACK_ENTITY
+from utils import terminal_clearing
 import copy
 
 
@@ -192,6 +193,7 @@ class Game:
             
 
             if show_state:
+                terminal_clearing.clear_terminal()
                 self._game_utils.display_current_state(board, current_level_index, 
                                                        self._levels, 
                                                        game_mode, self._current_snack._type, 
@@ -306,7 +308,7 @@ class Game:
                         traps.remove(trap)
                         occupied_positions.remove(trap._position)
                         self._game_utils._parallel_trap_eaten = True
-                    case _: print("No type found")                
+                    case _: print("No type found")        
         
         self.clear_owned_items(game_mode, current_level_index)
         self.clear_game_data()
@@ -330,6 +332,7 @@ class Game:
         # Main menu loop
         while True:
             if show_menu:
+                terminal_clearing.clear_terminal()
                 self._menu_front.print_game_menu()
                 show_menu = False
 

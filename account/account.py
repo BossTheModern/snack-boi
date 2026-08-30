@@ -13,6 +13,7 @@ from assets.shop.shop_item import ShopItem
 from assets.enums.enums import Confirmation, AccountOptions
 from utils.consts import NAME_MIN_LENGTH
 from utils.consts import NAME_MAX_LENGTH
+from utils import terminal_clearing
 
 
 class Account:
@@ -54,6 +55,7 @@ class Account:
 
         while True:
             if show_menu:
+                terminal_clearing.clear_terminal()
                 self.show_account()
                 show_menu = False
             
@@ -71,6 +73,7 @@ class Account:
         '''
             Handles logic of changing account name
         '''
+        terminal_clearing.clear_terminal()
         new_name: str = input("Enter new name: ")
         show_menu: bool = True
 
@@ -80,6 +83,7 @@ class Account:
 
         while True:
             if show_menu:
+                terminal_clearing.clear_terminal()
                 print("\nConfirm change?")
                 print("[Y] Yes [N] No")
                 show_menu = False
