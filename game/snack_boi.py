@@ -24,8 +24,6 @@ from assets.player import Player
 from assets.traps.traps import Trap
 from assets.traps.trap_types import HungerTrap, ParallelDimensionTrap
 from assets.powerups.recon_snack import ReconSnack
-from assets.printer.fancy_printer import FancyPrinter
-from assets.text_collection import TextCollection
 from assets.position.position2d import Position2D
 from assets.menu_front import MenuFront
 from account.account import Account
@@ -33,9 +31,8 @@ from assets.shop.shop_item import ShopItem
 from assets.shop.shop_items import ShopItems
 from assets.enums.enums import MainMenuOptions, MovementKeys, Gamemodes, MiscGameControls, SnackTypes
 from boards.board import Board
-from utils.consts import EMPTY_SHOP_ITEM, PLAYER_ENTITY, SNACK_ENTITY
+from utils.consts import EMPTY_SHOP_ITEM, PLAYER_ENTITY
 from utils import terminal_clearing
-import copy
 
 
 # Game class where the game logic is implemented
@@ -118,7 +115,7 @@ class Game:
         intro_show_state: bool = True
         recon_duration: int = self._recon_snack._duration
         random_snack_type: SnackTypes
-        trap: Trap
+        trap: Trap | None
         occupied_positions: List[Position2D] = []
         levels_unlocked: int = 0
         hunger_traps: List[Trap] = []
