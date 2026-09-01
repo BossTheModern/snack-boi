@@ -7,9 +7,7 @@
 import keyboard
 from keyboard import KeyboardEvent
 from utils import keyboard_utils
-from typing import List
 from assets.shop.shop_items import ShopItems
-from assets.shop.shop_item import ShopItem
 from assets.enums.enums import Confirmation, AccountOptions
 from utils.consts import NAME_MIN_LENGTH
 from utils.consts import NAME_MAX_LENGTH
