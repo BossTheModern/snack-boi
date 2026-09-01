@@ -17,7 +17,7 @@ from account.account import Account
 from assets.shop.shop_item import ShopItem
 from assets.shop.shop_items import ShopItems
 from boards.board import Board
-from assets.enums.enums import Gamemodes, SaveFileOptions, ModeSelection, OptionsSelection, Confirmation, StdNavigationOptions
+from assets.enums.enums import Gamemodes, SaveFileOptions, ModeSelection, OptionsSelection, Confirmation, StdNavigationOptions, StdPowerupNavigationsOptions
 from assets.shop.shop_items_collection import shop_item_collection
 from assets.shop.shop_items import ShopItems
 from utils.consts import NAME_MIN_LENGTH
@@ -430,18 +430,18 @@ class Menu:
 
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
-            if keyboard_utils.check_key_event(key_event, 'w') and index > 0:
+            if keyboard_utils.check_key_event(key_event, StdPowerupNavigationsOptions.UP.value) and index > 0:
                 index -= 1
                 show_menu = True
 
-            if keyboard_utils.check_key_event(key_event, 's') and index < len(owned_powerups)-1:
+            if keyboard_utils.check_key_event(key_event, StdPowerupNavigationsOptions.DOWN.value) and index < len(owned_powerups)-1:
                 index += 1
                 show_menu = True
 
-            if keyboard_utils.check_key_event(key_event, 'e'):
+            if keyboard_utils.check_key_event(key_event, StdPowerupNavigationsOptions.SELECT.value):
                 break
 
-            if keyboard_utils.check_key_event(key_event, 'q'):
+            if keyboard_utils.check_key_event(key_event, StdPowerupNavigationsOptions.SKIP.value):
                 index = -1
                 break
 
