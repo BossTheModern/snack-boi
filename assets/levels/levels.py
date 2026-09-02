@@ -25,7 +25,10 @@ from boards.grid_collection import square_obstacle_grid_7, square_obstacle_grid_
 from boards.grid_collection import square_obstacle_grid_9, square_obstacle_grid_10
 from boards.grid_collection import square_obstacle_grid_11, square_obstacle_grid_12
 from boards.grid_collection import square_obstacle_grid_13, square_obstacle_grid_14
-from boards.grid_collection import square_obstacle_grid_15
+from boards.grid_collection import square_obstacle_grid_15, square_obstacle_grid_16
+from boards.grid_collection import square_obstacle_grid_17, square_obstacle_grid_18
+from boards.grid_collection import square_obstacle_grid_19, square_obstacle_grid_20
+
 
 
 class Levels:
@@ -54,4 +57,9 @@ class Levels:
                             Level("Level 12", square_obstacle_grid_12, False, False, False, _win_cap + _cap_increase_interval * 3, ADVANCED_LEVEL_REWARD),
                             Level("Level 13", square_obstacle_grid_13, False, False, False, _win_cap + _cap_increase_interval * 3, ADVANCED_LEVEL_REWARD),
                             Level("Level 14", square_obstacle_grid_14, False, False, False, _win_cap + _cap_increase_interval * 3, ADVANCED_LEVEL_REWARD),
-                            Level("Level 15", square_obstacle_grid_15, False, False, False, _win_cap + _cap_increase_interval * 3, ADVANCED_LEVEL_REWARD),]
+                            Level("Level 15", square_obstacle_grid_15, False, False, False, _win_cap + _cap_increase_interval * 3, ADVANCED_LEVEL_REWARD),
+                            Level("Level 16", square_obstacle_grid_16, False, False, False, _win_cap + _cap_increase_interval * 3, ADVANCED_LEVEL_REWARD),
+                            Level("Level 17", square_obstacle_grid_17, False, False, False, _win_cap + _cap_increase_interval * 3, ADVANCED_LEVEL_REWARD),
+                            Level("Level 18", square_obstacle_grid_18, False, False, False, _win_cap + _cap_increase_interval * 3, ADVANCED_LEVEL_REWARD),
+                            Level("Level 19", square_obstacle_grid_19, False, False, False, _win_cap + _cap_increase_interval * 3, ADVANCED_LEVEL_REWARD),
+                            Level("Level 20", square_obstacle_grid_20, False, False, False, _win_cap + _cap_increase_interval * 3, ADVANCED_LEVEL_REWARD),]
