@@ -67,6 +67,19 @@ class Levels(Collection):
         else:
             level._reward = BASE_LEVEL_REWARD
 
+    def paginate(self) -> List[List[Level]]:
+        pages: List[List[Level]] = []
+        page: List[Level] = []
+
+        for index, level in enumerate(self.get_items()):
+            page.append(level)
+
+            if len(page) == self._page_size or index == self.size()-1:
+                pages.append(page.copy())
+                page.clear()
+
+        return pages
+
     # Level blueprint
     # _levels: List[Level] = [Level("Level 1", square_obstacle_grid, True, True, False, _win_cap, BASE_LEVEL_REWARD), 
     #                         Level("Level 2", square_obstacle_grid_2, False, False, False, _win_cap, BASE_LEVEL_REWARD),
