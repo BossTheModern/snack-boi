@@ -267,6 +267,3 @@ square_obstacle_grid_20.add_obstacles_vertically(1, 10, 4, OBSTACLE_CHAR)
 square_obstacle_grid_20.add_obstacle(9, 2, OBSTACLE_CHAR)
 square_obstacle_grid_20.add_obstacle(10, 1, OBSTACLE_CHAR)
 square_obstacle_grid_20.add_obstacle(4, 9, OBSTACLE_CHAR)
-
-
-square_obstacle_grid_20.display()
