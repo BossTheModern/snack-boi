@@ -20,12 +20,11 @@ from boards.board import Board
 from assets.enums.enums import Gamemodes, SaveFileOptions, ModeSelection, OptionsSelection, Confirmation, StdNavigationOptions, StdPowerupNavigationsOptions
 from assets.shop.shop_items_collection import shop_item_collection
 from assets.shop.shop_items import ShopItems
+from assets.levels.levels_set import levels_set
 from utils.consts import NAME_MIN_LENGTH
 from utils.consts import NAME_MAX_LENGTH
 from utils.consts import EMPTY_SHOP_ITEM
-from utils.menu_utils import make_pages
 from utils import terminal_clearing
-
 
 
 class Menu:
@@ -202,7 +201,7 @@ class Menu:
 
         print("Returning to main menu")
     
-    def navigate_selection(self, input: KeyboardEvent, levels: List[Level]) -> None:
+    def navigate_selection(self, input: KeyboardEvent, levels: List[Level], current_page_index: int) -> int:
         '''
             Logic for naviagting selection of levels from existing gamemodes
         '''
@@ -213,20 +212,28 @@ class Menu:
             if level._selected:
                 break
             current_lvl_index += 1
+
+        current_lvl_index %= len(levels) # Ensure index is within bounds
         
         # Handle keyboard input
         if keyboard_utils.check_key_event(input, StdNavigationOptions.LEFT.value):
             if current_lvl_index - 1 < 0:
-                return
+                if current_page_index - 1 < 0:
+                    return current_page_index
+                return current_page_index - 1
             
             levels[current_lvl_index-1]._selected = True
             levels[current_lvl_index]._selected = False
         elif keyboard_utils.check_key_event(input, StdNavigationOptions.RIGHT.value):
             if current_lvl_index + 1 > len(levels)-1:
-                return
+                if current_page_index + 1 > len(levels_set.paginate())-1:
+                    return current_page_index
+                return current_page_index + 1
 
             levels[current_lvl_index+1]._selected = True
             levels[current_lvl_index]._selected = False
+
+        return current_page_index
 
     def levels_menu(self, levels: List[Level], mode: str) -> None:
         '''
@@ -236,10 +243,15 @@ class Menu:
         original_grid: Board
         show_menu: bool = True
 
+        pages: List[List[Level]] = levels_set.paginate()
+        current_page_index: int = 0
+        previous_page_index: int = current_page_index
+        current_page: List[Level] = pages[current_page_index]
+
         while True:
             if show_menu:
                 terminal_clearing.clear_terminal()
-                self._menu_front.print_levels_menu(levels, mode)
+                self._menu_front.print_levels_menu(current_page, mode)
                 show_menu = False
 
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
@@ -249,7 +261,7 @@ class Menu:
                 break
 
             if keyboard_utils.check_key_event(key_event, StdNavigationOptions.SELECT.value):
-                selected_level = self.selected_level(levels)
+                selected_level = self.selected_level(current_page)
 
                 if mode == Gamemodes.CLASSIC.value:
                     if selected_level._unlocked:
@@ -270,7 +282,13 @@ class Menu:
                         print("Level is locked, clear the corresponding level in classic mode first")
                 
             if keyboard_utils.check_key_event(key_event, StdNavigationOptions.LEFT.value) or keyboard_utils.check_key_event(key_event, StdNavigationOptions.RIGHT.value):
-                self.navigate_selection(key_event, levels)
+                current_page_index = self.navigate_selection(key_event, current_page, current_page_index)
+                current_page = pages[current_page_index]
+
+                # Properly set the first level of the new page to be selected if the user navigates to a new page the first time
+                if current_page_index > previous_page_index:
+                    current_page[0]._selected = True
+                    previous_page_index = current_page_index
                 show_menu = True
 
     def shop_menu(self) -> None:
@@ -280,7 +298,7 @@ class Menu:
         show_menu: bool = True
         
         # Makes pages for navigation
-        pages: List[ShopItems] = make_pages(ShopItems(shop_item_collection.get_items()))
+        pages: List[ShopItems] = shop_item_collection.paginate()
         current_page_index: int = 0
         current_page: ShopItems = ShopItems()
         message: str = ""
@@ -314,8 +332,6 @@ class Menu:
             if key_event.event_type == keyboard.KEY_DOWN and key_event.name in [str(x+1) for x in range(current_page.size())]:
                 message = self.shop_item_details_menu(current_page.get_items()[int(key_event.name)-1])
                 show_menu = True
-            
-
 
     def shop_item_details_menu(self, selected_item: ShopItem) -> str:
         '''
