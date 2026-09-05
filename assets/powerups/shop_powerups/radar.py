@@ -115,6 +115,3 @@ class Radar(ShopItem):
     
     def reached_usage_per_game(self) -> bool:
         return self._use_count == self._use_limit
-    
-    def complete_usage(self) -> None:
-        self._stock -= 1
