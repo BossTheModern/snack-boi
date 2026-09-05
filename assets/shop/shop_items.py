@@ -5,29 +5,23 @@
 '''
 
 from assets.shop.shop_item import ShopItem
-from assets.powerups.shop_powerups.doubler import Doubler
-from assets.powerups.shop_powerups.radar import Radar
-from assets.powerups.shop_powerups.recall import Recall 
 from typing import List
-import textwrap
-from utils.consts import SHOP_ITEM_LIMIT
+from utils.consts import PAGE_SIZE
+from assets.collection.collection import Collection
 
-
-class ShopItems:
+class ShopItems(Collection):
     def __init__(self, items: List[ShopItem] = []) -> None:
-        self._items: List[ShopItem] = items
+        super().__init__(items, page_size = PAGE_SIZE)
 
-    def get_items(self) -> List[ShopItem]:
-        return self._items
-
-    def size(self) -> int:
-        return len(self._items)
-
-    def is_empty(self) -> bool:
-        return len(self._items) == 0
-
-    def add_item(self, item: ShopItem) -> None:
-        self._items.append(item)
-
-    def clear_items(self) -> None:
-        self._items.clear() 
+    def paginate(self) -> List[ShopItems]:
+        pages: List[ShopItems] = []
+        page: ShopItems = ShopItems()
+        
+        for index, item in enumerate(self.get_items()):
+            page.add_item(item)
+        
+            if page.size() == self._page_size or index == self.size()-1:
+                pages.append(ShopItems(page.get_items().copy()))
+                page.clear_items()
+        
+        return pages

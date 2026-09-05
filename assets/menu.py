@@ -17,13 +17,14 @@ from account.account import Account
 from assets.shop.shop_item import ShopItem
 from assets.shop.shop_items import ShopItems
 from boards.board import Board
-from assets.enums.enums import Gamemodes, SaveFileOptions, ModeSelection, OptionsSelection, Confirmation, StdNavigationOptions
+from assets.enums.enums import Gamemodes, SaveFileOptions, ModeSelection, OptionsSelection, Confirmation, StdNavigationOptions, StdPowerupNavigationsOptions
 from assets.shop.shop_items_collection import shop_item_collection
 from assets.shop.shop_items import ShopItems
+from assets.levels.levels_set import levels_set
 from utils.consts import NAME_MIN_LENGTH
 from utils.consts import NAME_MAX_LENGTH
 from utils.consts import EMPTY_SHOP_ITEM
-from utils.menu_utils import make_pages
+from utils import terminal_clearing
 
 
 class Menu:
@@ -57,6 +58,7 @@ class Menu:
         
         while True:
             if display_text:
+                terminal_clearing.clear_terminal()
                 self._menu_front.print_version_log()
                 print("\nPress Q to return to menu")
                 display_text = False
@@ -82,6 +84,7 @@ class Menu:
 
         while True:
             if show_menu:
+                terminal_clearing.clear_terminal()
                 self._menu_front.print_mode_selection_menu()
                 show_menu = False
                 
@@ -156,6 +159,7 @@ class Menu:
         # Game options menu loop
         while True:
             if show_menu:
+                terminal_clearing.clear_terminal()
                 self._menu_front.print_game_options()
                 show_menu = False
 
@@ -170,6 +174,7 @@ class Menu:
                 
                 while True:
                     if show_save_menu:
+                        terminal_clearing.clear_terminal()
                         self._menu_front.print_save_file_options()
                         show_save_menu = False
                     
@@ -196,7 +201,7 @@ class Menu:
 
         print("Returning to main menu")
     
-    def navigate_selection(self, input: KeyboardEvent, levels: List[Level]) -> None:
+    def navigate_selection(self, input: KeyboardEvent, levels: List[Level], current_page_index: int) -> int:
         '''
             Logic for naviagting selection of levels from existing gamemodes
         '''
@@ -207,20 +212,28 @@ class Menu:
             if level._selected:
                 break
             current_lvl_index += 1
+
+        current_lvl_index %= len(levels) # Ensure index is within bounds
         
         # Handle keyboard input
         if keyboard_utils.check_key_event(input, StdNavigationOptions.LEFT.value):
             if current_lvl_index - 1 < 0:
-                return
+                if current_page_index - 1 < 0:
+                    return current_page_index
+                return current_page_index - 1
             
             levels[current_lvl_index-1]._selected = True
             levels[current_lvl_index]._selected = False
         elif keyboard_utils.check_key_event(input, StdNavigationOptions.RIGHT.value):
             if current_lvl_index + 1 > len(levels)-1:
-                return
+                if current_page_index + 1 > len(levels_set.paginate())-1:
+                    return current_page_index
+                return current_page_index + 1
 
             levels[current_lvl_index+1]._selected = True
             levels[current_lvl_index]._selected = False
+
+        return current_page_index
 
     def levels_menu(self, levels: List[Level], mode: str) -> None:
         '''
@@ -230,9 +243,15 @@ class Menu:
         original_grid: Board
         show_menu: bool = True
 
+        pages: List[List[Level]] = levels_set.paginate()
+        current_page_index: int = 0
+        previous_page_index: int = current_page_index
+        current_page: List[Level] = pages[current_page_index]
+
         while True:
             if show_menu:
-                self._menu_front.print_levels_menu(levels, mode)
+                terminal_clearing.clear_terminal()
+                self._menu_front.print_levels_menu(current_page, mode)
                 show_menu = False
 
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
@@ -242,7 +261,7 @@ class Menu:
                 break
 
             if keyboard_utils.check_key_event(key_event, StdNavigationOptions.SELECT.value):
-                selected_level = self.selected_level(levels)
+                selected_level = self.selected_level(current_page)
 
                 if mode == Gamemodes.CLASSIC.value:
                     if selected_level._unlocked:
@@ -263,7 +282,13 @@ class Menu:
                         print("Level is locked, clear the corresponding level in classic mode first")
                 
             if keyboard_utils.check_key_event(key_event, StdNavigationOptions.LEFT.value) or keyboard_utils.check_key_event(key_event, StdNavigationOptions.RIGHT.value):
-                self.navigate_selection(key_event, levels)
+                current_page_index = self.navigate_selection(key_event, current_page, current_page_index)
+                current_page = pages[current_page_index]
+
+                # Properly set the first level of the new page to be selected if the user navigates to a new page the first time
+                if current_page_index > previous_page_index:
+                    current_page[0]._selected = True
+                    previous_page_index = current_page_index
                 show_menu = True
 
     def shop_menu(self) -> None:
@@ -273,14 +298,19 @@ class Menu:
         show_menu: bool = True
         
         # Makes pages for navigation
-        pages: List[ShopItems] = make_pages(ShopItems(shop_item_collection.get_items()))
+        pages: List[ShopItems] = shop_item_collection.paginate()
         current_page_index: int = 0
         current_page: ShopItems = ShopItems()
+        message: str = ""
 
         while True:
             current_page = pages[current_page_index]
             if show_menu:
+                terminal_clearing.clear_terminal()
                 self._shop.print_shop_menu(self._account, pages[current_page_index])
+                if message != "":
+                    print(message)
+                    message = ""
                 show_menu = False
             
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
@@ -300,41 +330,38 @@ class Menu:
 
 
             if key_event.event_type == keyboard.KEY_DOWN and key_event.name in [str(x+1) for x in range(current_page.size())]:
-                self.shop_item_details_menu(current_page.get_items()[int(key_event.name)-1])
+                message = self.shop_item_details_menu(current_page.get_items()[int(key_event.name)-1])
                 show_menu = True
-            
 
-
-    def shop_item_details_menu(self, selected_item: ShopItem) -> None:
+    def shop_item_details_menu(self, selected_item: ShopItem) -> str:
         '''
             Logic for handling shop item detals menu display and navigation
         '''
         show_menu: bool = True
+        message: str = ""
 
         while True:
             if show_menu:
+                terminal_clearing.clear_terminal()
                 self._shop.show_shop_item_details(selected_item)
                 show_menu = False
             
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
             if keyboard_utils.check_key_event(key_event, 'q'):
-                print("Returning to shop menu\n\n")
-                break
+                return "Returned to shop menu\n\n"
 
             if keyboard_utils.check_key_event(key_event, 'b'):
-                # TODO: Create logic for buying item
-                self.shop_item_purchase(selected_item)
-                break
+                message = self.shop_item_purchase(selected_item)
+                return message
     
-    def shop_item_purchase(self, selected_item: ShopItem) -> None:
+    def shop_item_purchase(self, selected_item: ShopItem) -> str:
         '''
             Handles the logic of purchasing the shop item,
             such as linking button presses to corresponding actions
             such as purchasing or cancelling
         '''
         show_menu: bool = True
-        #item_num -= 1
         current_balance: int = self._account._points_balance
         price: int = selected_item._price
         shop_item: ShopItem = selected_item
@@ -351,16 +378,15 @@ class Menu:
         # Reject preemptively if the user has insufficient funds
         # or if item stock has reached limit
         if current_balance < price:
-            print("Insufficient funds, try again later\n\n")
-            return
+            return "Insufficient funds, try again later\n\n"
         
         if shop_item_stock == shop_item_limit:
-            print("Stock limit reached, try again later\n\n")
-            return
+            return "Stock limit reached, try again later\n\n"
 
         
         while True:
             if show_menu:
+                terminal_clearing.clear_terminal()
                 self._shop.purchase_item_menu(selected_item)
                 show_menu = False
             
@@ -372,12 +398,10 @@ class Menu:
 
                 shop_item._stock += 1
                 self._account._points_balance -= price
-                print("Purchase successful\n\n")
-                break
+                return "Purchase successful\n\n"
             
             if keyboard_utils.check_key_event(key_event, Confirmation.NO.value):
-                print("Canceled purchase\n\n")
-                break
+                return "Canceled purchase\n\n"
     
     def shop_item_exists(self, shop_item: ShopItem) -> bool:
         owned_shop_items: ShopItems = self._account._owned_shop_items
@@ -416,23 +440,24 @@ class Menu:
 
         while True:
             if show_menu:
+                terminal_clearing.clear_terminal()
                 self._menu_front.print_owned_powerups(owned_powerups, index)
                 show_menu = False
 
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
-            if keyboard_utils.check_key_event(key_event, 'w') and index > 0:
+            if keyboard_utils.check_key_event(key_event, StdPowerupNavigationsOptions.UP.value) and index > 0:
                 index -= 1
                 show_menu = True
 
-            if keyboard_utils.check_key_event(key_event, 's') and index < len(owned_powerups)-1:
+            if keyboard_utils.check_key_event(key_event, StdPowerupNavigationsOptions.DOWN.value) and index < len(owned_powerups)-1:
                 index += 1
                 show_menu = True
 
-            if keyboard_utils.check_key_event(key_event, 'e'):
+            if keyboard_utils.check_key_event(key_event, StdPowerupNavigationsOptions.SELECT.value):
                 break
 
-            if keyboard_utils.check_key_event(key_event, 'q'):
+            if keyboard_utils.check_key_event(key_event, StdPowerupNavigationsOptions.SKIP.value):
                 index = -1
                 break
 

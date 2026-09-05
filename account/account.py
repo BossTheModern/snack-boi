@@ -7,12 +7,11 @@
 import keyboard
 from keyboard import KeyboardEvent
 from utils import keyboard_utils
-from typing import List
 from assets.shop.shop_items import ShopItems
-from assets.shop.shop_item import ShopItem
 from assets.enums.enums import Confirmation, AccountOptions
 from utils.consts import NAME_MIN_LENGTH
 from utils.consts import NAME_MAX_LENGTH
+from utils import terminal_clearing
 
 
 class Account:
@@ -51,26 +50,31 @@ class Account:
             Handles account display logic
         '''
         show_menu: bool = True
+        message: str = ""
 
         while True:
             if show_menu:
+                terminal_clearing.clear_terminal()
                 self.show_account()
+                if message != "":
+                    print(message)
                 show_menu = False
             
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
             if keyboard_utils.check_key_event(key_event, AccountOptions.CHANGE_NAME.value):
-                self.change_name()
+                message = self.change_name()
                 show_menu = True
             
             if keyboard_utils.check_key_event(key_event, AccountOptions.BACK.value):
                 print("Back to main menu")
                 break           
     
-    def change_name(self) -> None:
+    def change_name(self) -> str:
         '''
             Handles logic of changing account name
         '''
+        terminal_clearing.clear_terminal()
         new_name: str = input("Enter new name: ")
         show_menu: bool = True
 
@@ -80,6 +84,7 @@ class Account:
 
         while True:
             if show_menu:
+                terminal_clearing.clear_terminal()
                 print("\nConfirm change?")
                 print("[Y] Yes [N] No")
                 show_menu = False
@@ -88,9 +93,7 @@ class Account:
 
             if keyboard_utils.check_key_event(key_event, Confirmation.YES.value):
                 self._name = new_name
-                print("Name changed successfully")
-                break
+                return "Name changed successfully"
         
             if keyboard_utils.check_key_event(key_event, Confirmation.NO.value):
-                print("Canceled name change")
-                break
+                return "Canceled name change"

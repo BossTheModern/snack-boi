@@ -12,7 +12,6 @@ from assets.levels.level import Level
 from assets.snacks.snack import Snack
 from assets.shop.shop_item import ShopItem
 from assets.enums.enums import Gamemodes, SnackTypes, MiscGameControls
-from boards.board_creator import draw_grid
 from boards.board import Board
 from account.account import Account
 

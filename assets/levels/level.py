@@ -14,9 +14,9 @@ class Level:
     _win_cap: int
     _reward: int
 
-    def __init__(self, level_name: str, level_board: Board, 
-                 unlocked: bool, selected: bool, cleared: bool, 
-                 win_cap: int, reward: int) -> None:
+    def __init__(self,  level_board: Board, level_name: str = "", 
+                 unlocked: bool = False, selected: bool = False, cleared: bool = False, 
+                 win_cap: int = 0, reward: int = 0) -> None:
         self._level_name = level_name
         self._level_board = level_board
         self._unlocked = unlocked

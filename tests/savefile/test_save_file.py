@@ -18,6 +18,7 @@ sys.path.insert(0, root_dir)
 from assets.save_file import SaveFile
 from assets.levels.levels import Levels
 from assets.levels.level import Level
+from assets.levels.levels_set import levels_set
 from account.account import Account
 from typing import List
 from io import StringIO
@@ -32,7 +33,7 @@ class TestSaveFile(unittest.TestCase):
         '''
         account: Account = Account()
         save_file: SaveFile = SaveFile(save_file_tests_path + "/test_save_normal.txt", account)
-        levels: List[Level] = copy.deepcopy(Levels._levels)
+        levels: List[Level] = copy.deepcopy(levels_set.get_items())
         save_file.load(levels)
         output: StringIO = mock_stdout.getvalue()
 
@@ -48,7 +49,7 @@ class TestSaveFile(unittest.TestCase):
         '''
         account: Account = Account()
         save_file: SaveFile = SaveFile(save_file_tests_path + "/test_save_invalid_format.txt", account)
-        levels: List[Level] = copy.deepcopy(Levels._levels)
+        levels: List[Level] = copy.deepcopy(levels_set.get_items())
         save_file.load(levels)
         output: StringIO = mock_stdout.getvalue()
 
@@ -63,7 +64,7 @@ class TestSaveFile(unittest.TestCase):
         '''
         account: Account = Account()
         save_file: SaveFile = SaveFile(save_file_tests_path + "/nonexistant.txt", account)
-        levels: List[Level] = copy.deepcopy(Levels._levels)
+        levels: List[Level] = copy.deepcopy(levels_set.get_items())
         save_file.load(levels)
         output: StringIO = mock_stdout.getvalue()
 
@@ -82,7 +83,7 @@ class TestSaveFile(unittest.TestCase):
 
         account: Account = Account()
         save_file: SaveFile = SaveFile(save_file_tests_path + "/test_new_save.txt", account)
-        levels: List[Level] = copy.deepcopy(Levels._levels)
+        levels: List[Level] = copy.deepcopy(levels_set.get_items())
         for i in range(expected_highest_unlocked):
             levels[i]._unlocked = True
         for i in range(expected_highest_cleared):
@@ -103,7 +104,7 @@ class TestSaveFile(unittest.TestCase):
         '''
         account: Account = Account()
         save_file: SaveFile = SaveFile(save_file_tests_path + "/test_deleted_save.txt", account)
-        levels: List[Level] = copy.deepcopy(Levels._levels)
+        levels: List[Level] = copy.deepcopy(levels_set.get_items())
         output: StringIO
 
         save_file.save(levels)

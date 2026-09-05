@@ -24,17 +24,16 @@ from assets.player import Player
 from assets.traps.traps import Trap
 from assets.traps.trap_types import HungerTrap, ParallelDimensionTrap
 from assets.powerups.recon_snack import ReconSnack
-from assets.printer.fancy_printer import FancyPrinter
-from assets.text_collection import TextCollection
 from assets.position.position2d import Position2D
 from assets.menu_front import MenuFront
 from account.account import Account
+from assets.levels.levels_set import levels_set
 from assets.shop.shop_item import ShopItem
 from assets.shop.shop_items import ShopItems
 from assets.enums.enums import MainMenuOptions, MovementKeys, Gamemodes, MiscGameControls, SnackTypes
 from boards.board import Board
-from utils.consts import EMPTY_SHOP_ITEM, PLAYER_ENTITY, SNACK_ENTITY
-import copy
+from utils.consts import EMPTY_SHOP_ITEM, PLAYER_ENTITY
+from utils import terminal_clearing
 
 
 # Game class where the game logic is implemented
@@ -49,9 +48,6 @@ class Game:
     
     # Powerup related properties
     _recon_snack: ReconSnack = ReconSnack()
-    
-    # Levels related properties
-    _levels: List[Level] = Levels._levels
 
     # Other properties
     _menu_front: MenuFront = MenuFront()
@@ -74,7 +70,7 @@ class Game:
 
     def clear_owned_items(self, game_mode: str, current_level_index: int) -> None:
         # Determine if usage of active powerup is complete
-        if game_mode == "classic" and self._snack._count >= self._levels[current_level_index]._win_cap and (self._active_shop_powerup.reached_usage_per_game() or self._active_shop_powerup._active):
+        if game_mode == "classic" and self._snack._count >= levels_set.get_at(current_level_index)._win_cap and (self._active_shop_powerup.reached_usage_per_game() or self._active_shop_powerup._active):
             self._active_shop_powerup.complete_usage()
         elif game_mode == "endless" and self._active_shop_powerup.reached_usage_per_game():
             self._active_shop_powerup.complete_usage()
@@ -117,7 +113,7 @@ class Game:
         intro_show_state: bool = True
         recon_duration: int = self._recon_snack._duration
         random_snack_type: SnackTypes
-        trap: Trap
+        trap: Trap | None
         occupied_positions: List[Position2D] = []
         levels_unlocked: int = 0
         hunger_traps: List[Trap] = []
@@ -130,7 +126,7 @@ class Game:
         # Eating flags for one time display
         recon_start_reached: bool = False
 
-        for level in self._levels:
+        for level in levels_set.get_items():
             if level._selected:
                 break
             current_level_index += 1
@@ -166,7 +162,7 @@ class Game:
             
             recon_start_reached = True
         
-        levels_unlocked = len([lvl for lvl in self._levels if lvl._unlocked == True])
+        levels_unlocked = len([lvl for lvl in levels_set.get_items() if lvl._unlocked == True])
 
         # Prompt user to choose a powerup if they have any
         if owned_powerups:
@@ -186,14 +182,15 @@ class Game:
                 intro_show_state = False
             
             # Handle win condition
-            if game_mode == Gamemodes.CLASSIC.value and self._snack._count >= self._levels[current_level_index]._win_cap:
-                self._game_utils.classic_game_win(current_level_index, self._levels, self._account)
+            if game_mode == Gamemodes.CLASSIC.value and self._snack._count >= levels_set.get_at(current_level_index)._win_cap:
+                self._game_utils.classic_game_win(current_level_index, levels_set.get_items(), self._account)
                 break
             
 
             if show_state:
+                terminal_clearing.clear_terminal()
                 self._game_utils.display_current_state(board, current_level_index, 
-                                                       self._levels, 
+                                                       levels_set.get_items(), 
                                                        game_mode, self._current_snack._type, 
                                                        recon_duration, self._recon_snack._active,
                                                        self._active_shop_powerup)
@@ -306,7 +303,7 @@ class Game:
                         traps.remove(trap)
                         occupied_positions.remove(trap._position)
                         self._game_utils._parallel_trap_eaten = True
-                    case _: print("No type found")                
+                    case _: print("No type found")        
         
         self.clear_owned_items(game_mode, current_level_index)
         self.clear_game_data()
@@ -320,7 +317,7 @@ class Game:
         show_menu: bool = True
 
         self.menu.print_welcome_screen()
-        self._save_file.load(self._levels)
+        self._save_file.load(levels_set.get_items())
 
         if self._account._name == "":
             self.menu.prompt_name()
@@ -330,13 +327,14 @@ class Game:
         # Main menu loop
         while True:
             if show_menu:
+                terminal_clearing.clear_terminal()
                 self._menu_front.print_game_menu()
                 show_menu = False
 
             key_event = keyboard.read_event(suppress=True)
 
             if keyboard_utils.check_key_event(key_event, MainMenuOptions.START_GAME.value):
-                self.menu.mode_selection_menu(self._levels)
+                self.menu.mode_selection_menu(levels_set.get_items())
                 show_menu = True
             elif keyboard_utils.check_key_event(key_event, MainMenuOptions.SHOP_MENU.value):
                 self.menu.shop_menu()
@@ -345,7 +343,7 @@ class Game:
                 self._account.account_display()
                 show_menu = True
             elif keyboard_utils.check_key_event(key_event, MainMenuOptions.OPTIONS.value):
-                self.menu.game_options(self._levels, self._save_file)
+                self.menu.game_options(levels_set.get_items(), self._save_file)
                 show_menu = True
             elif keyboard_utils.check_key_event(key_event, MainMenuOptions.VERSION_LOG.value):
                 self.menu.version_log()
@@ -353,4 +351,4 @@ class Game:
             elif keyboard_utils.check_key_event(key_event, MainMenuOptions.QUIT.value):
                 break
         
-        self._save_file.save_prompt(key_event, self._levels) if not self._save_file._already_saved else None
+        self._save_file.save_prompt(key_event, levels_set.get_items()) if not self._save_file._already_saved else None
