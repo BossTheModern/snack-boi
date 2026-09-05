@@ -38,23 +38,6 @@ class Doubler(ShopItem):
             
             if self._active_duration == 0:
                 self.deactivate()
-
-    def activate(self) -> None:
-        '''
-            Activates doubler effect
-        '''
-        if self.reached_usage_per_game():
-            print(f"Maximum number of uses per game ({self._use_limit}) reached.")
-        else:
-            self._active = True
-            self._active_duration = self._duration
-    
-    def deactivate(self) -> None:
-        '''
-            Deactivates doubler effect
-        '''
-        self._active = False
-        self._use_count += 1
     
     def reset(self) -> None:
         self._use_count = 0
