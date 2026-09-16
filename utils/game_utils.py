@@ -27,6 +27,7 @@ class GameUtils:
           self._snack_eaten: bool = False
           self._fake_snack_eaten: bool = False
           self._super_snack_eaten: bool = False
+          self._protected: bool = False
           self._fancy_print: FancyPrinter = FancyPrinter()
           self._text_collection: TextCollection = TextCollection()
 
@@ -94,6 +95,9 @@ class GameUtils:
         if self._super_snack_eaten:
             print("Yum! That one was delicious!")
             self._super_snack_eaten = False
+
+        if self._protected:
+            print("Shield blocked a trap!")
     
     def clear_toggle_text(self) -> None:
         '''
