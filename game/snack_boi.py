@@ -347,7 +347,7 @@ class Game:
             key_event = keyboard.read_event(suppress=True)
 
             if keyboard_utils.check_key_event(key_event, MainMenuOptions.START_GAME.value):
-                self.menu.mode_selection_menu(levels_set.get_items())
+                self.menu.mode_selection_menu()
                 show_menu = True
             elif keyboard_utils.check_key_event(key_event, MainMenuOptions.SHOP_MENU.value):
                 self.menu.shop_menu()

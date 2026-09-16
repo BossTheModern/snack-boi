@@ -76,7 +76,7 @@ class Menu:
                 return level
         
 
-    def mode_selection_menu(self, levels: List[Level]) -> None:
+    def mode_selection_menu(self) -> None:
         '''
             Logic for handling mode selection and displaying its menu
         '''
@@ -91,11 +91,11 @@ class Menu:
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
 
             if keyboard_utils.check_key_event(key_event, ModeSelection.CLASSIC_MODE.value):
-                self.levels_menu(levels, Gamemodes.CLASSIC.value)
+                self.levels_menu(Gamemodes.CLASSIC.value)
                 show_menu = True
                 break
             elif keyboard_utils.check_key_event(key_event, ModeSelection.ENDLESS_MODE.value):
-                self.levels_menu(levels, Gamemodes.ENDLESS.value)
+                self.levels_menu(Gamemodes.ENDLESS.value)
                 show_menu = True
                 break
             elif keyboard_utils.check_key_event(key_event, ModeSelection.BACK.value):
@@ -235,7 +235,7 @@ class Menu:
 
         return current_page_index
 
-    def levels_menu(self, levels: List[Level], mode: str) -> None:
+    def levels_menu(self, mode: str) -> None:
         '''
             Logic for handling endless levels navigation and selection
         '''
