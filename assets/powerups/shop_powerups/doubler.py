@@ -17,7 +17,6 @@ class Doubler(ShopItem):
         super().__init__('Doubler', 10, textwrap.fill('Doubles points earned from eating snacks', width=40), SHOP_ITEM_LIMIT)
         self._active: bool = False
         self._duration: int = 3 # Duration in number of snacks eaten
-        self._active_duration: int = 0
         self._use_limit: int = 1 
         self._use_count: int = 0
     
@@ -34,7 +33,6 @@ class Doubler(ShopItem):
                 case SnackTypes.SUPER.value: 
                     snack._count += 2 * SUPER_SNACK_POINTS
                     self._active_duration -= 1
-
             
             if self._active_duration == 0:
                 self.deactivate()

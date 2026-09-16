@@ -16,7 +16,6 @@ class Radar(ShopItem):
         super().__init__('Radar', 15, textwrap.fill('Tell the player if there are traps nearby', width=50), SHOP_ITEM_LIMIT)
         self._active: bool = False
         self._duration: int = 3 # Duration in number of snacks eaten
-        self._active_duration: int = 0
         self._use_limit: int = 1 
         self._use_count: int = 0
         self._revealed_traps: List[Trap] = []

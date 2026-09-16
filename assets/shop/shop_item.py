@@ -13,6 +13,7 @@ class ShopItem:
         self._stock: int = 0
         self._use_count: int = 0
         self._use_limit: int = 1
+        self._active_duration: int = 0
         self._active: bool = False
         self._duration: int = 3 # Standard duration of number of triggers
     
@@ -35,6 +36,9 @@ class ShopItem:
 
     def complete_usage(self) -> None:
         self._stock -= 1
+
+    def reduce_duration(self) -> None:
+        self._active_duration -= 1
 
     def reached_usage_per_game(self) -> bool:
         return self._use_count == self._use_limit
