@@ -18,6 +18,7 @@ import copy
 from boards.grid_collection import empty_grid
 from boards.board_creator import OBSTACLE_CHAR
 from assets.printer.fancy_printer import FancyPrinter
+from utils import terminal_clearing
 from assets.snacks.snack import Snack
 from boards.board import Board
 
@@ -96,12 +97,13 @@ class ParallelDimensionTrap(Trap):
         # Parallel dimension loop
         while True:
             if show_board:
+                terminal_clearing.clear_terminal()
                 self.print_parallel_dimension()
                 show_board = False
             
             if not printed_dialogue and game_mode == Gamemodes.CLASSIC.value:
                 show_initial_dialogue()
-                printed_dialogue = True    
+                printed_dialogue = True
             
             if found_trigger:
                 print("Ah, there's the exit!")
