@@ -98,7 +98,6 @@ class Game:
 
     def activate_parallel_trap(self, parallel_trap: ParallelDimensionTrap, game_mode: str) -> None:
             parallel_trap.teleport_player(game_mode)
-        
     
     def game_loop(self, board: Board, game_mode: str) -> None:
         '''
@@ -111,6 +110,7 @@ class Game:
         key_event: KeyboardEvent
         show_state: bool = True
         intro_show_state: bool = True
+        shield_used: bool = False
         recon_duration: int = self._recon_snack._duration
         random_snack_type: SnackTypes
         trap: Trap | None
@@ -185,7 +185,6 @@ class Game:
             if game_mode == Gamemodes.CLASSIC.value and self._snack._count >= levels_set.get_at(current_level_index)._win_cap:
                 self._game_utils.classic_game_win(current_level_index, levels_set.get_items(), self._account)
                 break
-            
 
             if show_state:
                 terminal_clearing.clear_terminal()
@@ -209,7 +208,7 @@ class Game:
                 self._active_shop_powerup.activate()
                 show_state = True
             
-
+            # Handle player movement
             if key_event.event_type == keyboard.KEY_DOWN and key_event.name in MovementKeys._value2member_map_:
                 self._player.move_player(key_event, board, OBSTACLE_CHAR, self._player._position)
 
@@ -287,11 +286,18 @@ class Game:
                 self._recon_snack.reveal_position(board, traps)
                 self._game_utils._traps_revealed = True
                 occupied_positions.remove(self._recon_snack._position)
-            
+
             # Handle player eating any trap
             trap = next((t for t in traps if t._position == self._player._position), None)
-            if trap:
+
+            # lower shield duration only when player is not in the same space as trap
+            if not trap and self._active_shop_powerup._name == "Shield" and self._active_shop_powerup._active:
+                self._active_shop_powerup.use()
+                self._game_utils._protected = False
+
+            if trap and not (self._active_shop_powerup._name == "Shield" and self._active_shop_powerup._active):
                 # Check type and activate accordingly
+                # solution to prevent trap to still activate upon final shield usage
                 match trap._type:
                     case 'hunger': 
                         occupied_positions.remove(trap._position)
@@ -303,7 +309,14 @@ class Game:
                         traps.remove(trap)
                         occupied_positions.remove(trap._position)
                         self._game_utils._parallel_trap_eaten = True
-                    case _: print("No type found")        
+                    case _: print("No type found")
+            elif trap and self._active_shop_powerup._name == "Shield" and self._active_shop_powerup._active:
+                self._active_shop_powerup.protect()
+                self._game_utils._protected = True
+
+            # Shield should always protect when on same space as trap and shield is active, only count down once the player is no 
+            # longer in the same space as shield
+                    
         
         self.clear_owned_items(game_mode, current_level_index)
         self.clear_game_data()
