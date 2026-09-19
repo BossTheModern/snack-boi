@@ -110,7 +110,6 @@ class Game:
         key_event: KeyboardEvent
         show_state: bool = True
         intro_show_state: bool = True
-        shield_used: bool = False
         recon_duration: int = self._recon_snack._duration
         random_snack_type: SnackTypes
         trap: Trap | None
