@@ -10,7 +10,7 @@ from utils.consts import PAGE_SIZE
 from assets.collection.collection import Collection
 
 class ShopItems(Collection):
-    def __init__(self, items: List[ShopItem] = []) -> None:
+    def __init__(self, items: List[ShopItem] | None = None) -> None:
         super().__init__(items, page_size = PAGE_SIZE)
 
     def paginate(self) -> List[ShopItems]:

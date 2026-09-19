@@ -7,8 +7,8 @@
 from typing import List, Any
 
 class Collection:
-    def __init__(self, items: List[Any] = [], page_size: int = 5) -> None:
-        self._items: List[Any] = items
+    def __init__(self, items: List[Any] | None = None, page_size: int = 5) -> None:
+        self._items: List[Any] = [] if items is None else items
         self._page_size: int = page_size
 
     def get_items(self) -> List[Any]:
