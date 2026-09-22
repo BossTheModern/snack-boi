@@ -79,7 +79,7 @@ class Board:
                 return
             self._board[row-1][col-1 + i] = char
 
-    def add_obstacle(self, row: int, col: int, char: str) -> None:
+    def add_at(self, row: int, col: int, char: str) -> None:
         '''
             Adds an obstacle to the specified position on the board
         '''
