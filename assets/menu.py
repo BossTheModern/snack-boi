@@ -251,7 +251,7 @@ class Menu:
         changed_page: bool = False
         
 
-        # set level index
+        # finding current page index based on multiple pages
         for level in levels_set.get_items():
             if level._selected:
                 break
@@ -302,7 +302,7 @@ class Menu:
                 current_page = pages[current_page_index]
                 previous_page = pages[previous_page_index]
 
-                # Properly set the first level of the new page to be selected if the user navigates to a new page the first time
+            # Properly set selection upon page change
             if current_page_index != previous_page_index:
                 if current_page_index > previous_page_index:
                     previous_page[-1]._selected = False
