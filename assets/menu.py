@@ -32,6 +32,7 @@ class Menu:
     _menu_front: MenuFront = MenuFront()
     _shop: Shop = Shop()
     _account: Account
+    _page_size: int = 15
     
     _fancy_print: FancyPrinter = FancyPrinter()
 
@@ -244,14 +245,29 @@ class Menu:
         show_menu: bool = True
 
         pages: List[List[Level]] = levels_set.paginate()
+        marked_level_index: int = 0
         current_page_index: int = 0
         previous_page_index: int = current_page_index
+        changed_page: bool = False
+        
+
+        # set level index
+        for level in levels_set.get_items():
+            if level._selected:
+                break
+            marked_level_index += 1
+
+        current_page_index = marked_level_index // self._page_size
+        previous_page_index = current_page_index
         current_page: List[Level] = pages[current_page_index]
+        previous_page: List[Level] = current_page
+        
 
         while True:
             if show_menu:
                 terminal_clearing.clear_terminal()
                 self._menu_front.print_levels_menu(current_page, mode)
+                print(current_page_index)
                 show_menu = False
 
             key_event: KeyboardEvent = keyboard.read_event(suppress=True)
@@ -284,12 +300,19 @@ class Menu:
             if keyboard_utils.check_key_event(key_event, StdNavigationOptions.LEFT.value) or keyboard_utils.check_key_event(key_event, StdNavigationOptions.RIGHT.value):
                 current_page_index = self.navigate_selection(key_event, current_page, current_page_index)
                 current_page = pages[current_page_index]
+                previous_page = pages[previous_page_index]
 
                 # Properly set the first level of the new page to be selected if the user navigates to a new page the first time
+            if current_page_index != previous_page_index:
                 if current_page_index > previous_page_index:
+                    previous_page[-1]._selected = False
                     current_page[0]._selected = True
-                    previous_page_index = current_page_index
-                show_menu = True
+                elif current_page_index < previous_page_index:
+                    previous_page[0]._selected = False
+                    current_page[-1]._selected = True
+                previous_page_index = current_page_index
+
+            show_menu = True
 
     def shop_menu(self) -> None:
         '''

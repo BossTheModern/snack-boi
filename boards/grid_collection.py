@@ -330,4 +330,4 @@ square_obstacle_grid_25.add_obstacles_horizontally(6, 7, 4, OBSTACLE_CHAR)
 square_obstacle_grid_25.add_at(2, 5, TELEPORT_POD_ENTITY)
 square_obstacle_grid_25.add_at(9, 6, TELEPORT_POD_ENTITY)
 
-square_obstacle_grid_25.display()
+# square_obstacle_grid_25.display()
